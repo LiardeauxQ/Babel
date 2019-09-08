@@ -7,26 +7,34 @@
 
 #include "portaudio.h"
 #include <exception>
+#include <memory>
+#include <vector>
 
 class AudioController {
 public:
-    AudioController();
-    ~AudioController();
+  // Initialize the AudioController can fail and throw `AudioControllerError`.
+  AudioController();
+  ~AudioController();
 
-    void chooseDevice();
+  // Get number version of the program.
+  static int getVersion();
 
-private:
+  // Get text version of the program.
+  static std::string getTextVersion();
 
+  [[nodiscard]] std::vector<const PaDeviceInfo *> getDevicesInfo() const;
+
+  void chooseDevice();
 };
 
 class AudioControllerError : std::exception {
 public:
-    AudioControllerError(int error);
+  explicit AudioControllerError(int error);
 
-    const char *what() const noexcept;
+  [[nodiscard]] const char *what() const noexcept final;
 
 private:
-    int error_;
+  int error_;
 };
 
-#endif //BABEL_AUDIO_HPP
+#endif // BABEL_AUDIO_HPP

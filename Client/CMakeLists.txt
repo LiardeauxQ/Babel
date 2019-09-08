@@ -14,6 +14,8 @@ add_executable(babel-client
         main.cpp
         AudioController.cpp
         AudioController.hpp
+		SoundStream.cpp
+		SoundStream.hpp
 )
 
 find_package(portaudio)
@@ -22,8 +24,7 @@ find_package(boost)
 find_package(sqlite3)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-target_link_libraries(babel-client portaudio::portaudio opus::opus boost::boost sqlite3::sqlite3)
-target_link_libraries(babel-client Qt5::Widgets)
+target_link_libraries(babel-client portaudio::portaudio opus::opus boost::boost sqlite3::sqlite3 Qt5::Widgets)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	target_link_libraries(babel-client jack asound)

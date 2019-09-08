@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/alex/.conan/data/portaudio/v190600.20161030/bincrafters/stable/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include/portaudio.h
+
+/home/alex/Epitech/Cpp/babel/Client/AudioController.hpp
+portaudio.h
+/home/alex/Epitech/Cpp/babel/Client/portaudio.h
+exception
+-
+memory
+-
+vector
+-
+
+/home/alex/Epitech/Cpp/babel/Client/SoundStream.cpp
+SoundStream.hpp
+/home/alex/Epitech/Cpp/babel/Client/SoundStream.hpp
+AudioController.hpp
+/home/alex/Epitech/Cpp/babel/Client/AudioController.hpp
+
+/home/alex/Epitech/Cpp/babel/Client/SoundStream.hpp
+portaudio.h
+/home/alex/Epitech/Cpp/babel/Client/portaudio.h
+string
+-
+iostream
+-
+
