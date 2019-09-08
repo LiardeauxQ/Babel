@@ -29,3 +29,34 @@ SoundStream::SoundStream(double sampleRate, int numInputChannels,
 }
 
 SoundStream::~SoundStream() { Pa_CloseStream(stream_); }
+
+void SoundStream::start() const {
+  int error = Pa_StartStream(stream_);
+
+  if (error != paNoError)
+    throw AudioControllerError(error);
+}
+
+void SoundStream::stop() const {
+  int error = Pa_StopStream(stream_);
+
+  if (error != paNoError)
+    throw AudioControllerError(error);
+}
+
+bool SoundStream::isActive() const { return Pa_IsStreamActive(stream_); }
+
+void SoundStream::abort() const {
+  int error = Pa_AbortStream(stream_);
+
+  if (error != paNoError)
+    throw AudioControllerError(error);
+}
+
+const PaStreamInfo *SoundStream::info() const {
+  return Pa_GetStreamInfo(stream_);
+}
+
+double SoundStream::getCPULoad() const {
+  return Pa_GetStreamCpuLoad(stream_);
+}

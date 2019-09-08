@@ -18,6 +18,13 @@ public:
 
   ~SoundStream();
 
+  void start() const;
+  void stop() const;
+  void abort() const;
+  [[nodiscard]] bool isActive() const;
+  [[nodiscard]] const PaStreamInfo *info() const;
+  [[nodiscard]] double getCPULoad() const;
+
 private:
   PaStream *stream_;
   std::string name_;
