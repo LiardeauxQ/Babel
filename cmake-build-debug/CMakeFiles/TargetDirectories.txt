@@ -1,4 +1,0 @@
-/home/alex/Epitech/Cpp/babel/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/alex/Epitech/Cpp/babel/cmake-build-debug/CMakeFiles/babel.dir
-/home/alex/Epitech/Cpp/babel/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/alex/Epitech/Cpp/babel/cmake-build-debug/CMakeFiles/babel_autogen.dir

@@ -1,3 +1,0 @@
-# Babel
-
-SIP based VOIP

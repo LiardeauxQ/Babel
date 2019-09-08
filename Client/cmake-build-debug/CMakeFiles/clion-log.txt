@@ -1,0 +1,19 @@
+/home/alex/bin/Programs/clion-2019.2.1/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/alex/Epitech/Cpp/babel/Client
+CMake Error at CMakeLists.txt:5 (include):
+  include could not find load file:
+
+    /home/alex/Epitech/Cpp/babel/Client/cmake-build-debug/conanbuildinfo.cmake
+
+
+CMake Error at CMakeLists.txt:6 (include):
+  include could not find load file:
+
+    /home/alex/Epitech/Cpp/babel/Client/cmake-build-debug/conan_paths.cmake
+
+
+CMake Error at CMakeLists.txt:7 (conan_basic_setup):
+  Unknown CMake command "conan_basic_setup".
+
+
+-- Configuring incomplete, errors occurred!
+See also "/home/alex/Epitech/Cpp/babel/Client/cmake-build-debug/CMakeFiles/CMakeOutput.log".
