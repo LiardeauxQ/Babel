@@ -17,7 +17,6 @@ AudioController::AudioController() {
 
   handleError(error);
 
-
   handleError(error);
 }
 
@@ -38,6 +37,18 @@ void AudioController::chooseDevice() {
   std::cout << "Changing device." << std::endl;
 }
 
+const PaDeviceInfo *AudioController::getDefaultInputDevice() const {
+  int idx = Pa_GetDefaultInputDevice();
+
+  return Pa_GetDeviceInfo(idx);
+}
+
+const PaDeviceInfo *AudioController::getDefaultOutputDevice() const {
+  int idx = Pa_GetDefaultOutputDevice();
+
+  return Pa_GetDeviceInfo(idx);
+}
+
 int AudioController::getVersion() { return Pa_GetVersion(); }
 
 std::string AudioController::getTextVersion() {
@@ -55,8 +66,25 @@ std::vector<const PaDeviceInfo *> AudioController::getDevicesInfo() const {
   return devices;
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "MemberFunctionCanBeStatic"
+SoundStream AudioController::createStreamFromDevice(const PaDeviceInfo *dev,
+                                                    PaStreamCallback *callback,
+                                                    void *linkedData,
+                                                    std::string name) {
+  return SoundStream(dev->defaultSampleRate, dev->maxInputChannels,
+                     dev->maxOutputChannels, paFloat32,
+                     1024, callback, linkedData, //TODO Change framePerBuffer
+                     std::move(name));
+}
+#pragma clang diagnostic pop
+
 const char *AudioControllerError::what() const noexcept {
   return Pa_GetErrorText(error_);
+}
+
+void AudioController::sleep(long ms) {
+  Pa_Sleep(ms);
 }
 
 AudioControllerError::AudioControllerError(int error) : error_(error) {}

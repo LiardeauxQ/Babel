@@ -5,6 +5,7 @@
 #ifndef BABEL_AUDIO_HPP
 #define BABEL_AUDIO_HPP
 
+#include "SoundStream.hpp"
 #include "portaudio.h"
 #include <exception>
 #include <memory>
@@ -25,6 +26,15 @@ public:
   [[nodiscard]] std::vector<const PaDeviceInfo *> getDevicesInfo() const;
 
   void chooseDevice();
+
+  SoundStream createStreamFromDevice(const PaDeviceInfo *dev,
+                                     PaStreamCallback *callback,
+                                     void *linkedData, std::string name);
+
+  [[nodiscard]] const PaDeviceInfo *getDefaultInputDevice() const;
+  [[nodiscard]] const PaDeviceInfo *getDefaultOutputDevice() const;
+
+  void sleep(long ms);
 };
 
 class AudioControllerError : std::exception {
