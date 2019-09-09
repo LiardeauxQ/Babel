@@ -7,12 +7,6 @@
 #include "AudioController.hpp"
 #include <utility>
 
-int callBack(const void *input, void *output, unsigned long frameCount,
-             const PaStreamCallbackTimeInfo *timeInfo,
-             PaStreamCallbackFlags statusFlags, void *userData) {
-  std::cout << "Callback" << std::endl;
-  return 1;
-}
 
 SoundStream::SoundStream(double sampleRate, int numInputChannels,
                          int numOutputChannels, PaSampleFormat sampleFormat,
@@ -26,6 +20,12 @@ SoundStream::SoundStream(double sampleRate, int numInputChannels,
 
   if (error != paNoError)
     throw AudioControllerError(error);
+}
+
+int SoundStream::setFinishCallback(PaStreamFinishedCallback *finishCallback) {
+  int error = Pa_SetStreamFinishedCallback(stream_, finishCallback);
+
+  throw AudioControllerError(error);
 }
 
 SoundStream::~SoundStream() { Pa_CloseStream(stream_); }
@@ -57,6 +57,4 @@ const PaStreamInfo *SoundStream::info() const {
   return Pa_GetStreamInfo(stream_);
 }
 
-double SoundStream::getCPULoad() const {
-  return Pa_GetStreamCpuLoad(stream_);
-}
+double SoundStream::getCPULoad() const { return Pa_GetStreamCpuLoad(stream_); }

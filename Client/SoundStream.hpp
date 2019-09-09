@@ -28,6 +28,7 @@ public:
 private:
   PaStream *stream_;
   std::string name_;
+  int setFinishCallback(PaStreamFinishedCallback *finishCallback);
 };
 
 #endif // BABEL_CLIENT_SOUNDSTREAM_HPP
