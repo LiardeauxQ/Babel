@@ -1,4 +1,0 @@
-/home/alex/Epitech/Cpp/babel/Client/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/alex/Epitech/Cpp/babel/Client/cmake-build-debug/CMakeFiles/babel-client.dir
-/home/alex/Epitech/Cpp/babel/Client/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/alex/Epitech/Cpp/babel/Client/cmake-build-debug/CMakeFiles/babel-client_autogen.dir

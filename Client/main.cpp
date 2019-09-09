@@ -5,15 +5,15 @@
 #include "AudioController.hpp"
 #include "SoundStream.hpp"
 #include <iostream>
+#include <random>
 
 int callBack(const void *input, void *output, unsigned long frameCount,
              const PaStreamCallbackTimeInfo *timeInfo,
              PaStreamCallbackFlags statusFlags, void *userData) {
   auto *testOutput = static_cast<float *>(output);
 
-  for (unsigned long i = 0; i < frameCount; i += 2) {
-    testOutput[i] = 100.0;
-    testOutput[i + 1] = -2.0;
+  for (unsigned long i = 0; i < frameCount; i++) {
+    testOutput[i] = 1.0;
   }
 
   return paContinue;
