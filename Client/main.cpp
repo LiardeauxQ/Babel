@@ -9,14 +9,11 @@
 int callBack(const void *input, void *output, unsigned long frameCount,
              const PaStreamCallbackTimeInfo *timeInfo,
              PaStreamCallbackFlags statusFlags, void *userData) {
-  const auto *testInput = static_cast<const float *>(input);
   auto *testOutput = static_cast<float *>(output);
 
-  std::cout << "Actual time: " << timeInfo->currentTime << std::endl;
-
   for (unsigned long i = 0; i < frameCount; i += 2) {
-    testOutput[i] = 1.0;
-    testOutput[i + 1] = -1.0;
+    testOutput[i] = 100.0;
+    testOutput[i + 1] = -2.0;
   }
 
   return paContinue;
@@ -28,10 +25,20 @@ int main(int argc, char *argv[]) {
 
     auto defaultDevice = audioController.getDefaultOutputDevice();
 
-    std::cout << "Name: " << defaultDevice->name << std::endl;
+    if (!defaultDevice) {
+      std::cerr << "No default device" << std::endl;
+      return 1;
+    }
 
-    auto stream = audioController.createStreamFromDevice(
-        defaultDevice, callBack, nullptr, "Default input stream.");
+    PaStreamParameters out;
+    out.device = audioController.getDefaultOutputId();
+    out.channelCount = 2;
+    out.sampleFormat = paFloat32;
+    out.suggestedLatency = defaultDevice->defaultLowOutputLatency;
+    out.hostApiSpecificStreamInfo = nullptr;
+
+    auto stream = audioController.createStream(&out, nullptr, callBack, nullptr,
+                                               paNoFlag, "Complex stream.");
 
     stream.start();
 
@@ -40,5 +47,7 @@ int main(int argc, char *argv[]) {
     stream.stop();
   } catch (const AudioControllerError &e) {
     std::cerr << "Cannot create controller " << e.what() << std::endl;
+    return 1;
   };
+  return 0;
 }
