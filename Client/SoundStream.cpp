@@ -7,7 +7,6 @@
 #include "AudioController.hpp"
 #include <utility>
 
-
 SoundStream::SoundStream(double sampleRate, int numInputChannels,
                          int numOutputChannels, PaSampleFormat sampleFormat,
                          unsigned long framesPerBuffer,
@@ -58,3 +57,17 @@ const PaStreamInfo *SoundStream::info() const {
 }
 
 double SoundStream::getCPULoad() const { return Pa_GetStreamCpuLoad(stream_); }
+
+SoundStream::SoundStream(PaStreamParameters *outputStream,
+                         PaStreamParameters *inputStream,
+                         double sampleParameter, unsigned long framePerBuffer,
+                         PaStreamFlags streamFlags, PaStreamCallback *callback,
+                         void *userData, std::string name)
+    : stream_(nullptr), name_(std::move(name)) {
+  int error =
+      Pa_OpenStream(&stream_, inputStream, outputStream, sampleParameter,
+                    framePerBuffer, streamFlags, callback, userData);
+
+  if (error != paNoError)
+    throw AudioControllerError(error);
+}

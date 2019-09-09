@@ -16,7 +16,14 @@ public:
               PaStreamCallback *streamCallback, void *linkedData,
               std::string name);
 
+  SoundStream(PaStreamParameters *outputStream,
+              PaStreamParameters *inputStream, double sampleParameter,
+              unsigned long framePerBuffer, PaStreamFlags streamFlags,
+              PaStreamCallback *callback, void *userData, std::string name);
+
   ~SoundStream();
+
+  int setFinishCallback(PaStreamFinishedCallback *finishCallback);
 
   void start() const;
   void stop() const;
@@ -28,7 +35,6 @@ public:
 private:
   PaStream *stream_;
   std::string name_;
-  int setFinishCallback(PaStreamFinishedCallback *finishCallback);
 };
 
 #endif // BABEL_CLIENT_SOUNDSTREAM_HPP
