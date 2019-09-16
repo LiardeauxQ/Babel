@@ -11,6 +11,9 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
     set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
 endif()
 
+include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
+message("HOME DIRECTORY ${CMAKE_HOME_DIRECTORY}")
+
 set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 
 set(SERVER_PATH "${CMAKE_SOURCE_DIR}/Server")
@@ -29,6 +32,10 @@ set(BABEL_CLIENT
     ${CLIENT_PATH}/AudioController.hpp
     ${CLIENT_PATH}/SoundStream.cpp
     ${CLIENT_PATH}/SoundStream.hpp
+	${CLIENT_PATH}/OggReader.cpp
+	${CLIENT_PATH}/OggReader.hpp
+	${CLIENT_PATH}/ISoundFormatReader.cpp
+	${CLIENT_PATH}/ISoundFormatReader.hpp
 )
 
 set(BABEL_COMMON

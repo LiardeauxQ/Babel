@@ -7,8 +7,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
+message("HOME DIRECTORY ${CMAKE_HOME_DIRECTORY}")
+
 set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
-message(${CMAKE_BINARY_DIR})
 
 add_executable(babel-client
         main.cpp

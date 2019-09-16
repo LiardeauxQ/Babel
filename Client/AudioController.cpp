@@ -67,8 +67,8 @@ SoundStream AudioController::createDefaultStreamFromDevice(
     const PaDeviceInfo *dev, PaStreamCallback *callback, void *linkedData,
     const std::string &name) {
   return SoundStream(dev->defaultSampleRate, dev->maxInputChannels,
-                     dev->maxOutputChannels, paFloat32, FRAME_PER_BUFFER,
-                     callback, linkedData,
+                     dev->maxOutputChannels, paFloat32,
+                     paFramesPerBufferUnspecified, callback, linkedData,
                      name); // TODO Change framePerBuffer
 }
 
@@ -79,8 +79,9 @@ SoundStream AudioController::createStream(PaStreamParameters *outputStream,
                                           PaStreamCallback *callback,
                                           void *userData, PaStreamFlags flags,
                                           const std::string &name) {
-  return SoundStream(outputStream, inputStream, SAMPLE_RATE, FRAME_PER_BUFFER,
-                     flags, callback, userData, name);
+  return SoundStream(outputStream, inputStream, SAMPLE_RATE,
+                     paFramesPerBufferUnspecified, flags, callback, userData,
+                     name);
 }
 
 int AudioController::getDefaultOutputId() const {

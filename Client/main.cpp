@@ -4,25 +4,25 @@
 
 #include "AudioController.hpp"
 #include "SoundStream.hpp"
+#include <cstring>
+#include <fstream>
 #include <iostream>
 #include <random>
+
+struct UserData {
+  char *data;
+  unsigned long offset;
+};
 
 int callBack(const void *input, void *output, unsigned long frameCount,
              const PaStreamCallbackTimeInfo *timeInfo,
              PaStreamCallbackFlags statusFlags, void *userData) {
-  auto *testOutput = static_cast<float *>(output);
-
-  for (unsigned long i = 0; i < frameCount; i++) {
-    testOutput[i] = 1.0;
-  }
-
-  return paContinue;
+  return paComplete;
 }
 
 int main(int argc, char *argv[]) {
   try {
     AudioController audioController;
-
     auto defaultDevice = audioController.getDefaultOutputDevice();
 
     if (!defaultDevice) {
@@ -42,7 +42,9 @@ int main(int argc, char *argv[]) {
 
     stream.start();
 
-    audioController.sleep(100000);
+    while (stream.isActive()) {
+      audioController.sleep(1000);
+    }
 
     stream.stop();
   } catch (const AudioControllerError &e) {
