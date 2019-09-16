@@ -1,13 +1,18 @@
 //
-// Created by alex on 9/16/19.
+// Created by Alexandre Fourcat on 9/16/19.
 //
 
 #ifndef BABEL_COMMON_PROTOCOL_H
 #define BABEL_COMMON_PROTOCOL_H
 
+// Should be updated at each modification.
+#define VERSION 0x01
+
+// 1 if the request id come from the server.
+#define IS_SERVER_REQUEST(x) ((x) & 0b10000000)
 
 // This is the final data structure send through internet during the client/server communication.
-struct request {
+typedef struct {
     // Defined by CLIENT_REQ_ID if it's a client request. SERVER_REQ_ID otherwise.
     int id;
 
@@ -16,9 +21,8 @@ struct request {
 
     // The request payload.
     void *payload;
-};
+} request_t;
 
-#define IS_SERVER_REQUEST(x) ((x) & 0b10000000)
 
 /// Client's request id.
 enum CLIENT_REQ_ID {
