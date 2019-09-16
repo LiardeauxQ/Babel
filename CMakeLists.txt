@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.14.5)
 project(babel-client)
 project(babel-server)
 
+add_definitions(-D BOOST_TEST_DYN_LINK)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -32,10 +34,6 @@ set(BABEL_CLIENT
     ${CLIENT_PATH}/AudioController.hpp
     ${CLIENT_PATH}/SoundStream.cpp
     ${CLIENT_PATH}/SoundStream.hpp
-	${CLIENT_PATH}/OggReader.cpp
-	${CLIENT_PATH}/OggReader.hpp
-	${CLIENT_PATH}/ISoundFormatReader.cpp
-	${CLIENT_PATH}/ISoundFormatReader.hpp
 )
 
 set(BABEL_COMMON
