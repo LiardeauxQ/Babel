@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+    set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 
