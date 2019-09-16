@@ -25,22 +25,22 @@ public:
 
   [[nodiscard]] std::vector<const PaDeviceInfo *> getDevicesInfo() const;
 
-  SoundStream createDefaultStreamFromDevice(const PaDeviceInfo *dev,
-                                            PaStreamCallback *callback,
-                                            void *linkedData,
-                                            const std::string &name);
+    SoundStream createStream(const PaDeviceInfo *dev,
+                             PaStreamCallback *callback,
+                             void *linkedData,
+                             const std::string &name);
 
-  SoundStream createStream(PaStreamParameters *outputStream,
-                           PaStreamParameters *inputStream,
-                           PaStreamCallback *callback, void *userData,
-                           PaStreamFlags flags, const std::string &name);
+    SoundStream createCustomStream(PaStreamParameters *outputStream,
+                                   PaStreamParameters *inputStream,
+                                   PaStreamCallback *callback, void *userData,
+                                   PaStreamFlags flags, const std::string &name);
 
   [[nodiscard]] const PaDeviceInfo *getDefaultInputDevice() const;
   [[nodiscard]] const PaDeviceInfo *getDefaultOutputDevice() const;
   [[nodiscard]] int getDefaultOutputId() const;
   [[nodiscard]] int getDefaultInputId() const;
 
-  void sleep(long ms);
+  inline void sleep(long ms) { Pa_Sleep(ms); }
 };
 
 class AudioControllerError : std::exception {

@@ -10,46 +10,105 @@
 #include <random>
 
 struct UserData {
-  char *data;
-  unsigned long offset;
+    char *data;
+    unsigned long offset;
 };
+
+float CubicAmplifier( float input )
+{
+    float output, temp;
+    if( input < 0.0 )
+    {
+        temp = input + 1.0f;
+        output = (temp * temp * temp) - 1.0f;
+    }
+    else
+    {
+        temp = input - 1.0f;
+        output = (temp * temp * temp) + 1.0f;
+    }
+
+    return output;
+}
+#define FUZZ(x) CubicAmplifier(CubicAmplifier(CubicAmplifier(CubicAmplifier(x))))
+
+static int fuzzCallback(const void *inputBuffer, void *outputBuffer,
+                        unsigned long framesPerBuffer,
+                        const PaStreamCallbackTimeInfo *timeInfo,
+                        PaStreamCallbackFlags statusFlags,
+                        void *userData) {
+    auto *out = (float *) outputBuffer;
+    const auto *in = (const float *) inputBuffer;
+    unsigned int i;
+
+    if (inputBuffer == nullptr) {
+        for (i = 0; i < framesPerBuffer; i++) {
+            *out++ = 0;  /* left - silent */
+            *out++ = 0;  /* right - silent */
+        }
+    } else {
+        for (i = 0; i < framesPerBuffer; i++) {
+            *out++ = *in++;  /* left - distorted */
+            *out++ = *in++;          /* right - clean */
+        }
+    }
+
+    return paContinue;
+}
 
 int callBack(const void *input, void *output, unsigned long frameCount,
              const PaStreamCallbackTimeInfo *timeInfo,
              PaStreamCallbackFlags statusFlags, void *userData) {
-  return paComplete;
+    auto inputFloat = (float *) input;
+
+    for (int i = 0; i < frameCount; i++) {
+        std::cout << inputFloat[i] << std::endl;
+    }
+
+    return paContinue;
 }
 
 int main(int argc, char *argv[]) {
-  try {
-    AudioController audioController;
-    auto defaultDevice = audioController.getDefaultOutputDevice();
+    try {
+        AudioController audioController;
+        auto defaultDevice = audioController.getDefaultInputDevice();
 
-    if (!defaultDevice) {
-      std::cerr << "No default device" << std::endl;
-      return 1;
-    }
+        if (!defaultDevice) {
+            std::cerr << "No default device" << std::endl;
+            return 1;
+        }
 
-    PaStreamParameters out;
-    out.device = audioController.getDefaultOutputId();
-    out.channelCount = 2;
-    out.sampleFormat = paFloat32;
-    out.suggestedLatency = defaultDevice->defaultLowOutputLatency;
-    out.hostApiSpecificStreamInfo = nullptr;
+        PaStreamParameters out;
+        out.device = audioController.getDefaultInputId();
+        out.channelCount = 2;
+        out.sampleFormat = paFloat32;
+        out.suggestedLatency = defaultDevice->defaultLowInputLatency;
+        out.hostApiSpecificStreamInfo = nullptr;
 
-    auto stream = audioController.createStream(&out, nullptr, callBack, nullptr,
-                                               paNoFlag, "Complex stream.");
+        auto defaultOutputDevice = audioController.getDefaultInputDevice();
 
-    stream.start();
+        if (!defaultOutputDevice) {
+            std::cerr << "No default device" << std::endl;
+            return 1;
+        }
 
-    while (stream.isActive()) {
-      audioController.sleep(1000);
-    }
+        PaStreamParameters in;
+        in.device = audioController.getDefaultOutputId();
+        in.channelCount = 2;
+        in.sampleFormat = paFloat32;
+        in.suggestedLatency = defaultOutputDevice->defaultLowOutputLatency;
+        in.hostApiSpecificStreamInfo = nullptr;
 
-    stream.stop();
-  } catch (const AudioControllerError &e) {
-    std::cerr << "Cannot create controller " << e.what() << std::endl;
-    return 1;
-  };
-  return 0;
+        auto stream = audioController.createCustomStream(&out, &in, fuzzCallback, nullptr, paNoFlag, "Distorder");
+
+        stream.start();
+
+        getchar();
+
+        stream.stop();
+    } catch (const AudioControllerError &e) {
+        std::cerr << "Cannot create controller " << e.what() << std::endl;
+        return 1;
+    };
+    return 0;
 }
