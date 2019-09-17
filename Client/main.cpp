@@ -14,25 +14,7 @@ struct UserData {
     unsigned long offset;
 };
 
-float CubicAmplifier( float input )
-{
-    float output, temp;
-    if( input < 0.0 )
-    {
-        temp = input + 1.0f;
-        output = (temp * temp * temp) - 1.0f;
-    }
-    else
-    {
-        temp = input - 1.0f;
-        output = (temp * temp * temp) + 1.0f;
-    }
-
-    return output;
-}
-#define FUZZ(x) CubicAmplifier(CubicAmplifier(CubicAmplifier(CubicAmplifier(x))))
-
-static int fuzzCallback(const void *inputBuffer, void *outputBuffer,
+static int callBack(const void *inputBuffer, void *outputBuffer,
                         unsigned long framesPerBuffer,
                         const PaStreamCallbackTimeInfo *timeInfo,
                         PaStreamCallbackFlags statusFlags,
@@ -49,22 +31,9 @@ static int fuzzCallback(const void *inputBuffer, void *outputBuffer,
     } else {
         for (i = 0; i < framesPerBuffer; i++) {
             *out++ = *in++;  /* left - distorted */
-            *out++ = *in++;          /* right - clean */
+            *out++ = *in++;  /* right - clean */
         }
     }
-
-    return paContinue;
-}
-
-int callBack(const void *input, void *output, unsigned long frameCount,
-             const PaStreamCallbackTimeInfo *timeInfo,
-             PaStreamCallbackFlags statusFlags, void *userData) {
-    auto inputFloat = (float *) input;
-
-    for (int i = 0; i < frameCount; i++) {
-        std::cout << inputFloat[i] << std::endl;
-    }
-
     return paContinue;
 }
 
@@ -99,7 +68,7 @@ int main(int argc, char *argv[]) {
         in.suggestedLatency = defaultOutputDevice->defaultLowOutputLatency;
         in.hostApiSpecificStreamInfo = nullptr;
 
-        auto stream = audioController.createCustomStream(&out, &in, fuzzCallback, nullptr, paNoFlag, "Distorder");
+        auto stream = audioController.createCustomStream(&out, &in, callBack, nullptr, paNoFlag, "Releave");
 
         stream.start();
 

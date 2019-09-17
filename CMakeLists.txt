@@ -11,7 +11,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
     set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
-endif()
+endif ()
 
 include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
 message("HOME DIRECTORY ${CMAKE_HOME_DIRECTORY}")
@@ -25,30 +25,32 @@ set(COMMON_PATH "${CMAKE_SOURCE_DIR}/Common")
 message("CLIENT PATH: ${CLIENT_PATH}")
 
 set(BABEL_SERVER
-    ${SERVER_PATH}/main.cpp
-)
+        ${SERVER_PATH}/main.cpp
+        )
 
 set(BABEL_CLIENT
-    ${CLIENT_PATH}/main.cpp
-    ${CLIENT_PATH}/AudioController.cpp
-    ${CLIENT_PATH}/AudioController.hpp
-    ${CLIENT_PATH}/SoundStream.cpp
-    ${CLIENT_PATH}/SoundStream.hpp
-)
+        ${CLIENT_PATH}/main.cpp
+        ${CLIENT_PATH}/AudioController.cpp
+        ${CLIENT_PATH}/AudioController.hpp
+        ${CLIENT_PATH}/SoundStream.cpp
+        ${CLIENT_PATH}/SoundStream.hpp
+        ${CLIENT_PATH}/SoundHandler.hpp
+        ${CLIENT_PATH}/SoundHandler.cpp
+        )
 
 set(BABEL_COMMON
-    ""
-)
+        ""
+        )
 
 add_executable(babel-client
-    ${BABEL_CLIENT}
-    ${BABEL_COMMON}
-)
+        ${BABEL_CLIENT}
+        ${BABEL_COMMON}
+        )
 
 add_executable(babel-server
-    ${BABEL_SERVER}
-    ${BABEL_COMMON}
-)
+        ${BABEL_SERVER}
+        ${BABEL_COMMON}
+        )
 
 find_package(portaudio)
 find_package(opus)
@@ -61,5 +63,5 @@ target_link_libraries(babel-client portaudio::portaudio opus::opus boost::boost 
 target_link_libraries(babel-server boost::boost sqlite3::sqlite3)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	target_link_libraries(babel-client jack asound)
-endif()
+    target_link_libraries(babel-client jack asound)
+endif ()
