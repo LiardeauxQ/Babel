@@ -11,30 +11,30 @@
 
 class SoundStream {
 public:
-  SoundStream(double sampleRate, int numInputChannels, int numOutputChannels,
-              PaSampleFormat sampleFormat, unsigned long framesPerBuffer,
-              PaStreamCallback *streamCallback, void *linkedData,
-              std::string name);
+    SoundStream(double sampleRate, int numInputChannels, int numOutputChannels,
+        PaSampleFormat sampleFormat, unsigned long framesPerBuffer,
+        PaStreamCallback* streamCallback, void* linkedData,
+        std::string name);
 
-  SoundStream(PaStreamParameters *outputStream,
-              PaStreamParameters *inputStream, double sampleParameter,
-              unsigned long framePerBuffer, PaStreamFlags streamFlags,
-              PaStreamCallback *callback, void *userData, std::string name);
+    SoundStream(PaStreamParameters* outputStream,
+        PaStreamParameters* inputStream, double sampleParameter,
+        unsigned long framePerBuffer, PaStreamFlags streamFlags,
+        PaStreamCallback* callback, void* userData, std::string name);
 
-  ~SoundStream();
+    ~SoundStream();
 
-  int setFinishCallback(PaStreamFinishedCallback *finishCallback);
+    int setFinishCallback(PaStreamFinishedCallback* finishCallback);
 
-  void start() const;
-  void stop() const;
-  void abort() const;
-  [[nodiscard]] bool isActive() const;
-  [[nodiscard]] const PaStreamInfo *info() const;
-  [[nodiscard]] double getCPULoad() const;
+    void start() const;
+    void stop() const;
+    void abort() const;
+    [[nodiscard]] bool isActive() const;
+    [[nodiscard]] const PaStreamInfo* info() const;
+    [[nodiscard]] double getCPULoad() const;
 
 private:
-  PaStream *stream_;
-  std::string name_;
+    PaStream* stream_;
+    std::string name_;
 };
 
 #endif // BABEL_CLIENT_SOUNDSTREAM_HPP

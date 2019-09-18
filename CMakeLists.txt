@@ -3,20 +3,15 @@ cmake_minimum_required(VERSION 3.14.5)
 project(babel-client)
 project(babel-server)
 
+add_definitions(-D BOOST_TEST_DYN_LINK)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
     set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
-endif()
-
-if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-	include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-	conan_basic_setup()
-else()
-	message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
-endif()
+endif ()
 
 include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
 message("HOME DIRECTORY ${CMAKE_HOME_DIRECTORY}")
@@ -30,41 +25,32 @@ set(COMMON_PATH "${CMAKE_SOURCE_DIR}/Common")
 message("CLIENT PATH: ${CLIENT_PATH}")
 
 set(BABEL_SERVER
-    ${SERVER_PATH}/main.cpp
-)
+        ${SERVER_PATH}/main.cpp
+        )
 
 set(BABEL_CLIENT
-    ${CLIENT_PATH}/main.cpp
-    ${CLIENT_PATH}/AudioController.cpp
-    ${CLIENT_PATH}/AudioController.hpp
-    ${CLIENT_PATH}/SoundStream.cpp
-    ${CLIENT_PATH}/SoundStream.hpp
-	${CLIENT_PATH}/OggReader.cpp
-	${CLIENT_PATH}/OggReader.hpp
-	${CLIENT_PATH}/ISoundFormatReader.cpp
-	${CLIENT_PATH}/ISoundFormatReader.hpp
-	${CLIENT_PATH}/Error.cpp
-	${CLIENT_PATH}/Error.hpp
-	${CLIENT_PATH}/Packet.hpp
-	${CLIENT_PATH}/opus/Encoder.cpp
-	${CLIENT_PATH}/opus/Encoder.hpp
-	${CLIENT_PATH}/opus/Decoder.cpp
-	${CLIENT_PATH}/opus/Decoder.hpp
-	${CLIENT_PATH}/opus/Opus.hpp)
+        ${CLIENT_PATH}/main.cpp
+        ${CLIENT_PATH}/AudioController.cpp
+        ${CLIENT_PATH}/AudioController.hpp
+        ${CLIENT_PATH}/SoundStream.cpp
+        ${CLIENT_PATH}/SoundStream.hpp
+        ${CLIENT_PATH}/SoundManager.hpp
+        ${CLIENT_PATH}/SoundManager.cpp
+        )
 
 set(BABEL_COMMON
-    ""
-)
+        ""
+        )
 
 add_executable(babel-client
-    ${BABEL_CLIENT}
-    ${BABEL_COMMON}
-)
+        ${BABEL_CLIENT}
+        ${BABEL_COMMON}
+        )
 
 add_executable(babel-server
-    ${BABEL_SERVER}
-    ${BABEL_COMMON}
-)
+        ${BABEL_SERVER}
+        ${BABEL_COMMON}
+        )
 
 find_package(portaudio)
 find_package(opus)
@@ -77,5 +63,5 @@ target_link_libraries(babel-client portaudio::portaudio opus::opus boost::boost 
 target_link_libraries(babel-server boost::boost sqlite3::sqlite3)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	target_link_libraries(babel-client jack asound)
-endif()
+    target_link_libraries(babel-client jack asound)
+endif ()
