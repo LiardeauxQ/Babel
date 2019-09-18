@@ -11,6 +11,13 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
     set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
 endif()
 
+if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+	include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+	conan_basic_setup()
+else()
+	message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
+endif()
+
 include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
 message("HOME DIRECTORY ${CMAKE_HOME_DIRECTORY}")
 
@@ -36,7 +43,10 @@ set(BABEL_CLIENT
 	${CLIENT_PATH}/OggReader.hpp
 	${CLIENT_PATH}/ISoundFormatReader.cpp
 	${CLIENT_PATH}/ISoundFormatReader.hpp
-)
+	${CLIENT_PATH}/Encoder.hpp
+	${CLIENT_PATH}/Encoder.cpp
+	${CLIENT_PATH}/Error.cpp
+	${CLIENT_PATH}/Error.hpp)
 
 set(BABEL_COMMON
     ""
