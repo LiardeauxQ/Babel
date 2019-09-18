@@ -43,10 +43,14 @@ set(BABEL_CLIENT
 	${CLIENT_PATH}/OggReader.hpp
 	${CLIENT_PATH}/ISoundFormatReader.cpp
 	${CLIENT_PATH}/ISoundFormatReader.hpp
-	${CLIENT_PATH}/Encoder.hpp
-	${CLIENT_PATH}/Encoder.cpp
 	${CLIENT_PATH}/Error.cpp
-	${CLIENT_PATH}/Error.hpp Client/Packet.hpp Client/Decoder.cpp Client/Decoder.hpp Client/Opus.hpp)
+	${CLIENT_PATH}/Error.hpp
+	${CLIENT_PATH}/Packet.hpp
+	${CLIENT_PATH}/opus/Encoder.cpp
+	${CLIENT_PATH}/opus/Encoder.hpp
+	${CLIENT_PATH}/opus/Decoder.cpp
+	${CLIENT_PATH}/opus/Decoder.hpp
+	${CLIENT_PATH}/opus/Opus.hpp)
 
 set(BABEL_COMMON
     ""

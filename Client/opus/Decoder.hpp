@@ -5,9 +5,11 @@
 #ifndef BABEL_SERVER_DECODER_HPP
 #define BABEL_SERVER_DECODER_HPP
 
-#include "Packet.hpp"
+#include <vector>
+
 #include "Opus.hpp"
-#include "Error.hpp"
+#include "../Error.hpp"
+#include "../Packet.hpp"
 
 namespace opus {
     class Decoder {
@@ -16,8 +18,8 @@ namespace opus {
 
         ~Decoder();
 
-        opus_int16 *decode_to_bytes(const unsigned char *input, int frame_size);
-        float *decode_to_floats(const unsigned char *input, int frame_size);
+        std::vector<opus_int16> decode_to_bytes(const unsigned char *input, int frame_size);
+        std::vector<float> decode_to_floats(const unsigned char *input, int frame_size);
     private:
         OpusDecoder *dec;
         int channels;

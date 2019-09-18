@@ -7,9 +7,11 @@
 
 #include <stdlib.h>
 
+#include <vector>
+
 #include "Opus.hpp"
-#include "Packet.hpp"
-#include "Error.hpp"
+#include "../Error.hpp"
+#include "../Packet.hpp"
 
 namespace opus {
     class Encoder {
@@ -18,8 +20,8 @@ namespace opus {
         Encoder(InputSignalFq fd, int channels, ApplicationType type);
         ~Encoder();
 
-        Packet encode_packet(const opus_int16 *input, int frame_size);
-        Packet encode_packet(const float *input, int frame_size);
+        std::vector<unsigned char> encode_packet(const opus_int16 *input, int frame_size);
+        std::vector<unsigned char> encode_packet(const float *input, int frame_size);
     private:
         OpusEncoder *enc;
         int channels;
