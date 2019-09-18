@@ -46,7 +46,7 @@ set(BABEL_CLIENT
 	${CLIENT_PATH}/Encoder.hpp
 	${CLIENT_PATH}/Encoder.cpp
 	${CLIENT_PATH}/Error.cpp
-	${CLIENT_PATH}/Error.hpp Client/Packet.hpp)
+	${CLIENT_PATH}/Error.hpp Client/Packet.hpp Client/Decoder.cpp Client/Decoder.hpp Client/Opus.hpp)
 
 set(BABEL_COMMON
     ""

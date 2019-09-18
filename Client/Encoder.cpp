@@ -4,7 +4,7 @@
 
 #include "Encoder.hpp"
 
-Encoder::Encoder(InputSignalFrequency fs, int channels, ApplicationType type) {
+opus::Encoder::Encoder(InputSignalFq fs, int channels, ApplicationType type) {
     int error = 0;
 
     this->channels = channels;
@@ -13,11 +13,11 @@ Encoder::Encoder(InputSignalFrequency fs, int channels, ApplicationType type) {
         throw Error("Cannot init Encoder");
 }
 
-Encoder::~Encoder() {
+opus::Encoder::~Encoder() {
     opus_encoder_destroy(this->enc);
 }
 
-Packet Encoder::encode_packet(const opus_int16 *input, int frame_size) {
+Packet opus::Encoder::encode_packet(const opus_int16 *input, int frame_size) {
     Packet packet = Packet();
     opus_int32 error = 0;
 
@@ -27,7 +27,7 @@ Packet Encoder::encode_packet(const opus_int16 *input, int frame_size) {
     return packet;
 }
 
-Packet Encoder::encode_packet(const float *input, int frame_size) {
+Packet opus::Encoder::encode_packet(const float *input, int frame_size) {
     Packet packet = Packet();
     opus_int32 error = 0;
 
