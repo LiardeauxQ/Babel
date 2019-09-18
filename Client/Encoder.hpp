@@ -8,13 +8,8 @@
 #include "opus.h"
 #include <stdlib.h>
 
+#include "Packet.hpp"
 #include "Error.hpp"
-
-#define DATA_PACKET_SIZE 1000
-
-struct Packet {
-    unsigned char data[DATA_PACKET_SIZE];
-};
 
 class Encoder {
 public:
@@ -36,8 +31,8 @@ public:
     Encoder(InputSignalFrequency fd, int channels, ApplicationType type);
     ~Encoder();
 
-    Packet encode_packet(const opus_int16 *input, int frame_size); //TODO: Replace by a Packet class
-    Packet encode_packet(const float *input, int frame_size); //TODO: Replace by a Packet class
+    Packet encode_packet(const opus_int16 *input, int frame_size);
+    Packet encode_packet(const float *input, int frame_size);
 private:
     OpusEncoder *enc;
     int channels;
