@@ -2,74 +2,119 @@
 // Created by alex on 9/17/19.
 //
 
-#ifndef BABEL_SERVER_SOUNDHANDLER_HPP
-#define BABEL_SERVER_SOUNDHANDLER_HPP
+#ifndef BABEL_SERVER_SOUNDMANAGER_HPP
+#define BABEL_SERVER_SOUNDMANAGER_HPP
 
 #include "AudioController.hpp"
 #include "SoundStream.hpp"
 #include <boost/circular_buffer.hpp>
-#include <queue>
+#include <memory>
+#include <vector>
 
-class SoundHandler {
+const size_t MAX_SIZE = 64000;
+
+class SoundManager {
 public:
-    explicit SoundHandler(AudioController &controller)
-            : outputBuffer_()
-            , inputBuffer_()
-            , inputStream_(
-                    controller.createStream(controller.getDefaultInputDevice(), inputCallback_,
-                                            static_cast<void *>(&this->inputBuffer_), "InputBuffer")
-            )
-            , outputStream_(
-            controller.createStream(controller.getDefaultOutputDevice(), outputCallback_,
-                                    static_cast<void *>(&this->outputBuffer_), "OutputBuffer")
-    ) {}
+    explicit SoundManager(AudioController& controller)
+        : buffers_ {
+            std::make_unique<boost::circular_buffer<float>>(MAX_SIZE),
+            std::make_unique<std::vector<float>>(MAX_SIZE),
+        }
+        , stream_ { createSoundStream(controller, (void*)&buffers_) }
+    {
+    }
+
+    [[nodiscard]] std::unique_ptr<boost::circular_buffer<float>> read()
+    {
+        if (buffers_.inputBuffer->size() > 0) {
+            auto newVec = std::make_unique<boost::circular_buffer<float>>(MAX_SIZE);
+            buffers_.inputBuffer.swap(newVec);
+            return newVec;
+        }
+        return nullptr;
+    }
+
+    void write(const std::unique_ptr<std::vector<float>> data)
+    {
+        buffers_.outputBuffer->reserve(buffers_.outputBuffer->size() + data->size());
+        buffers_.outputBuffer->insert(buffers_.outputBuffer->end(), data->begin(), data->end());
+    }
+
+    // Enable streaming interaction.
+    inline void start()
+    {
+        stream_.start();
+    }
+
+    // Enable streaming interaction.
+    inline void stop()
+    {
+        stream_.stop();
+    }
 
 private:
-    std::queue<float> inputBuffer_;
+    static SoundStream createSoundStream(AudioController& controller, void* data)
+    {
+        auto in = PaStreamParameters {
+            .device = controller.getDefaultInputId(),
+            .channelCount = 2,
+            .sampleFormat = paFloat32,
+            .suggestedLatency = controller.getDefaultInputDevice()->defaultLowInputLatency,
+            .hostApiSpecificStreamInfo = nullptr,
+        };
 
-    std::queue<float> outputBuffer_;
+        auto out = PaStreamParameters {
+            .device = controller.getDefaultOutputId(),
+            .channelCount = 2,
+            .sampleFormat = paFloat32,
+            .suggestedLatency = controller.getDefaultOutputDevice()->defaultLowOutputLatency,
+            .hostApiSpecificStreamInfo = nullptr,
+        };
 
-    // Microphone sound stream that write to inputBuffer_.
-    SoundStream inputStream_;
-
-    // Speaker sound stream that read from outputBuffer_.
-    SoundStream outputStream_;
-
-    static int outputCallback_(const void *inputBuffer, void *outputBuffer,
-                              unsigned long framesPerBuffer,
-                              const PaStreamCallbackTimeInfo *timeInfo,
-                              PaStreamCallbackFlags statusFlags,
-                              void *userData) {
-        auto out = (float *) outputBuffer;
-        auto in = static_cast<std::queue<float> *>(userData);
-
-        if (in->size() < framesPerBuffer * 2)
-            return paContinue;
-
-        for (size_t i = 0; i < framesPerBuffer; ++i) {
-            *out++ = in->back();
-            in->pop();
-            *out++ = in->back();
-            in->pop();
-        }
-        return paContinue;
+        return controller.createCustomStream(
+            &out,
+            &in,
+            callback,
+            data,
+            paNoFlag,
+            "CustomStream");
     }
 
-    static int inputCallback_(const void *inputBuffer, void *outputBuffer,
-                             unsigned long framesPerBuffer,
-                             const PaStreamCallbackTimeInfo *timeInfo,
-                             PaStreamCallbackFlags statusFlags,
-                             void *userData) {
-        const auto *in = (const float *) inputBuffer;
-        auto out = static_cast<std::queue<float> *>(userData);
+    static int callback(const void* inputBuffer, void* outputBuffer,
+        unsigned long framesPerBuffer,
+        const PaStreamCallbackTimeInfo* timeInfo,
+        PaStreamCallbackFlags statusFlags,
+        void* userData)
+    {
+        auto out = static_cast<float*>(outputBuffer);
+        auto data = static_cast<Buffers*>(userData);
+        const auto* micro = static_cast<const float*>(inputBuffer);
 
         for (size_t i = 0; i < framesPerBuffer; i++) {
-            out->push(*in++); // push left.
-            out->push(*in++); // push right.
+            data->inputBuffer->push_back(*micro++); // push left.
+            data->inputBuffer->push_back(*micro++); // push right.
         }
+
+        for (size_t i = 0; i < framesPerBuffer; ++i) {
+            if (data->outputBuffer->size() >= framesPerBuffer * 2) {
+                *out++ = data->outputBuffer->back();
+                data->outputBuffer->pop_back();
+                *out++ = data->outputBuffer->back();
+                data->outputBuffer->pop_back();
+            } else {
+                return paContinue;
+            }
+        }
+
         return paContinue;
     }
+
+    struct Buffers {
+        std::unique_ptr<boost::circular_buffer<float>> inputBuffer;
+        std::unique_ptr<std::vector<float>> outputBuffer;
+    } buffers_;
+
+    SoundStream stream_;
 };
 
-
-#endif //BABEL_SERVER_SOUNDHANDLER_HPP
+#endif //BABEL_SERVER_SOUNDMANAGER_HPP
