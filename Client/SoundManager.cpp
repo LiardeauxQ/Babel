@@ -13,12 +13,11 @@ int SoundManager::outputCallback(const void* inputBuffer, void* outputBuffer,
 {
      auto out = (float*)outputBuffer;
      auto data = (Buffers*)userData;
-     size_t bufferSize = data->outputBuffer->size();
 
-     if (bufferSize == 0)
+     if (data->outputBuffer->size() == 0)
          return paContinue;
-     if (bufferSize <= framesPerBuffer * 2) {
-         for (size_t i = 0; i < bufferSize; i += 2) {
+     if (data->outputBuffer->size() <= framesPerBuffer * 2) {
+         for (size_t i = 0; i < data->outputBuffer->size(); i += 2) {
              *out++ = data->outputBuffer->back();
              data->outputBuffer->pop_back();
              *out++ = data->outputBuffer->back();
