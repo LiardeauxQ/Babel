@@ -32,8 +32,8 @@ set(BABEL_CLIENT
         ${CLIENT_PATH}/main.cpp
         ${CLIENT_PATH}/AudioController.cpp
         ${CLIENT_PATH}/AudioController.hpp
-        ${CLIENT_PATH}/SoundStream.cpp
-        ${CLIENT_PATH}/SoundStream.hpp
+        ${CLIENT_PATH}/AudioControllerError.hpp
+        ${CLIENT_PATH}/AudioControllerError.cpp
         ${CLIENT_PATH}/SoundManager.hpp
         ${CLIENT_PATH}/SoundManager.cpp
         )
