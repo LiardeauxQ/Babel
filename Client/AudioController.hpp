@@ -5,11 +5,12 @@
 #ifndef BABEL_AUDIO_HPP
 #define BABEL_AUDIO_HPP
 
-#include "SoundStream.hpp"
-#include "portaudio.h"
 #include <exception>
 #include <memory>
+#include <portaudio.h>
 #include <vector>
+#include "AudioControllerError.hpp"
+#include "SoundManager.hpp"
 
 class AudioController {
 public:
@@ -19,22 +20,16 @@ public:
     ~AudioController();
 
     // Get number version of the program.
-    static int getVersion();
+    static int getVersion() { return Pa_GetVersion(); }
 
     // Get text version of the program.
-    static std::string getTextVersion();
+    static std::string getTextVersion() { return std::string(Pa_GetVersionText()); }
 
     [[nodiscard]] std::vector<const PaDeviceInfo*> getDevicesInfo() const;
 
-    SoundStream createStream(const PaDeviceInfo* dev,
-        PaStreamCallback* callback,
-        void* linkedData,
-        const std::string& name);
+    [[nodiscard]] std::unique_ptr<SoundManager> createManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate = 44100) const;
 
-    SoundStream createCustomStream(PaStreamParameters* outputStream,
-        PaStreamParameters* inputStream,
-        PaStreamCallback* callback, void* userData,
-        PaStreamFlags flags, const std::string& name);
+    [[nodiscard]] std::unique_ptr<SoundManagerBlocking> createBlockingManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate = 44100) const;
 
     [[nodiscard]] const PaDeviceInfo* getDefaultInputDevice() const;
 
@@ -45,16 +40,6 @@ public:
     [[nodiscard]] int getDefaultInputId() const;
 
     inline void sleep(long ms) { Pa_Sleep(ms); }
-};
-
-class AudioControllerError : std::exception {
-public:
-    explicit AudioControllerError(int error);
-
-    [[nodiscard]] const char* what() const noexcept final;
-
-private:
-    int error_;
 };
 
 #endif // BABEL_AUDIO_HPP
