@@ -14,7 +14,7 @@ int SoundManager::outputCallback(const void* inputBuffer, void* outputBuffer,
      auto out = (float*)outputBuffer;
      auto data = (Buffers*)userData;
 
-     if (data->outputBuffer->size() == 0)
+     if (data->outputBuffer->empty())
          return paContinue;
      if (data->outputBuffer->size() <= framesPerBuffer * 2) {
          for (size_t i = 0; i < data->outputBuffer->size(); i += 2) {
