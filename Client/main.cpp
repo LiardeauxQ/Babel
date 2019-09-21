@@ -3,27 +3,45 @@
 //
 
 #include "AudioController.hpp"
-#include "SoundManager.hpp"
+#include "AudioControllerError.hpp"
 #include <iostream>
 
 int main(int argc, char* argv[])
 {
     try {
         AudioController audioController;
-        SoundManager soundManager(audioController);
 
-        soundManager.start();
+        PaStreamParameters in;
+        in.device = audioController.getDefaultInputId();
+        in.hostApiSpecificStreamInfo = nullptr;
+        in.suggestedLatency = audioController.getDefaultInputDevice()->defaultHighInputLatency;
+        in.sampleFormat = paFloat32;
+        in.channelCount = 2;
 
-        while (true) {
-            auto data = soundManager.read();
+        PaStreamParameters out;
+        out.device = audioController.getDefaultOutputId();
+        out.hostApiSpecificStreamInfo = nullptr;
+        out.suggestedLatency = audioController.getDefaultOutputDevice()->defaultHighOutputLatency;
+        out.sampleFormat = paFloat32;
+        out.channelCount = 2;
 
-            if (data)
-                soundManager.write(std::make_unique<std::vector<float>>(data->begin(), data->end()));
+        auto soundManager = audioController.createManager(&in, &out, 44100);
+
+        soundManager->start();
+
+        for (;;) {
+            auto data = soundManager->read();
+
+            if (data) {
+                std::vector<float> vec(data->begin(), data->end());
+                std::reverse(vec.begin(), vec.end());
+                soundManager->write(vec);
+            }
         }
 
-        soundManager.stop();
+        soundManager->stop();
     } catch (const AudioControllerError& e) {
-        std::cerr << "Cannot create controller " << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
         return 1;
     };
     return 0;
