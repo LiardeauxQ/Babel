@@ -10,8 +10,12 @@ stages:
   - deploy
 
 install:
+  before_script:
+    - echo "Starting installation."
   stage: install
   script:
+    - mkdir build
+    - cd build
     - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan 
     - conan remote add epitech https://api.bintray.com/conan/epitech/public-conan 
     - sudo apt-get update && sudo apt-get install -y qtdeclarative5-dev
