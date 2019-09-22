@@ -2,6 +2,8 @@ image: conanio/gcc9:latest
 
 before_script:
   - mkdir build
+  - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan 
+  - conan remote add epitech https://api.bintray.com/conan/epitech/public-conan 
 
 stages:
   - install
