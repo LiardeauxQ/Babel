@@ -1,6 +1,7 @@
 image: conanio/gcc9:latest
 
 before_script:
+  - ls -lRa ../
   - cd build
 
 stages:
