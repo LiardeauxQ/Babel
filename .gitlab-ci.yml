@@ -1,10 +1,7 @@
 image: conanio/gcc9:latest
 
 before_script:
-  - sudo apt-get update && sudo apt-get install -y qtdeclarative5-dev
-  - mkdir build
-  - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan 
-  - conan remote add epitech https://api.bintray.com/conan/epitech/public-conan 
+  - cd build
 
 stages:
   - install
@@ -15,7 +12,9 @@ stages:
 install:
   stage: install
   script:
-    - cd build
+    - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan 
+    - conan remote add epitech https://api.bintray.com/conan/epitech/public-conan 
+    - sudo apt-get update && sudo apt-get install -y qtdeclarative5-dev
     - conan install .. --build=missing
     - cmake ..
 
@@ -24,7 +23,7 @@ build_client:
   dependencies:
     - install
   script:
-    - cd build
+    - ls -lRa ../
     - make babel-client
 
 build_server:
@@ -32,7 +31,6 @@ build_server:
   dependencies:
     - install
   script:
-    - cd build
     - make babel-server
 
 test_client:
@@ -41,7 +39,6 @@ test_client:
   dependencies:
     - build_client
   script:
-    - cd build
     - make babel-client-test
     - ./babel-client-test
 
@@ -51,7 +48,6 @@ test_server:
   dependencies:
     - build_server
   script:
-    - cd build
     - make babel-server-test
     - ./babel-server-test
 
