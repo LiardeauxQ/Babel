@@ -1,0 +1,70 @@
+image: conanio/gcc9:latest
+
+before_script:
+  - mkdir build
+
+stage:
+  - install
+  - build
+  - test
+  - deploy
+
+install:
+  stage: install
+  script:
+    - cd build
+    - conan install .. --build=missing
+    - cmake ..
+
+build_client:
+  stage: build
+  dependencies:
+    - install
+  script:
+    - cd build
+    - make babel-client
+
+build_server:
+  stage: build
+  dependencies:
+    - install
+  script:
+    - cd build
+    - make babel-server
+
+test_client:
+  stage: test
+  allow_failure: true
+  dependencies:
+    - build_client
+  script:
+    - cd build
+    - make babel-client-test
+    - ./babel-client-test
+
+test_server:
+  stage: test
+  allow_failure: true
+  dependencies:
+    - build_server
+  script:
+    - cd build
+    - make babel-server-test
+    - ./babel-server-test
+
+full_deploy:
+  stage: deploy
+  only:
+    - master
+  script:
+    - echo "Pushing to $TARGET_REPO"
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/epitech
+    - chmod 600 ~/.ssh/epitech
+    - git config core.sshCommand "ssh -o \"StrictHostKeyChecking=no\" -i ~/.ssh/epitech -F /dev/null"
+    - git remote remove epitech || true
+    - git remote add epitech $TARGET_REPO || true
+    - git push epitech HEAD:$CI_COMMIT_REF_NAME
+    - git config --unset core.sshCommand
+    - rm -rf ~/.ssh/epitech
+
