@@ -3,15 +3,12 @@ cmake_minimum_required(VERSION 3.14.5)
 project(babel-client)
 project(babel-server)
 
-add_definitions(-D BOOST_TEST_DYN_LINK)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-    set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
-endif()
+
+set(CMAKE_PREFIX_PATH "F:\\Qt\\5.13.1\\msvc2017_64\\")
 
 include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
 message("HOME DIRECTORY ${CMAKE_HOME_DIRECTORY}")
@@ -56,6 +53,7 @@ find_package(boost_asio)
 find_package(boost_circular_buffer)
 find_package(sqlite3)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
+
 
 target_link_libraries(babel-client portaudio::portaudio opus::opus boost_circular_buffer::boost_circular_buffer sqlite3::sqlite3 Qt5::Widgets)
 

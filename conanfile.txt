@@ -10,3 +10,4 @@ cmake_find_package
 
 [options]
 boost:without_test=True
+
