@@ -14,8 +14,8 @@ build_client:
     - cd build
     - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan 
     - conan remote add epitech https://api.bintray.com/conan/epitech/public-conan 
-    - sudo apt-get update && sudo apt-get install -y qtdeclarative5-dev
-    - conan install .. --build=missing
+    - sudo apt-get update && sudo apt-get install -y qtdeclarative5-dev && sudo apt-get install jackd
+    - conan install ..
     - cmake ..
     - make babel-client
 
@@ -27,8 +27,8 @@ build_server:
     - cd build
     - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan 
     - conan remote add epitech https://api.bintray.com/conan/epitech/public-conan 
-    - sudo apt-get update && sudo apt-get install -y qtdeclarative5-dev
-    - conan install .. --build=missing
+    - sudo apt-get update && sudo apt-get install -y qtdeclarative5-dev && sudo apt-get install jackd
+    - conan install ..
     - cmake ..
     - make babel-server
 
