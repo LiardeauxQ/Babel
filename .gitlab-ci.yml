@@ -5,15 +5,12 @@ before_script:
   - cd build
 
 stages:
-  - install
   - build
   - test
   - deploy
 
-install:
-  before_script:
-    - echo "Starting installation."
-  stage: install
+before_build:
+  stage: build
   script:
     - mkdir build
     - cd build
@@ -26,16 +23,17 @@ install:
 build_client:
   stage: build
   dependencies:
-    - install
+    - before_build
   script:
-    - ls -lRa ../
+    - ls
     - make babel-client
 
 build_server:
   stage: build
   dependencies:
-    - install
+    - before_build
   script:
+    - ls
     - make babel-server
 
 test_client:
