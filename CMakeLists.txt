@@ -52,13 +52,14 @@ add_executable(babel-server
 
 find_package(portaudio)
 find_package(opus)
-find_package(boost)
+find_package(boost_asio)
+find_package(boost_circular_buffer)
 find_package(sqlite3)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-target_link_libraries(babel-client portaudio::portaudio opus::opus boost::boost sqlite3::sqlite3 Qt5::Widgets)
+target_link_libraries(babel-client portaudio::portaudio opus::opus boost_circular_buffer::boost_circular_buffer sqlite3::sqlite3 Qt5::Widgets)
 
-target_link_libraries(babel-server boost::boost sqlite3::sqlite3)
+target_link_libraries(babel-server sqlite3::sqlite3 boost_asio::boost_asio)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	target_link_libraries(babel-client jack asound)
