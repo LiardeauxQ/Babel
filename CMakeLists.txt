@@ -9,6 +9,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
+include_directories("./Common")
+include_directories("./Client")
+include_directories("./Server")
 
 set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 
@@ -20,6 +23,8 @@ set(BABEL_SERVER
         ${SERVER_PATH}/main.cpp
         ${SERVER_PATH}/ServerApplication.hpp
         ${SERVER_PATH}/ServerApplication.cpp
+        ${SERVER_PATH}/ServerError.hpp
+        ${SERVER_PATH}/ServerError.cpp
         )
 
 set(BABEL_CLIENT
@@ -35,6 +40,8 @@ set(BABEL_CLIENT
 set(BABEL_COMMON
         ${COMMON_PATH}/User.hpp
         ${COMMON_PATH}/User.cpp
+        ${COMMON_PATH}/Database.hpp
+        ${COMMON_PATH}/Database.cpp
         )
 
 add_executable(babel-client
