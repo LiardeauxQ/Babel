@@ -5,8 +5,8 @@
 #ifndef BABEL_SERVER_AUDIOCONTROLLERERROR_HPP
 #define BABEL_SERVER_AUDIOCONTROLLERERROR_HPP
 
-#include <portaudio.h>
 #include <exception>
+#include <portaudio.h>
 
 class AudioControllerError : std::exception {
 public:

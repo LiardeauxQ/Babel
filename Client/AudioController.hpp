@@ -5,12 +5,12 @@
 #ifndef BABEL_AUDIO_HPP
 #define BABEL_AUDIO_HPP
 
+#include "AudioControllerError.hpp"
+#include "SoundManager.hpp"
 #include <exception>
 #include <memory>
 #include <portaudio.h>
 #include <vector>
-#include "AudioControllerError.hpp"
-#include "SoundManager.hpp"
 
 class AudioController {
 public:

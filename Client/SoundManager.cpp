@@ -11,26 +11,26 @@ int SoundManager::outputCallback(const void* inputBuffer, void* outputBuffer,
     PaStreamCallbackFlags statusFlags,
     void* userData)
 {
-     auto out = (float*)outputBuffer;
-     auto data = (Buffers*)userData;
+    auto out = (float*)outputBuffer;
+    auto data = (Buffers*)userData;
 
-     if (data->outputBuffer->empty())
-         return paContinue;
-     if (data->outputBuffer->size() <= framesPerBuffer * 2) {
-         for (size_t i = 0; i < data->outputBuffer->size(); i += 2) {
-             *out++ = data->outputBuffer->back();
-             data->outputBuffer->pop_back();
-             *out++ = data->outputBuffer->back();
-             data->outputBuffer->pop_back();
-         }
-     } else {
-         for (size_t i = 0; i < framesPerBuffer; i++) {
-             *out++ = data->outputBuffer->back();
-             data->outputBuffer->pop_back();
-             *out++ = data->outputBuffer->back();
-             data->outputBuffer->pop_back();
-         }
-     }
+    if (data->outputBuffer->empty())
+        return paContinue;
+    if (data->outputBuffer->size() <= framesPerBuffer * 2) {
+        for (size_t i = 0; i < data->outputBuffer->size(); i += 2) {
+            *out++ = data->outputBuffer->back();
+            data->outputBuffer->pop_back();
+            *out++ = data->outputBuffer->back();
+            data->outputBuffer->pop_back();
+        }
+    } else {
+        for (size_t i = 0; i < framesPerBuffer; i++) {
+            *out++ = data->outputBuffer->back();
+            data->outputBuffer->pop_back();
+            *out++ = data->outputBuffer->back();
+            data->outputBuffer->pop_back();
+        }
+    }
     return paContinue;
 }
 

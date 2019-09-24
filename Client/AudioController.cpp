@@ -72,8 +72,7 @@ std::unique_ptr<SoundManager> AudioController::createManager(PaStreamParameters*
     return std::unique_ptr<SoundManager>(new SoundManager(
         input,
         output,
-        sampleRate
-    ));
+        sampleRate));
 }
 std::unique_ptr<SoundManagerBlocking> AudioController::createBlockingManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate) const
 {
