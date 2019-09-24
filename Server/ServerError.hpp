@@ -17,7 +17,7 @@ public:
 
     [[nodiscard]] const char* what() const noexcept final
     {
-        error_->what();
+        return error_->what();
     }
 
 private:
