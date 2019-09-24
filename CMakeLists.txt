@@ -27,7 +27,9 @@ set(BABEL_SERVER
         ${SERVER_PATH}/ServerConfig.cpp
         ${SERVER_PATH}/ServerConfig.hpp
         ${SERVER_PATH}/ServerError.hpp
-        ${SERVER_PATH}/ServerError.cpp)
+        ${SERVER_PATH}/ServerError.cpp
+        ${SERVER_PATH}/Session.hpp
+        ${SERVER_PATH}/Session.cpp)
 
 set(BABEL_CLIENT
         ${CLIENT_PATH}/main.cpp
