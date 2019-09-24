@@ -3,6 +3,7 @@ boost/1.69.0@conan/stable
 portaudio/v190600.20161030@bincrafters/stable
 opus/1.2.1@bincrafters/stable
 sqlite3/3.29.0@bincrafters/stable
+gtest/1.8.1@bincrafters/stable
 
 [generators]
 cmake_find_package
