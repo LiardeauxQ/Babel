@@ -3,3 +3,11 @@
 //
 
 #include "ServerError.hpp"
+
+ServerError::ServerError(std::exception* error)
+    : error_(error) {};
+
+const char* ServerError::what() const noexcept
+{
+    return error_->what();
+}
