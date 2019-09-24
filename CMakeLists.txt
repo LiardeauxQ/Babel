@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.14.5)
+
 set(CMAKE_CXX_STANDARD 17)
 
 project(babel-client)
@@ -24,8 +25,7 @@ set(BABEL_SERVER
         ${SERVER_PATH}/ServerApplication.hpp
         ${SERVER_PATH}/ServerApplication.cpp
         ${SERVER_PATH}/ServerError.hpp
-        ${SERVER_PATH}/ServerError.cpp
-        )
+        ${SERVER_PATH}/ServerError.cpp)
 
 set(BABEL_CLIENT
         ${CLIENT_PATH}/main.cpp
@@ -34,25 +34,19 @@ set(BABEL_CLIENT
         ${CLIENT_PATH}/AudioControllerError.hpp
         ${CLIENT_PATH}/AudioControllerError.cpp
         ${CLIENT_PATH}/SoundManager.hpp
-        ${CLIENT_PATH}/SoundManager.cpp
-        )
+        ${CLIENT_PATH}/SoundManager.cpp)
 
 set(BABEL_COMMON
         ${COMMON_PATH}/User.hpp
         ${COMMON_PATH}/User.cpp
         ${COMMON_PATH}/Database.hpp
         ${COMMON_PATH}/Database.cpp
-        )
+        ${COMMON_PATH}/DatabaseError.hpp
+        ${COMMON_PATH}/DatabaseError.cpp)
 
-add_executable(babel-client
-        ${BABEL_CLIENT}
-        ${BABEL_COMMON}
-        )
+add_executable(babel-client ${BABEL_CLIENT} ${BABEL_COMMON})
 
-add_executable(babel-server
-        ${BABEL_SERVER}
-        ${BABEL_COMMON}
-        )
+add_executable(babel-server ${BABEL_SERVER} ${BABEL_COMMON})
 
 find_package(portaudio)
 find_package(opus)
