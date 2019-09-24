@@ -24,6 +24,8 @@ set(BABEL_SERVER
         ${SERVER_PATH}/main.cpp
         ${SERVER_PATH}/ServerApplication.hpp
         ${SERVER_PATH}/ServerApplication.cpp
+        ${SERVER_PATH}/ServerConfig.cpp
+        ${SERVER_PATH}/ServerConfig.hpp
         ${SERVER_PATH}/ServerError.hpp
         ${SERVER_PATH}/ServerError.cpp)
 
