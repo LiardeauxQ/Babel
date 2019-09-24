@@ -5,6 +5,7 @@
 #ifndef BABEL_SERVER_DATABASE_HPP
 #define BABEL_SERVER_DATABASE_HPP
 
+#include "DatabaseError.hpp"
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -30,19 +31,20 @@ public:
         int error = sqlite3_open(url.c_str(), &connection_);
 
         if (error)
-            throw error;
+            throw DatabaseError(error);
 
         if (file.fail()) {
+            std::cout << "Database doesn't exist." << std::endl;
             setupDb();
         } else if (!isValidDb()) {
             std::cout << "Invalid database recreating one." << std::endl;
             sqlite3_close(connection_);
             remove(url.c_str());
 
-            int error = sqlite3_open(url.c_str(), &connection_);
+            error = sqlite3_open(url.c_str(), &connection_);
 
             if (error)
-                throw error;
+                throw DatabaseError(error);
 
             setupDb();
         }
@@ -53,7 +55,7 @@ public:
         int error = sqlite3_exec(connection_, request.c_str(), callback, data, &errMsg_);
 
         if (error)
-            throw error;
+            throw DatabaseError(error);
     }
 
     void exec(const std::string& request)
@@ -61,7 +63,7 @@ public:
         int error = sqlite3_exec(connection_, request.c_str(), nullptr, nullptr, &errMsg_);
 
         if (error)
-            throw error;
+            throw DatabaseError(error);
     }
 
 private:
@@ -72,7 +74,9 @@ private:
         bool friendship_present = false;
 
         this->exec(CHECK_USERS_TABLE, checkTable, &user_present);
+        std::cout << "`users` table ok." << std::endl;
         this->exec(CHECK_FRIENDSHIP_TABLE, checkTable, &friendship_present);
+        std::cout << "`friendship` table ok." << std::endl;
         return user_present && friendship_present;
     }
 
