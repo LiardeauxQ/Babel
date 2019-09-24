@@ -18,17 +18,17 @@ int SoundManager::outputCallback(const void* inputBuffer, void* outputBuffer,
         return paContinue;
     if (data->outputBuffer->size() <= framesPerBuffer * data->nbOutChannel) {
         for (size_t i = 0; i < data->outputBuffer->size(); i += data->nbOutChannel) {
-            *out++ = data->outputBuffer->back();
-            data->outputBuffer->pop_back();
-            *out++ = data->outputBuffer->back();
-            data->outputBuffer->pop_back();
+            for (size_t i = 0; i < data->nbOutChannel; ++i) {
+                *out++ = data->outputBuffer->back();
+                data->outputBuffer->pop_back();
+            }
         }
     } else {
         for (size_t i = 0; i < framesPerBuffer; i++) {
-            *out++ = data->outputBuffer->back();
-            data->outputBuffer->pop_back();
-            *out++ = data->outputBuffer->back();
-            data->outputBuffer->pop_back();
+            for (size_t i = 0; i < data->nbOutChannel; ++i) {
+                *out++ = data->outputBuffer->back();
+                data->outputBuffer->pop_back();
+            }
         }
     }
     return paContinue;
