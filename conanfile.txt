@@ -7,6 +7,3 @@ sqlite3/3.29.0@bincrafters/stable
 
 [generators]
 cmake_find_package
-
-[options]
-boost:without_test=True
