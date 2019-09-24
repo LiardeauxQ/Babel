@@ -13,10 +13,8 @@
 class ServerApplication {
 public:
     explicit ServerApplication(const ServerConfig& config)
-    try : database_(config.databaseUrl) {
-
-    } catch (int e) {
-        throw ServerError(e, ServerError::ErrorType::Sqlite);
+        : database_(config.databaseUrl)
+    {
     }
 
     ~ServerApplication() = default;

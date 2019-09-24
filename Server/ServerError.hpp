@@ -10,28 +10,18 @@
 
 class ServerError : public std::exception {
 public:
-    enum ErrorType {
-        Sqlite
-    };
-
-    explicit ServerError(int error, ErrorType type)
+    explicit ServerError(std::exception* error)
         : error_(error)
-        , type_(type)
     {
     }
 
-    [[nodiscard]] const char* what() const noexcept final {
-        switch (type_) {
-        case Sqlite:
-            return sqlite3_errstr(error_);
-        default:
-            return "Undefined error.";
-        }
+    [[nodiscard]] const char* what() const noexcept final
+    {
+        error_->what();
     }
 
 private:
-    int error_;
-    ErrorType type_;
+    std::exception* error_;
 };
 
 #endif //BABEL_SERVER_SERVERERROR_HPP
