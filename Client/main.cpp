@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
         out.sampleFormat = paFloat32;
         out.channelCount = 2;
 
-        auto soundManager = audioController.createManager(&in, &out, 44100);
+        auto soundManager = audioController.createManager(&in, &out, audioController.getDefaultOutputDevice()->defaultSampleRate);
 
         soundManager->start();
 
