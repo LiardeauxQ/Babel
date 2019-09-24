@@ -7,7 +7,6 @@
 
 #include "ServerApplication.hpp"
 #include "ServerConfig.hpp"
-#include "User.hpp"
 
 int main(int argc, char* argv[])
 {
