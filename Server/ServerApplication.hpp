@@ -9,7 +9,11 @@
 #include "ServerConfig.hpp"
 #include "ServerError.hpp"
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <vector>
+#include <memory>
+#include "Session.hpp"
 
 typedef boost::asio::ip::tcp BoostTcp;
 
@@ -23,6 +27,8 @@ public:
 
     void run();
 private:
+    void accept();
+
     Database database_;
     bool running_;
 
@@ -32,7 +38,8 @@ private:
     std::vector<BoostTcp::socket> clients_;
 
     // Private logic
-    void doAccept();
+    void handleAccept(std::shared_ptr<Session> session, const boost::system::error_code& ec);
+    void handleWrite(const boost::system::error_code& ec, size_t byte_trans);
 };
 
 #endif //BABEL_SERVER_SERVERAPPLICATION_HPP
