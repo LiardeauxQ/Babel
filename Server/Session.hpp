@@ -5,8 +5,9 @@
 #ifndef BABEL_SERVER_SESSION_HPP
 #define BABEL_SERVER_SESSION_HPP
 
-#include "RequestHandler.hpp"
 #include "Message.hpp"
+#include "RequestHandler.hpp"
+#include "SharedData.hpp"
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -17,7 +18,7 @@ typedef boost::asio::ip::tcp BoostTcp;
 
 class Session : public boost::enable_shared_from_this<Session> {
 public:
-    static boost::shared_ptr<Session> create(boost::asio::io_context& context);
+    static boost::shared_ptr<Session> create(boost::asio::io_context& context, Database& conn);
 
     [[nodiscard]] BoostTcp::socket& getSocket()
     {
@@ -31,16 +32,13 @@ public:
     void receiveBody(const boost::system::error_code& ec);
 
 private:
-    explicit Session(boost::asio::io_context& context);
+    explicit Session(boost::asio::io_context& context, Database& conn);
 
     BoostTcp::socket socket_;
 
     Message request_;
 
-    union {
-        char raw[REQUEST_SIZE];
-        request_t req;
-    } data_;
+    SharedData data_;
 };
 
 #endif //BABEL_SERVER_SESSION_HPP
