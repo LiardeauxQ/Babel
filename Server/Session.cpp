@@ -4,9 +4,9 @@
 
 #include "Session.hpp"
 
-std::shared_ptr<Session> Session::create(boost::asio::io_context& context)
+boost::shared_ptr<Session> Session::create(boost::asio::io_context& context)
 {
-    return std::shared_ptr<Session>(new Session(context));
+    return boost::shared_ptr<Session>(new Session(context));
 }
 
 Session::Session(boost::asio::io_context& context)
@@ -15,25 +15,28 @@ Session::Session(boost::asio::io_context& context)
 {
 }
 
-void Session::run()
+void Session::run(std::vector<boost::shared_ptr<Session>>& sessions)
 {
+    sessions.push_back(shared_from_this());
+
     boost::asio::async_read(
         socket_,
-        boost::asio::buffer(request_.header(), REQUEST_HEADER_SIZE),
-        boost::bind(&Session::receivePacket, this, boost::asio::placeholders::error));
+        boost::asio::buffer(data_.raw, REQUEST_HEADER_SIZE),
+        boost::bind(&Session::receivePacket, shared_from_this(), boost::asio::placeholders::error));
 }
 
 void Session::receivePacket(const boost::system::error_code& ec)
 {
     if (!ec) {
-        std::cout << "Packet received" << std::endl;
-        int size = request_.setupPayload();
-        std::cout << "The packet is of size: " << size << std::endl;
+        data_.req.payload = malloc(data_.req.request_len);
+        std::cout << "Packet received: " << data_.req.id << "." << std::endl;
 
         boost::asio::async_read(
             socket_,
-            boost::asio::buffer(request_.payload(), size),
-            boost::bind(&Session::receiveBody, this, boost::asio::placeholders::error));
+            boost::asio::buffer(data_.req.payload, data_.req.request_len),
+            boost::bind(&Session::receiveBody, shared_from_this(), boost::asio::placeholders::error));
+    } else {
+        std::cerr << "Error while receiving packet." << ec.message() << std::endl;
     }
 }
 
@@ -41,6 +44,8 @@ void Session::receiveBody(const boost::system::error_code& ec)
 {
     if (!ec) {
         std::cout << "Body received" << std::endl;
-        request_.handle();
+        RequestHandler::handleRequest(request_);
+    } else {
+        std::cerr << "Error while receiving body." << ec.message() << std::endl;
     }
 }
