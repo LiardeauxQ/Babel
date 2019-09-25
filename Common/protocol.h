@@ -29,8 +29,9 @@ typedef struct {
 
 const size_t REQUEST_HEADER_SIZE = sizeof(int) + sizeof(int);
 const size_t REQUEST_SIZE = REQUEST_HEADER_SIZE + sizeof(void*);
-const size_t USERNAME_LEN = 1024;
-const size_t PASSWORD_LEN = 1024;
+
+#define USERNAME_LEN 1024
+#define PASSWORD_LEN 1024
 
 /// Client's request id.
 enum CLIENT_REQ_ID {
