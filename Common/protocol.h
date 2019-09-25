@@ -10,7 +10,7 @@
 #include <bits/types/time_t.h>
 #include <glob.h>
 
-#define VERSION 0x03
+#define VERSION 0x04
 
 // 1 if the request id come from the server.
 #define IS_SERVER_REQUEST(x) ((x)&0b10000000)
@@ -29,6 +29,8 @@ typedef struct {
 
 const size_t REQUEST_HEADER_SIZE = sizeof(int) + sizeof(int);
 const size_t REQUEST_SIZE = REQUEST_HEADER_SIZE + sizeof(void*);
+const size_t USERNAME_LEN = 1024;
+const size_t PASSWORD_LEN = 1024;
 
 /// Client's request id.
 enum CLIENT_REQ_ID {
@@ -87,8 +89,8 @@ typedef struct {
 const size_t CLIENT_PING_SIZE = sizeof(client_ping_t);
 
 typedef struct {
-    char* username;
-    char* password;
+    char username[USERNAME_LEN];
+    char password[PASSWORD_LEN];
 } client_hello_t;
 
 const size_t CLIENT_HELLO_SIZE = sizeof(client_hello_t);
@@ -99,21 +101,21 @@ typedef struct {
 const size_t CLIENT_GOODBYE_SIZE = sizeof(client_goodbye_t);
 
 typedef struct {
-    char* username;
+    char username[USERNAME_LEN];
 } client_friend_request_t;
 
 const size_t CLIENT_FRIEND_REQUEST_SIZE = sizeof(client_friend_request_t);
 
 typedef struct {
-    char* username;
-    char* password;
+    char username[USERNAME_LEN];
+    char password[PASSWORD_LEN];
 } client_register_t;
 
 const size_t CLIENT_REGISTER_SIZE = sizeof(client_register_t);
 
 typedef struct {
     // Array of username to call.
-    char** usernames;
+    char usernames[USERNAME_LEN];
 
     // The number of user stored in usernames.
     int number;
@@ -127,7 +129,7 @@ typedef struct {
 const size_t CLIENT_BYE_SIZE = sizeof(client_bye_t);
 
 typedef struct {
-    char* username;
+    char username[USERNAME_LEN];
 } client_accept_friend_t;
 
 const size_t CLIENT_ACCEPT_FRIEND_SIZE = sizeof(client_accept_friend_t);
@@ -147,14 +149,14 @@ const size_t SERVER_PONG_SIZE = sizeof(server_pong_t);
 
 typedef struct {
     // The asker username.
-    char* username;
+    char username[USERNAME_LEN];
 } server_friend_request_t;
 
 const size_t SERVER_FRIEND_REQUEST_SIZE = sizeof(server_friend_request_t);
 
 typedef struct {
     // The asker username.
-    char** usernames;
+    char usernames[USERNAME_LEN];
 
     // Number of user inside usernames.
     int number;
@@ -164,14 +166,14 @@ const size_t SERVER_CALL_SIZE = sizeof(server_call_t);
 
 typedef struct {
     // Leaver username.
-    char* username;
+    char username[USERNAME_LEN];
 } server_bye_t;
 
 const size_t SERVER_BYE_SIZE = sizeof(server_bye_t);
 
 typedef struct {
     // Acceptor username.
-    char* username;
+    char username[USERNAME_LEN];
 } server_accept_friend_t;
 
 const size_t SERVER_ACCEPT_FRIEND_SIZE = sizeof(server_accept_friend_t);
