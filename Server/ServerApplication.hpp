@@ -8,14 +8,17 @@
 #include "Database.hpp"
 #include "ServerConfig.hpp"
 #include "ServerError.hpp"
+#include "Session.hpp"
+#include "SharedData.hpp"
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <vector>
 #include <memory>
-#include "Session.hpp"
+#include <vector>
 
 typedef boost::asio::ip::tcp BoostTcp;
+
+class Session;
 
 class ServerApplication {
 public:

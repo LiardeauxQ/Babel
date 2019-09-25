@@ -2,6 +2,7 @@
 // Created by alex on 9/23/19.
 //
 
+
 #include "ServerApplication.hpp"
 
 void ServerApplication::run()
@@ -21,7 +22,7 @@ ServerApplication::ServerApplication(const ServerConfig& config)
 
 void ServerApplication::accept()
 {
-    auto session = Session::create(context_);
+    auto session = Session::create(context_, database_);
 
     acceptor_.async_accept(
         session->getSocket(),
