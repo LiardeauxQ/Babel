@@ -14,7 +14,7 @@ public:
     RequestHandler(const RequestHandler&) = delete;
     ~RequestHandler() = delete;
 
-    static void handleRequest(const Message& request);
+    static void handleRequest(Message& request);
 
     static void friendRequest(client_friend_request_t *payload);
 
