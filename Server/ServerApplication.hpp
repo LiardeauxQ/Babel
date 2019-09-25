@@ -35,11 +35,10 @@ private:
     // Network
     boost::asio::io_context context_;
     BoostTcp::acceptor acceptor_;
-    std::vector<BoostTcp::socket> clients_;
+    std::vector<boost::shared_ptr<Session>> sessions_;
 
     // Private logic
-    void handleAccept(std::shared_ptr<Session> session, const boost::system::error_code& ec);
-    void handleWrite(const boost::system::error_code& ec, size_t byte_trans);
+    void handleAccept(boost::shared_ptr<Session> session, const boost::system::error_code& ec);
 };
 
 #endif //BABEL_SERVER_SERVERAPPLICATION_HPP
