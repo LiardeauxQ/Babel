@@ -49,7 +49,7 @@ public:
 
     int getId()
     {
-        return message_.id;
+        return message_->id;
     }
 
     static int getSizeFromId(int id)
@@ -67,6 +67,10 @@ public:
             return CLIENT_BYE_SIZE;
         case CLIENT_CALL:
             return CLIENT_CALL_SIZE;
+        case CLIENT_GOODBYE:
+            return CLIENT_GOODBYE_SIZE;
+        case CLIENT_FRIEND_STATUS:
+            return CLIENT_FRIEND_STATUS_SIZE;
         case SERVER_ACCEPT_FRIEND:
             return SERVER_ACCEPT_FRIEND_SIZE;
         case SERVER_BYE:
