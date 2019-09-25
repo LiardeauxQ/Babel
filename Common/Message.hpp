@@ -16,40 +16,34 @@ static const size_t MAX_LEN = 1024 * 256;
 class Message {
 public:
     // Construct a message from it's id and it's payload.
-    Message(int id, void* payload)
-        : message_(new request_t { id, -1, nullptr })
-        , ready_(false)
-        , headerUnion_()
+    Message(int id, int payload_len, void *payload)
+        : requestUnion_ {
+            .req = {
+                id,
+                payload_len }
+        }
+        , payload_(payload)
+        , allocated_(true)
     {
-        message_->request_len = getSizeFromId(id);
-
-        if (message_->request_len == -1)
-            throw "Unknown message type.";
-    };
+    }
 
     Message() = default;
 
-    char *header()
-    {
-        return (char *)message_;
-    }
+    [[nodiscard]] int getId() const { return requestUnion_.req.id; }
 
-    void *payload()
-    {
-        return message_->payload;
-    }
+    [[nodiscard]] int getPayloadSize() const { return requestUnion_.req.request_len; }
 
-    int setupPayload()
-    {
-        int size = getSizeFromId(message_->id);
+    [[nodiscard]] void* getPayload() const { return payload_; }
 
-        message_->payload = malloc(size);
-        return size;
-    }
+    void* getHeaderRaw() { return requestUnion_.headerRaw; }
 
-    int getId()
+    void setupPayload()
     {
-        return message_->id;
+        payload_ = malloc(requestUnion_.req.request_len);
+        if (payload_)
+            allocated_ = true;
+        else
+            throw "Allocation error.";
     }
 
     static int getSizeFromId(int id)
@@ -85,17 +79,13 @@ public:
     }
 
 private:
-    request_t* message_;
-
     union {
-        char headerRaw[8];
-        struct {
-            int id;
-            int size;
-        } headerInt;
-    } headerUnion_;
+        char headerRaw[HEADER_SIZE];
+        request_header_t req;
+    } requestUnion_;
 
-    bool ready_;
+    void *payload_;
+    bool allocated_;
 };
 
 #endif //BABEL_SERVER_MESSAGE_HPP
