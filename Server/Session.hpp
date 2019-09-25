@@ -5,7 +5,9 @@
 #ifndef BABEL_SERVER_SESSION_HPP
 #define BABEL_SERVER_SESSION_HPP
 
+#include "Message.hpp"
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
 #include <iostream>
 
 typedef boost::asio::ip::tcp BoostTcp;
@@ -21,11 +23,16 @@ public:
 
     void run();
 
-private:
+    void receivePacket(const boost::system::error_code& ec);
 
+    void receiveBody(const boost::system::error_code& ec);
+
+private:
     explicit Session(boost::asio::io_context& context);
 
     BoostTcp::socket socket_;
+
+    Message request_;
 };
 
 #endif //BABEL_SERVER_SESSION_HPP
