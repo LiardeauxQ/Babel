@@ -10,7 +10,7 @@
 #include <bits/types/time_t.h>
 #include <glob.h>
 
-#define VERSION 0x02
+#define VERSION 0x03
 
 // 1 if the request id come from the server.
 #define IS_SERVER_REQUEST(x) ((x)&0b10000000)
@@ -27,7 +27,8 @@ typedef struct {
     void* payload;
 } request_t;
 
-const size_t REQUEST_SIZE = sizeof(request_t);
+const size_t REQUEST_HEADER_SIZE = sizeof(int) + sizeof(int);
+const size_t REQUEST_SIZE = REQUEST_HEADER_SIZE + sizeof(void*);
 
 /// Client's request id.
 enum CLIENT_REQ_ID {
@@ -130,6 +131,11 @@ typedef struct {
 } client_accept_friend_t;
 
 const size_t CLIENT_ACCEPT_FRIEND_SIZE = sizeof(client_accept_friend_t);
+
+typedef struct {
+} client_friend_status_t;
+
+const size_t CLIENT_FRIEND_STATUS_SIZE = sizeof(client_friend_status_t);
 
 // ----------------- Server's payloads definitions ------------------------ //
 
