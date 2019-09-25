@@ -14,7 +14,7 @@ include_directories("./Common")
 include_directories("./Client")
 include_directories("./Server")
 
-set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
+set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
 
 set(SERVER_PATH "${CMAKE_SOURCE_DIR}/Server")
 set(CLIENT_PATH "${CMAKE_SOURCE_DIR}/Client")
@@ -24,6 +24,8 @@ set(BABEL_SERVER
         ${SERVER_PATH}/main.cpp
         ${SERVER_PATH}/ServerApplication.hpp
         ${SERVER_PATH}/ServerApplication.cpp
+        ${SERVER_PATH}/ServerConfig.cpp
+        ${SERVER_PATH}/ServerConfig.hpp
         ${SERVER_PATH}/ServerError.hpp
         ${SERVER_PATH}/ServerError.cpp)
 

@@ -10,15 +10,9 @@
 
 class ServerError : public std::exception {
 public:
-    explicit ServerError(std::exception* error)
-        : error_(error)
-    {
-    }
+    explicit ServerError(std::exception* error);
 
-    [[nodiscard]] const char* what() const noexcept final
-    {
-        return error_->what();
-    }
+    [[nodiscard]] const char* what() const noexcept final;
 
 private:
     std::exception* error_;

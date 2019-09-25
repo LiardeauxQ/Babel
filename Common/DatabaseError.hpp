@@ -8,6 +8,8 @@
 #include <exception>
 #include <sqlite3.h>
 
+static const int ROW_NOT_FOUND = -1;
+
 class DatabaseError : public std::exception {
 public:
     explicit DatabaseError(int error)
@@ -17,7 +19,16 @@ public:
 
     [[nodiscard]] const char* what() const noexcept final
     {
-        return sqlite3_errstr(error_);
+        if (error_ > 0) {
+            return sqlite3_errstr(error_);
+        } else {
+            switch (error_) {
+            case ROW_NOT_FOUND:
+                return "Row not found.";
+            default:
+                return "Unknown error.";
+            }
+        }
     }
 
 public:

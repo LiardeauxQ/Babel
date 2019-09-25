@@ -29,8 +29,6 @@ public:
 
     [[nodiscard]] std::unique_ptr<SoundManager> createManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate = 44100) const;
 
-    [[nodiscard]] std::unique_ptr<SoundManagerBlocking> createBlockingManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate = 44100) const;
-
     [[nodiscard]] const PaDeviceInfo* getDefaultInputDevice() const;
 
     [[nodiscard]] const PaDeviceInfo* getDefaultOutputDevice() const;

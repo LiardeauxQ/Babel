@@ -7,28 +7,19 @@
 
 #include "ServerApplication.hpp"
 #include "ServerConfig.hpp"
-#include "User.hpp"
-#include <iostream>
 
 int main(int argc, char* argv[])
 {
     try {
-        ServerConfig config {
-            .databaseUrl = "./data.db",
-            .maxUser = 100
-        };
+        ServerConfig config("./server.cfg");
 
         ServerApplication server(config);
 
-        auto conn = server.getConnection();
-
-        User user(conn, 2);
-
-        std::cout << "username: " << user.getName() << std::endl;
-        std::cout << "password: " << user.getPassword() << std::endl;
-        std::cout << "id: " << user.getId() << std::endl;
+        server.run();
 
     } catch (const std::exception& e) {
         std::cerr << "Server failed: " << e.what() << std::endl;
     }
 }
+
+
