@@ -31,7 +31,8 @@ set(BABEL_SERVER
         ${SERVER_PATH}/Session.hpp
         ${SERVER_PATH}/Session.cpp
         ${SERVER_PATH}/RequestHandler.cpp
-        ${SERVER_PATH}/RequestHandler.hpp)
+        ${SERVER_PATH}/RequestHandler.hpp
+        ${SERVER_PATH}/SharedData.hpp)
 
 set(BABEL_CLIENT
         ${CLIENT_PATH}/main.cpp
