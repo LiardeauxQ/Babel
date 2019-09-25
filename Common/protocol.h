@@ -22,13 +22,9 @@ typedef struct {
 
     // Defined by CLIENT_REQ_LEN if it's a client request. SERVER_REQ_LEN otherwise.
     int request_len;
+} request_header_t;
 
-    // The request payload.
-    void* payload;
-} request_t;
-
-const size_t REQUEST_HEADER_SIZE = sizeof(int) + sizeof(int);
-const size_t REQUEST_SIZE = REQUEST_HEADER_SIZE + sizeof(void*);
+const size_t HEADER_SIZE = sizeof(request_header_t);
 
 #define USERNAME_LEN 1024
 #define PASSWORD_LEN 1024
