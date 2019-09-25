@@ -1,0 +1,67 @@
+image: conanio/gcc9:latest
+
+stages:
+  - build
+  - test
+  - deploy
+    
+build_client:
+  stage: build
+  script:
+    - ls
+    - mkdir build
+    - cd build
+    - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan 
+    - conan remote add epitech https://api.bintray.com/conan/epitech/public-conan 
+    - sudo apt-get update && yes | sudo apt-get install --yes --force-yes --assume-yes qtdeclarative5-dev jackd
+    - conan install ..
+    - cmake ..
+    - make babel-client
+
+build_server:
+  stage: build
+  script:
+    - ls
+    - mkdir build
+    - cd build
+    - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan 
+    - conan remote add epitech https://api.bintray.com/conan/epitech/public-conan 
+    - sudo apt-get update && yes | sudo apt-get install --yes --force-yes --assume-yes qtdeclarative5-dev jackd
+    - conan install ..
+    - cmake ..
+    - make babel-server
+
+test_client:
+  stage: test
+  allow_failure: true
+  dependencies:
+    - build_client
+  script:
+    - make babel-client-test
+    - ./babel-client-test
+
+test_server:
+  stage: test
+  allow_failure: true
+  dependencies:
+    - build_server
+  script:
+    - make babel-server-test
+    - ./babel-server-test
+
+full_deploy:
+  stage: deploy
+  only:
+    - master
+  script:
+    - echo "Pushing to $TARGET_REPO"
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/epitech
+    - chmod 600 ~/.ssh/epitech
+    - git config core.sshCommand "ssh -o \"StrictHostKeyChecking=no\" -i ~/.ssh/epitech -F /dev/null"
+    - git remote remove epitech || true
+    - git remote add epitech $TARGET_REPO || true
+    - git push epitech HEAD:$CI_COMMIT_REF_NAME
+    - git config --unset core.sshCommand
+    - rm -rf ~/.ssh/epitech
+

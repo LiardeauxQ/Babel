@@ -3,10 +3,8 @@
 //
 
 #include "AudioController.hpp"
+#include "AudioControllerError.hpp"
 #include <iostream>
-
-#define SAMPLE_RATE (44100) // TODO Add this to configuration.
-#define FRAME_PER_BUFFER (1024) // TODO Add this to configuration.
 
 inline void handleError(int error)
 {
@@ -48,13 +46,6 @@ const PaDeviceInfo* AudioController::getDefaultOutputDevice() const
     return Pa_GetDeviceInfo(idx);
 }
 
-int AudioController::getVersion() { return Pa_GetVersion(); }
-
-std::string AudioController::getTextVersion()
-{
-    return std::string(Pa_GetVersionText());
-}
-
 std::vector<const PaDeviceInfo*> AudioController::getDevicesInfo() const
 {
     int count = Pa_GetDeviceCount();
@@ -67,28 +58,6 @@ std::vector<const PaDeviceInfo*> AudioController::getDevicesInfo() const
     return devices;
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "MemberFunctionCanBeStatic"
-
-SoundStream AudioController::createStream(const PaDeviceInfo* dev, PaStreamCallback* callback, void* linkedData,
-    const std::string& name)
-{
-
-    return SoundStream(dev->defaultSampleRate, dev->maxInputChannels,
-        dev->maxOutputChannels, paFloat32,
-        64, callback, linkedData,
-        name);
-}
-
-SoundStream AudioController::createCustomStream(PaStreamParameters* outputStream, PaStreamParameters* inputStream,
-    PaStreamCallback* callback, void* userData, PaStreamFlags flags,
-    const std::string& name)
-{
-    return SoundStream(outputStream, inputStream, SAMPLE_RATE,
-        64, flags, callback, userData,
-        name);
-}
-
 int AudioController::getDefaultOutputId() const
 {
     return Pa_GetDefaultOutputDevice();
@@ -98,15 +67,18 @@ int AudioController::getDefaultInputId() const
 {
     return Pa_GetDefaultInputDevice();
 }
-
-#pragma clang diagnostic pop
-
-const char* AudioControllerError::what() const noexcept
+std::unique_ptr<SoundManager> AudioController::createManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate) const
 {
-    return Pa_GetErrorText(error_);
+    return std::unique_ptr<SoundManager>(new SoundManager(
+        input,
+        output,
+        sampleRate));
 }
-
-AudioControllerError::AudioControllerError(int error)
-    : error_(error)
+std::unique_ptr<SoundManagerBlocking> AudioController::createBlockingManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate) const
 {
+    return std::unique_ptr<SoundManagerBlocking>(new SoundManagerBlocking(
+        input,
+        output,
+        sampleRate,
+        DEFAULT_FRAME_SIZE));
 }
