@@ -27,7 +27,12 @@ set(BABEL_SERVER
         ${SERVER_PATH}/ServerConfig.cpp
         ${SERVER_PATH}/ServerConfig.hpp
         ${SERVER_PATH}/ServerError.hpp
-        ${SERVER_PATH}/ServerError.cpp)
+        ${SERVER_PATH}/ServerError.cpp
+        ${SERVER_PATH}/Session.hpp
+        ${SERVER_PATH}/Session.cpp
+        ${SERVER_PATH}/RequestHandler.cpp
+        ${SERVER_PATH}/RequestHandler.hpp
+        ${SERVER_PATH}/SharedData.hpp)
 
 set(BABEL_CLIENT
         ${CLIENT_PATH}/main.cpp
@@ -44,7 +49,9 @@ set(BABEL_COMMON
         ${COMMON_PATH}/Database.hpp
         ${COMMON_PATH}/Database.cpp
         ${COMMON_PATH}/DatabaseError.hpp
-        ${COMMON_PATH}/DatabaseError.cpp)
+        ${COMMON_PATH}/DatabaseError.cpp
+        ${COMMON_PATH}/Message.hpp
+        ${COMMON_PATH}/protocol.h)
 
 add_executable(babel-client ${BABEL_CLIENT} ${BABEL_COMMON})
 
