@@ -11,32 +11,18 @@ int main(int argc, char* argv[])
     try {
         AudioController audioController;
 
-        PaStreamParameters in;
-        in.device = audioController.getDefaultInputId();
-        in.hostApiSpecificStreamInfo = nullptr;
-        in.suggestedLatency = audioController.getDefaultInputDevice()->defaultHighInputLatency;
-        in.sampleFormat = paFloat32;
-        in.channelCount = 2;
-
-        PaStreamParameters out;
-        out.device = audioController.getDefaultOutputId();
-        out.hostApiSpecificStreamInfo = nullptr;
-        out.suggestedLatency = audioController.getDefaultOutputDevice()->defaultHighOutputLatency;
-        out.sampleFormat = paFloat32;
-        out.channelCount = 2;
-
-        auto soundManager = audioController.createManager(&in, &out, audioController.getDefaultOutputDevice()->defaultSampleRate);
+        auto soundManager = audioController.createManager();
 
         soundManager->start();
 
-        for (;;) {
-            auto data = soundManager->read();
+        std::vector<float> data;
+        data.reserve(512);
 
-            if (data) {
-                std::vector<float> vec(data->begin(), data->end());
-                std::reverse(vec.begin(), vec.end());
-                soundManager->write(vec);
-            }
+        while (soundManager->isActive()) {
+            soundManager->read(data);
+
+            soundManager->write(data);
+            data.clear();
         }
 
         soundManager->stop();

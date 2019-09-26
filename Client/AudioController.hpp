@@ -27,7 +27,7 @@ public:
 
     [[nodiscard]] std::vector<const PaDeviceInfo*> getDevicesInfo() const;
 
-    [[nodiscard]] std::unique_ptr<SoundManager> createManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate = 44100) const;
+    [[nodiscard]] std::unique_ptr<SoundManager> createManager() const;
 
     [[nodiscard]] const PaDeviceInfo* getDefaultInputDevice() const;
 
