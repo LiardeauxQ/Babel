@@ -16,19 +16,21 @@ namespace ui {
         Q_OBJECT
     public:
         explicit MainWindow(QWidget *parent = nullptr);
+        ~MainWindow();
 
     private slots:
         void initRegisterWidget();
         void initLoginWidget();
     private:
-        QSharedPointer<QPushButton> registerButton_;
-        QSharedPointer<QPushButton> loginButton_;
         QSharedPointer<QStackedWidget> stackedWidget_;
+        QSharedPointer<QWidget> connectionWidget_;
 
         void registered();
         void logged();
         void closeRegister();
         void closeLogin();
+
+        void removeLastWidget();
     };
 }
 

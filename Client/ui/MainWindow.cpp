@@ -7,19 +7,25 @@
 ui::MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
     stackedWidget_ = QSharedPointer<QStackedWidget>(new QStackedWidget());
-    registerButton_ = QSharedPointer<QPushButton>(new QPushButton(tr("register")));
-    loginButton_ = QSharedPointer<QPushButton>(new QPushButton(tr("login")));
+    connectionWidget_ = QSharedPointer<QWidget>(new QWidget());
 
-    connect(registerButton_.get(), SIGNAL(clicked()), this, SLOT(initRegisterWidget()));
-    connect(loginButton_.get(), SIGNAL(clicked()), this, SLOT(initLoginWidget()));
+    QPointer<QPushButton> loginButton = new QPushButton(tr("login"));
+    QPointer<QPushButton> registerButton = new QPushButton(tr("register"));
 
-    QPointer<QGridLayout> layout = new QGridLayout();
+    connect(registerButton, SIGNAL(clicked()), this, SLOT(initRegisterWidget()));
+    connect(loginButton, SIGNAL(clicked()), this, SLOT(initLoginWidget()));
 
-    layout->addWidget(registerButton_.get());
-    layout->addWidget(loginButton_.get());
-    layout->addWidget(stackedWidget_.get());
+    QPointer<QLayout> mainLayout = new QGridLayout();
 
-    setLayout(layout);
+    connectionWidget_->setLayout(new QGridLayout());
+    connectionWidget_->layout()->addWidget(registerButton);
+    connectionWidget_->layout()->addWidget(loginButton);
+    stackedWidget_->addWidget(connectionWidget_.get());
+    mainLayout->addWidget(stackedWidget_.get());
+    setLayout(mainLayout);
+}
+
+ui::MainWindow::~MainWindow() {
 }
 
 void ui::MainWindow::initRegisterWidget()
@@ -32,24 +38,22 @@ void ui::MainWindow::initRegisterWidget()
     wRegister->addAction(registerAction);
     connect(closeAction,&QAction::triggered, this, &ui::MainWindow::closeRegister);
     wRegister->addAction(closeAction);
-    auto lastWidget = stackedWidget_->widget(stackedWidget_->currentIndex());
-    stackedWidget_->removeWidget(lastWidget);
+    removeLastWidget();
     stackedWidget_->addWidget(wRegister);
     std::cout << "register" << std::endl;
 }
 
 void ui::MainWindow::initLoginWidget()
 {
-    QPointer<LoginWidget> wLogin = new LoginWidget();
-    QPointer<QAction> loginAction = new QAction("login");
-    QPointer<QAction> closeAction = new QAction("close");
+    auto wLogin = new LoginWidget();
+    auto loginAction = new QAction("login");
+    auto closeAction = new QAction("close");
 
     connect(loginAction, &QAction::triggered, this, &ui::MainWindow::logged);
     wLogin->addAction(loginAction);
     connect(closeAction, &QAction::triggered, this, &ui::MainWindow::closeLogin);
     wLogin->addAction(closeAction);
-    auto lastWidget = stackedWidget_->widget(stackedWidget_->currentIndex());
-    stackedWidget_->removeWidget(lastWidget);
+    removeLastWidget();
     stackedWidget_->addWidget(wLogin);
     std::cout << "login" << std::endl;
 }
@@ -66,10 +70,23 @@ void ui::MainWindow::logged()
 
 void ui::MainWindow::closeRegister()
 {
-    std::cout << "close register" << std::endl;
+    removeLastWidget();
+    stackedWidget_->addWidget(connectionWidget_.get());
 }
 
 void ui::MainWindow::closeLogin()
 {
-    std::cout << "close login" << std::endl;
+    removeLastWidget();
+    stackedWidget_->addWidget(connectionWidget_.get());
+}
+
+void ui::MainWindow::removeLastWidget()
+{
+    if (stackedWidget_->count() <= 0) {
+        return;
+    }
+
+    auto lastWidget = stackedWidget_->widget(stackedWidget_->currentIndex());
+
+    stackedWidget_->removeWidget(lastWidget);
 }
