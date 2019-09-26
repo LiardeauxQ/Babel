@@ -12,9 +12,7 @@
 #include <portaudio.h>
 #include <vector>
 
-const size_t MAX_SIZE = 2048;
-const size_t DEFAULT_SAMPLE_RATE = 44100;
-const size_t DEFAULT_FRAME_SIZE = 64;
+const size_t MAX_SIZE = 50000;
 
 class SoundManager {
 public:
