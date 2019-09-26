@@ -6,10 +6,14 @@
 
 ui::RegisterWidget::RegisterWidget(QWidget *parent) : QWidget(parent)
 {
+    closeButton_ = QSharedPointer<QPushButton>(new QPushButton(tr("Close")));
     button_ = QSharedPointer<QPushButton>(new QPushButton(tr("Register")));
     usernameLineEdit_ = QSharedPointer<QLineEdit>(new QLineEdit());
     passwordLineEdit_ = QSharedPointer<QLineEdit>(new QLineEdit());
     confirmPassLineEdit_ = QSharedPointer<QLineEdit>(new QLineEdit());
+
+    connect(closeButton_.get(), SIGNAL(clicked()), this, SLOT(close()));
+    connect(button_.get(), SIGNAL(clicked()), this, SLOT(registerTap()));
 
     QPointer<QLabel> usernameLabel = new QLabel(tr("Username:"));
     QPointer<QLabel> passwordLabel = new QLabel(tr("Password:"));
@@ -20,6 +24,7 @@ ui::RegisterWidget::RegisterWidget(QWidget *parent) : QWidget(parent)
 
     QPointer<QFormLayout> formLayout = new QFormLayout();
 
+    formLayout->addRow(closeButton_.get());
     formLayout->addRow(usernameLabel, usernameLineEdit_.get());
     formLayout->addRow(passwordLabel, passwordLineEdit_.get());
     formLayout->addRow(confirmPassLabel, confirmPassLineEdit_.get());
@@ -27,4 +32,24 @@ ui::RegisterWidget::RegisterWidget(QWidget *parent) : QWidget(parent)
 
     setLayout(formLayout);
     setWindowTitle(tr("Register to Babel"));
+}
+
+void ui::RegisterWidget::registerTap()
+{
+    for (auto action : actions()) {
+        if (action->text() == "register") {
+            action->trigger();
+            break;
+        }
+    }
+}
+
+void ui::RegisterWidget::close()
+{
+    for (auto action : actions()) {
+        if (action->text() == "close") {
+            action->trigger();
+            break;
+        }
+    }
 }

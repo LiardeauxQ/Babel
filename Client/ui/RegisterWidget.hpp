@@ -15,8 +15,12 @@ namespace ui {
     public:
         explicit RegisterWidget(QWidget *parent = nullptr);
 
+    private slots:
+        void registerTap();
+        void close();
     private:
         QSharedPointer <QPushButton> button_;
+        QSharedPointer <QPushButton> closeButton_;
         QSharedPointer <QLineEdit> usernameLineEdit_;
         QSharedPointer <QLineEdit> passwordLineEdit_;
         QSharedPointer <QLineEdit> confirmPassLineEdit_;
