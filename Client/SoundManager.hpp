@@ -12,7 +12,7 @@
 #include <portaudio.h>
 #include <vector>
 
-const size_t MAX_SIZE = 50000;
+const size_t MAX_SIZE = 32000;
 
 class SoundManager {
 public:
@@ -38,7 +38,7 @@ private:
 
     struct SharedData {
         std::unique_ptr<boost::circular_buffer<float>> toRead;
-        std::unique_ptr<std::vector<float>> toWrite;
+        std::unique_ptr<boost::circular_buffer<float>> toWrite;
     } buffers_;
 
     static int callback(const void* inputBuffer, void* outputBuffer,

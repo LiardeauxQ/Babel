@@ -16,15 +16,13 @@ int main(int argc, char* argv[])
         soundManager->start();
 
         std::vector<float> data;
-        data.reserve(50000);
+        data.reserve(512);
 
         while (soundManager->isActive()) {
             soundManager->read(data);
 
             soundManager->write(data);
             data.clear();
-
-            audioController.sleep(1000);
         }
 
         soundManager->stop();

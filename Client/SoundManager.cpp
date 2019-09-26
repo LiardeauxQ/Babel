@@ -9,7 +9,7 @@ SoundManager::SoundManager(PaStreamParameters* input, PaStreamParameters* output
     : stream_(nullptr)
     , buffers_ {
         std::make_unique<boost::circular_buffer<float>>(MAX_SIZE),
-        std::make_unique<std::vector<float>>(MAX_SIZE),
+        std::make_unique<boost::circular_buffer<float>>(MAX_SIZE),
     }
 {
     int error = Pa_OpenStream(
@@ -37,8 +37,7 @@ void SoundManager::read(std::vector<float>& buffer)
 
 void SoundManager::write(const std::vector<float>& data)
 {
-    if (buffers_.toWrite->size() < MAX_SIZE)
-        buffers_.toWrite->insert(buffers_.toWrite->begin(), data.begin(), data.end());
+    buffers_.toWrite->insert(buffers_.toWrite->begin(), data.begin(), data.end());
 }
 
 int SoundManager::callback(const void* inputBuffer, void* outputBuffer,
