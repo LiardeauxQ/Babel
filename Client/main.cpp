@@ -6,7 +6,7 @@
 #include "AudioControllerError.hpp"
 #include <iostream>
 #include <QApplication>
-#include "ui/LoginWidget.hpp"
+#include "ui/RegisterWidget.hpp"
 
 int main(int argc, char *argv[])
 {

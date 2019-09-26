@@ -57,7 +57,9 @@ set(BABEL_CLIENT
 	${CLIENT_PATH}/opus/Decoder.hpp
 	${CLIENT_PATH}/opus/Opus.hpp
 	${CLIENT_PATH}/ui/LoginWidget.cpp
-	${CLIENT_PATH}/ui/LoginWidget.hpp)
+	${CLIENT_PATH}/ui/LoginWidget.hpp
+	${CLIENT_PATH}/ui/RegisterWidget.cpp
+	${CLIENT_PATH}/ui/RegisterWidget.hpp)
 
 set(BABEL_COMMON
         ${COMMON_PATH}/User.hpp
