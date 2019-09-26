@@ -5,7 +5,19 @@
 #include "AudioController.hpp"
 #include "AudioControllerError.hpp"
 #include <iostream>
+#include <QApplication>
+#include "ui/LoginWidget.hpp"
 
+int main(int argc, char *argv[])
+{
+    QApplication babelApp(argc, argv);
+    ui::LoginWidget w;
+
+    w.show();
+    return babelApp.exec();
+}
+
+/*
 int main(int argc, char* argv[])
 {
     try {
@@ -16,7 +28,7 @@ int main(int argc, char* argv[])
         in.hostApiSpecificStreamInfo = nullptr;
         in.suggestedLatency = audioController.getDefaultInputDevice()->defaultHighInputLatency;
         in.sampleFormat = paFloat32;
-        in.channelCount = 2;
+        in.channelCount = 1;
 
         PaStreamParameters out;
         out.device = audioController.getDefaultOutputId();
@@ -29,12 +41,21 @@ int main(int argc, char* argv[])
 
         soundManager->start();
 
+        for (auto a : audioController.getDevicesInfo()) {
+            std::cout << a->name << std::endl;
+            std::cout << a->maxOutputChannels << std::endl;
+            std::cout << a->maxInputChannels << std::endl;
+        }
+
         for (;;) {
             auto data = soundManager->read();
 
             if (data) {
                 std::vector<float> vec(data->begin(), data->end());
                 std::reverse(vec.begin(), vec.end());
+                for (auto &e : vec) {
+                    //std::cout << e << std::endl;
+                }
                 soundManager->write(vec);
             }
         }
@@ -45,4 +66,4 @@ int main(int argc, char* argv[])
         return 1;
     };
     return 0;
-}
+}*/
