@@ -29,6 +29,7 @@ namespace ui {
 
     private slots:
         void login();
+        void close();
     };
 }
 
