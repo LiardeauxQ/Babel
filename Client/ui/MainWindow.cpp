@@ -13,13 +13,13 @@ ui::MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     connect(registerButton_.get(), SIGNAL(clicked()), this, SLOT(initRegisterWidget()));
     connect(loginButton_.get(), SIGNAL(clicked()), this, SLOT(initLoginWidget()));
 
-    auto layout = QSharedPointer<QGridLayout>(new QGridLayout());
+    QPointer<QGridLayout> layout = new QGridLayout();
 
     layout->addWidget(registerButton_.get());
     layout->addWidget(loginButton_.get());
+    layout->addWidget(stackedWidget_.get());
 
-
-    setLayout(layout.get());
+    setLayout(layout);
 }
 
 void ui::MainWindow::initRegisterWidget()
@@ -32,7 +32,10 @@ void ui::MainWindow::initRegisterWidget()
     wRegister->addAction(registerAction);
     connect(closeAction,&QAction::triggered, this, &ui::MainWindow::closeRegister);
     wRegister->addAction(closeAction);
+    auto lastWidget = stackedWidget_->widget(stackedWidget_->currentIndex());
+    stackedWidget_->removeWidget(lastWidget);
     stackedWidget_->addWidget(wRegister);
+    std::cout << "register" << std::endl;
 }
 
 void ui::MainWindow::initLoginWidget()
@@ -45,8 +48,10 @@ void ui::MainWindow::initLoginWidget()
     wLogin->addAction(loginAction);
     connect(closeAction, &QAction::triggered, this, &ui::MainWindow::closeLogin);
     wLogin->addAction(closeAction);
-    layout()->addWidget(wLogin);
+    auto lastWidget = stackedWidget_->widget(stackedWidget_->currentIndex());
+    stackedWidget_->removeWidget(lastWidget);
     stackedWidget_->addWidget(wLogin);
+    std::cout << "login" << std::endl;
 }
 
 void ui::MainWindow::registered()
