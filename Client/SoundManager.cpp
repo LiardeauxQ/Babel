@@ -5,38 +5,45 @@
 #include "SoundManager.hpp"
 #include <iostream>
 
-SoundManager::SoundManager(double sampleRate)
+SoundManager::SoundManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate)
     : stream_(nullptr)
     , buffers_ {
         std::make_unique<boost::circular_buffer<float>>(1024),
         std::make_unique<std::vector<float>>(1024),
     }
 {
-    int error = Pa_OpenDefaultStream(&stream_,
-        1,
-        1,
-        paFloat32,
+    int error = Pa_OpenStream(
+        &stream_,
+        input,
+        output,
         sampleRate,
         paFramesPerBufferUnspecified,
-        nullptr,
-        nullptr);
+        paNoFlag,
+        callback,
+        &buffers_);
 
     if (error != paNoError)
         throw AudioControllerError(error);
 }
 
+// Copy all information to read buffer and discard local data.
 void SoundManager::read(std::vector<float>& buffer)
 {
-    int error = Pa_ReadStream(stream_, buffer.data(), buffer.capacity());
-    buffer.resize(buffer.capacity());
+    if (buffer.size() > MAX_SIZE)
+        return;
+    for (auto e: *buffers_.toRead)
+        buffer.push_back(e);
 
-    if (error != paNoError)
-        throw AudioControllerError(error);
+    buffers_.toRead->clear();
+    buffers_.toRead->resize(0);
 }
 
 void SoundManager::write(const std::vector<float>& data)
 {
-    Pa_WriteStream(stream_, data.data(), data.size());
+    if (buffers_.toWrite->size() < MAX_SIZE)
+        buffers_.toWrite->insert(buffers_.toWrite->begin(), data.rbegin(), data.rend());
+
+    std::cout << "ToWrite size: " << buffers_.toWrite->size() << std::endl;
 }
 
 int SoundManager::callback(const void* inputBuffer, void* outputBuffer,
@@ -45,29 +52,24 @@ int SoundManager::callback(const void* inputBuffer, void* outputBuffer,
     PaStreamCallbackFlags statusFlags,
     void* userData)
 {
-    std::cout << "Callback" << std::endl;
     auto in = (float*)inputBuffer;
     auto out = (float*)outputBuffer;
     auto shared = (SharedData*)userData;
 
-    for (size_t i = 0; i < framesPerBuffer; i++)
-        shared->toRead->push_back(*in++);
+    for (size_t i = 0; i < framesPerBuffer; i++) {
+        *out++ = *in;
+        *out++ = *in++;
+        //shared->toRead->push_front(*in++);
 
-//    if (shared->toWrite->empty())
-//        return paContinue;
-//
-//    if (shared->toWrite->size() <= framesPerBuffer) {
-//        for (size_t i = 0; i < shared->toWrite->size(); i++) {
-//            *out++ = shared->toWrite->back();
-//            *out++ = shared->toWrite->back();
-//            shared->toWrite->pop_back();
-//        }
-//    } else {
-//        for (size_t i = 0; i < framesPerBuffer; i++) {
-//            *out++ = shared->toWrite->back();
-//            *out++ = shared->toWrite->back();
-//            shared->toWrite->pop_back();
-//        }
-//    }
+        //if (shared->toWrite->empty()) {
+        //    *out++ = 0;
+        //    *out++ = 0;
+        //} else {
+        //    *out++ = shared->toWrite->back();
+        //    *out++ = shared->toWrite->back();
+        //    shared->toWrite->pop_back();
+        //}
+    }
+
     return paContinue;
 }

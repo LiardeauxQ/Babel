@@ -19,7 +19,7 @@ const size_t DEFAULT_FRAME_SIZE = 64;
 class SoundManager {
 public:
     // Should be used.
-    explicit SoundManager(double sampleRate);
+    explicit SoundManager(PaStreamParameters* input, PaStreamParameters *output, double sampleRate);
 
     // Discard internal data and give it to user.
     void read(std::vector<float>& buffer);
@@ -33,8 +33,10 @@ public:
     // Enable streaming interaction.
     inline void stop() { Pa_StopStream(stream_); }
 
+    inline bool isActive() { return Pa_IsStreamActive(stream_); }
+
 private:
-    PaStream  *stream_;
+    PaStream* stream_;
 
     struct SharedData {
         std::unique_ptr<boost::circular_buffer<float>> toRead;

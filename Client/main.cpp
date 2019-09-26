@@ -11,18 +11,17 @@ int main(int argc, char* argv[])
     try {
         AudioController audioController;
 
-        auto soundManager = audioController.createManager(44100);
+        auto soundManager = audioController.createManager();
 
         soundManager->start();
 
         std::vector<float> data;
         data.reserve(12000);
 
-        for (;;) {
+        while(soundManager->isActive()) {
             soundManager->read(data);
 
-            if (!data.empty())
-                soundManager->write(data);
+            soundManager->write(data);
         }
 
         soundManager->stop();
