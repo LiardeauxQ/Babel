@@ -9,6 +9,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+if (APPLE)
+    set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
+endif ()
+
 include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
 include_directories("./Common")
 include_directories("./Client")
@@ -68,6 +72,6 @@ target_link_libraries(babel-client portaudio::portaudio opus::opus boost_circula
 
 target_link_libraries(babel-server sqlite3::sqlite3 boost_asio::boost_asio)
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
     target_link_libraries(babel-client jack asound)
 endif ()
