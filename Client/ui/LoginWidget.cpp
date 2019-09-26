@@ -7,19 +7,20 @@
 ui::LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent)
 {
     button_ = QSharedPointer<QPushButton>(new QPushButton(tr("Login")));
-    usernameTextEdit_ = QSharedPointer<QTextEdit>(new QTextEdit());
-    passwordTextEdit_ = QSharedPointer<QTextEdit>(new QTextEdit());
+    usernameLineEdit_ = QSharedPointer<QLineEdit>(new QLineEdit());
+    passwordLineEdit_ = QSharedPointer<QLineEdit>(new QLineEdit());
 
-    QPointer<QVBoxLayout> mainLayout = new QVBoxLayout();
+    QPointer<QLabel> usernameLabel = new QLabel(tr("Username:"));
+    QPointer<QLabel> passwordLabel = new QLabel(tr("Password:"));
 
-    usernameTextEdit_->setFixedHeight(ui::DefaultUIHeights::textBoxHeight);
-    usernameTextEdit_->setLineWrapMode(QTextEdit::NoWrap);
-    passwordTextEdit_->setFixedHeight(ui::DefaultUIHeights::textBoxHeight);
-    passwordTextEdit_->setLineWrapMode(QTextEdit::NoWrap);
-    mainLayout->addWidget(usernameTextEdit_.get());
-    mainLayout->addWidget(passwordTextEdit_.get());
-    mainLayout->addWidget(button_.get());
+    passwordLineEdit_->setEchoMode(QLineEdit::Password);
 
-    setLayout(mainLayout);
+    QPointer<QFormLayout> formLayout = new QFormLayout();
+
+    formLayout->addRow(usernameLabel, usernameLineEdit_.get());
+    formLayout->addRow(passwordLabel, passwordLineEdit_.get());
+    formLayout->addRow(button_.get());
+
+    setLayout(formLayout);
     setWindowTitle(tr("Login to Babel"));
 }

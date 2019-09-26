@@ -6,7 +6,6 @@
 #define BABEL_SERVER_LOGINWIDGET_HPP
 
 #include <memory>
-#include <QMainWindow>
 #include <QtWidgets>
 #include <QSharedPointer>
 
@@ -26,8 +25,8 @@ namespace ui {
 
     private:
         QSharedPointer<QPushButton> button_;
-        QSharedPointer<QTextEdit> usernameTextEdit_;
-        QSharedPointer<QTextEdit> passwordTextEdit_;
+        QSharedPointer<QLineEdit> usernameLineEdit_;
+        QSharedPointer<QLineEdit> passwordLineEdit_;
     };
 }
 
