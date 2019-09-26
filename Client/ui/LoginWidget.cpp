@@ -15,6 +15,8 @@ ui::LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent)
 
     passwordLineEdit_->setEchoMode(QLineEdit::Password);
 
+    connect(button_.get(), SIGNAL(clicked()), this, SLOT(login()));
+
     QPointer<QFormLayout> formLayout = new QFormLayout();
 
     formLayout->addRow(usernameLabel, usernameLineEdit_.get());
@@ -23,4 +25,14 @@ ui::LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent)
 
     setLayout(formLayout);
     setWindowTitle(tr("Login to Babel"));
+}
+
+void ui::LoginWidget::login()
+{
+    for (auto action : actions()) {
+        if (action->text() == "login") {
+            action->trigger();
+            break;
+        }
+    }
 }

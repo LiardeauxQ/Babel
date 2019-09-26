@@ -8,6 +8,7 @@
 #include <memory>
 #include <QtWidgets>
 #include <QSharedPointer>
+#include <iostream>
 
 namespace ui {
 
@@ -21,12 +22,13 @@ namespace ui {
     public:
         explicit LoginWidget(QWidget *parent = nullptr);
 
-        ~LoginWidget() override = default;
-
     private:
         QSharedPointer<QPushButton> button_;
         QSharedPointer<QLineEdit> usernameLineEdit_;
         QSharedPointer<QLineEdit> passwordLineEdit_;
+
+    private slots:
+        void login();
     };
 }
 

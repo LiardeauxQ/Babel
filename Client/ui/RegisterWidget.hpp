@@ -15,8 +15,6 @@ namespace ui {
     public:
         explicit RegisterWidget(QWidget *parent = nullptr);
 
-        ~RegisterWidget() override = default;
-
     private:
         QSharedPointer <QPushButton> button_;
         QSharedPointer <QLineEdit> usernameLineEdit_;

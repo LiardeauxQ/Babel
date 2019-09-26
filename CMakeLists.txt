@@ -59,7 +59,7 @@ set(BABEL_CLIENT
 	${CLIENT_PATH}/ui/LoginWidget.cpp
 	${CLIENT_PATH}/ui/LoginWidget.hpp
 	${CLIENT_PATH}/ui/RegisterWidget.cpp
-	${CLIENT_PATH}/ui/RegisterWidget.hpp)
+	${CLIENT_PATH}/ui/RegisterWidget.hpp Client/ui/MainWindow.cpp Client/ui/MainWindow.hpp)
 
 set(BABEL_COMMON
         ${COMMON_PATH}/User.hpp
