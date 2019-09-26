@@ -5,48 +5,69 @@
 #include "SoundManager.hpp"
 #include <iostream>
 
-int SoundManager::outputCallback(const void* inputBuffer, void* outputBuffer,
-    unsigned long framesPerBuffer,
-    const PaStreamCallbackTimeInfo* timeInfo,
-    PaStreamCallbackFlags statusFlags,
-    void* userData)
-{
-    auto out = (float*)outputBuffer;
-    auto data = (SharedData*)userData;
-
-    if (data->outputBuffer->empty())
-        return paContinue;
-
-    if (data->outputBuffer->size() <= framesPerBuffer * data->nbOutChannel) {
-        for (size_t i = 0; i < data->outputBuffer->size(); i += data->nbOutChannel) {
-            for (size_t y = 0; y < data->nbOutChannel; ++y) {
-                *out++ = data->outputBuffer->back();
-                data->outputBuffer->pop_back();
-            }
-        }
-    } else {
-        for (size_t i = 0; i < framesPerBuffer; i++) {
-            for (size_t y = 0; y < data->nbOutChannel; ++y) {
-                *out++ = data->outputBuffer->back();
-                data->outputBuffer->pop_back();
-            }
-        }
+SoundManager::SoundManager(double sampleRate)
+    : stream_(nullptr)
+    , buffers_ {
+        std::make_unique<boost::circular_buffer<float>>(1024),
+        std::make_unique<std::vector<float>>(1024),
     }
-    return paContinue;
+{
+    int error = Pa_OpenDefaultStream(&stream_,
+        1,
+        1,
+        paFloat32,
+        sampleRate,
+        paFramesPerBufferUnspecified,
+        nullptr,
+        nullptr);
+
+    if (error != paNoError)
+        throw AudioControllerError(error);
 }
 
-int SoundManager::inputCallback(const void* inputBuffer, void* outputBuffer,
+void SoundManager::read(std::vector<float>& buffer)
+{
+    int error = Pa_ReadStream(stream_, buffer.data(), buffer.capacity());
+    buffer.resize(buffer.capacity());
+
+    if (error != paNoError)
+        throw AudioControllerError(error);
+}
+
+void SoundManager::write(const std::vector<float>& data)
+{
+    Pa_WriteStream(stream_, data.data(), data.size());
+}
+
+int SoundManager::callback(const void* inputBuffer, void* outputBuffer,
     unsigned long framesPerBuffer,
     const PaStreamCallbackTimeInfo* timeInfo,
     PaStreamCallbackFlags statusFlags,
     void* userData)
 {
-    auto data = static_cast<SharedData*>(userData);
-    const auto* micro = static_cast<const float*>(inputBuffer);
+    std::cout << "Callback" << std::endl;
+    auto in = (float*)inputBuffer;
+    auto out = (float*)outputBuffer;
+    auto shared = (SharedData*)userData;
 
     for (size_t i = 0; i < framesPerBuffer; i++)
-        for (size_t i = 0; i < data->nbInChannel; i++)
-            data->inputBuffer->push_back(*micro++); // push left.
+        shared->toRead->push_back(*in++);
 
+//    if (shared->toWrite->empty())
+//        return paContinue;
+//
+//    if (shared->toWrite->size() <= framesPerBuffer) {
+//        for (size_t i = 0; i < shared->toWrite->size(); i++) {
+//            *out++ = shared->toWrite->back();
+//            *out++ = shared->toWrite->back();
+//            shared->toWrite->pop_back();
+//        }
+//    } else {
+//        for (size_t i = 0; i < framesPerBuffer; i++) {
+//            *out++ = shared->toWrite->back();
+//            *out++ = shared->toWrite->back();
+//            shared->toWrite->pop_back();
+//        }
+//    }
     return paContinue;
 }

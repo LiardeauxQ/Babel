@@ -67,10 +67,7 @@ int AudioController::getDefaultInputId() const
 {
     return Pa_GetDefaultInputDevice();
 }
-std::unique_ptr<SoundManager> AudioController::createManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate) const
+std::unique_ptr<SoundManager> AudioController::createManager(double sampleRate) const
 {
-    return std::unique_ptr<SoundManager>(new SoundManager(
-        input,
-        output,
-        sampleRate));
+    return std::unique_ptr<SoundManager>(new SoundManager(sampleRate));
 }
