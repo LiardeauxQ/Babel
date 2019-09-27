@@ -28,8 +28,8 @@ namespace ui {
         QSharedPointer<QLineEdit> passwordLineEdit_;
 
     private slots:
-        void login();
-        void close();
+        void loginTap();
+        void closeTap();
     };
 }
 

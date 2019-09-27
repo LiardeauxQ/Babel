@@ -17,7 +17,7 @@ namespace ui {
 
     private slots:
         void registerTap();
-        void close();
+        void closeTap();
     private:
         QSharedPointer <QPushButton> button_;
         QSharedPointer <QPushButton> closeButton_;

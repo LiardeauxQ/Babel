@@ -12,7 +12,7 @@ ui::RegisterWidget::RegisterWidget(QWidget *parent) : QWidget(parent)
     passwordLineEdit_ = QSharedPointer<QLineEdit>(new QLineEdit());
     confirmPassLineEdit_ = QSharedPointer<QLineEdit>(new QLineEdit());
 
-    connect(closeButton_.get(), SIGNAL(clicked()), this, SLOT(close()));
+    connect(closeButton_.get(), SIGNAL(clicked()), this, SLOT(closeTap()));
     connect(button_.get(), SIGNAL(clicked()), this, SLOT(registerTap()));
 
     QPointer<QLabel> usernameLabel = new QLabel(tr("Username:"));
@@ -44,7 +44,7 @@ void ui::RegisterWidget::registerTap()
     }
 }
 
-void ui::RegisterWidget::close()
+void ui::RegisterWidget::closeTap()
 {
     for (auto action : actions()) {
         if (action->text() == "close") {

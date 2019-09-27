@@ -6,7 +6,7 @@
 
 ui::LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent)
 {
-    QPointer<QPushButton> closeButton = new QPushButton(tr("x"));
+    QPointer<QPushButton> closeButton = new QPushButton(tr("Close"));
     button_ = QSharedPointer<QPushButton>(new QPushButton(tr("Login")));
     usernameLineEdit_ = QSharedPointer<QLineEdit>(new QLineEdit());
     passwordLineEdit_ = QSharedPointer<QLineEdit>(new QLineEdit());
@@ -16,8 +16,8 @@ ui::LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent)
 
     passwordLineEdit_->setEchoMode(QLineEdit::Password);
 
-    connect(button_.get(), SIGNAL(clicked()), this, SLOT(login()));
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
+    connect(button_.get(), SIGNAL(clicked()), this, SLOT(loginTap()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeTap()));
 
     QPointer<QFormLayout> formLayout = new QFormLayout();
 
@@ -30,7 +30,7 @@ ui::LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent)
     setWindowTitle(tr("Login to Babel"));
 }
 
-void ui::LoginWidget::login()
+void ui::LoginWidget::loginTap()
 {
     for (auto action : actions()) {
         if (action->text() == "login") {
@@ -40,7 +40,7 @@ void ui::LoginWidget::login()
     }
 }
 
-void ui::LoginWidget::close()
+void ui::LoginWidget::closeTap()
 {
     for (auto action : actions()) {
         if (action->text() == "close") {
