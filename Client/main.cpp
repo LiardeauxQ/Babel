@@ -6,12 +6,14 @@
 #include "AudioControllerError.hpp"
 #include <iostream>
 #include <QApplication>
+#include <ui/FriendListWidget.hpp>
+#include <ui/CallWidget.hpp>
 #include "ui/MainWindow.hpp"
 
 int main(int argc, char *argv[])
 {
     QApplication babelApp(argc, argv);
-    ui::MainWindow w;
+    ui::FriendListWidget w;
 
     w.resize(500, 500);
     w.show();
