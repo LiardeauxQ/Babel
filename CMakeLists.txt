@@ -59,7 +59,15 @@ set(BABEL_CLIENT
 	${CLIENT_PATH}/ui/LoginWidget.cpp
 	${CLIENT_PATH}/ui/LoginWidget.hpp
 	${CLIENT_PATH}/ui/RegisterWidget.cpp
-	${CLIENT_PATH}/ui/RegisterWidget.hpp Client/ui/MainWindow.cpp Client/ui/MainWindow.hpp Client/ui/FriendListWidget.cpp Client/ui/FriendListWidget.hpp Client/ui/CallWidget.cpp Client/ui/CallWidget.hpp Client/ui/WidgetsHandler.cpp Client/ui/WidgetsHandler.hpp)
+	${CLIENT_PATH}/ui/RegisterWidget.hpp
+	${CLIENT_PATH}/ui/MainWindow.cpp
+	${CLIENT_PATH}/ui/MainWindow.hpp
+	${CLIENT_PATH}/ui/FriendListWidget.cpp
+	${CLIENT_PATH}/ui/FriendListWidget.hpp
+	${CLIENT_PATH}/ui/CallWidget.cpp
+	${CLIENT_PATH}/ui/CallWidget.hpp
+	${CLIENT_PATH}/ui/WidgetsHandler.cpp
+	${CLIENT_PATH}/ui/WidgetsHandler.hpp)
 
 set(BABEL_COMMON
         ${COMMON_PATH}/User.hpp
