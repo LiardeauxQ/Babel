@@ -6,7 +6,10 @@
 #define BABEL_COMMON_PROTOCOL_H
 
 // Should be updated at each modification.
-#define VERSION 0x01
+
+#include <time.h>
+
+#define VERSION 0x04
 
 // 1 if the request id come from the server.
 #define IS_SERVER_REQUEST(x) ((x) & 0b10000000)

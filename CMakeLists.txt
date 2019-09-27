@@ -8,7 +8,13 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(CMAKE_PREFIX_PATH "F:\\Qt\\5.13.1\\msvc2017_64\\")
+if (APPLE)
+    set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
+endif()
+
+if (WIN32)
+    set(CMAKE_PREFIX_PATH "C:\\Qt\\5.13.1\\mingw73_64\\")
+endif()
 
 include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
 message("HOME DIRECTORY ${CMAKE_HOME_DIRECTORY}")
