@@ -16,7 +16,6 @@ int main(int argc, char* argv[])
         ServerApplication server(config);
 
         server.run();
-
     } catch (const std::exception& e) {
         std::cerr << "Server failed: " << e.what() << std::endl;
     }
