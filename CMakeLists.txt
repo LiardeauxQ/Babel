@@ -13,13 +13,6 @@ if (APPLE)
     set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
 endif ()
 
-if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-	include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-	conan_basic_setup()
-else()
-	message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
-endif()
-
 include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
 include_directories("./Common")
 include_directories("./Client")
@@ -38,36 +31,21 @@ set(BABEL_SERVER
         ${SERVER_PATH}/ServerConfig.cpp
         ${SERVER_PATH}/ServerConfig.hpp
         ${SERVER_PATH}/ServerError.hpp
-        ${SERVER_PATH}/ServerError.cpp)
+        ${SERVER_PATH}/ServerError.cpp
+        ${SERVER_PATH}/Session.hpp
+        ${SERVER_PATH}/Session.cpp
+        ${SERVER_PATH}/RequestHandler.cpp
+        ${SERVER_PATH}/RequestHandler.hpp
+        ${SERVER_PATH}/SharedData.hpp)
 
 set(BABEL_CLIENT
-	${CLIENT_PATH}/main.cpp
-	${CLIENT_PATH}/AudioController.cpp
-	${CLIENT_PATH}/AudioController.hpp
-	${CLIENT_PATH}/AudioControllerError.hpp
-	${CLIENT_PATH}/AudioControllerError.cpp
-	${CLIENT_PATH}/SoundManager.hpp
-	${CLIENT_PATH}/SoundManager.cpp
-	${CLIENT_PATH}/Error.cpp
-	${CLIENT_PATH}/Error.hpp
-	${CLIENT_PATH}/Packet.hpp
-	${CLIENT_PATH}/opus/Encoder.cpp
-	${CLIENT_PATH}/opus/Encoder.hpp
-	${CLIENT_PATH}/opus/Decoder.cpp
-	${CLIENT_PATH}/opus/Decoder.hpp
-	${CLIENT_PATH}/opus/Opus.hpp
-	${CLIENT_PATH}/ui/LoginWidget.cpp
-	${CLIENT_PATH}/ui/LoginWidget.hpp
-	${CLIENT_PATH}/ui/RegisterWidget.cpp
-	${CLIENT_PATH}/ui/RegisterWidget.hpp
-	${CLIENT_PATH}/ui/MainWindow.cpp
-	${CLIENT_PATH}/ui/MainWindow.hpp
-	${CLIENT_PATH}/ui/FriendListWidget.cpp
-	${CLIENT_PATH}/ui/FriendListWidget.hpp
-	${CLIENT_PATH}/ui/CallWidget.cpp
-	${CLIENT_PATH}/ui/CallWidget.hpp
-	${CLIENT_PATH}/ui/WidgetsHandler.cpp
-	${CLIENT_PATH}/ui/WidgetsHandler.hpp)
+        ${CLIENT_PATH}/main.cpp
+        ${CLIENT_PATH}/AudioController.cpp
+        ${CLIENT_PATH}/AudioController.hpp
+        ${CLIENT_PATH}/AudioControllerError.hpp
+        ${CLIENT_PATH}/AudioControllerError.cpp
+        ${CLIENT_PATH}/SoundManager.hpp
+        ${CLIENT_PATH}/SoundManager.cpp)
 
 set(BABEL_COMMON
         ${COMMON_PATH}/User.hpp
@@ -75,7 +53,9 @@ set(BABEL_COMMON
         ${COMMON_PATH}/Database.hpp
         ${COMMON_PATH}/Database.cpp
         ${COMMON_PATH}/DatabaseError.hpp
-        ${COMMON_PATH}/DatabaseError.cpp)
+        ${COMMON_PATH}/DatabaseError.cpp
+        ${COMMON_PATH}/Message.hpp
+        ${COMMON_PATH}/protocol.h)
 
 add_executable(babel-client ${BABEL_CLIENT} ${BABEL_COMMON})
 
