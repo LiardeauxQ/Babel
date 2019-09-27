@@ -10,27 +10,27 @@
 
 #include "RegisterWidget.hpp"
 #include "LoginWidget.hpp"
+#include "FriendListWidget.hpp"
+#include "WidgetsHandler.hpp"
 
 namespace ui {
     class MainWindow : public QWidget {
         Q_OBJECT
     public:
         explicit MainWindow(QWidget *parent = nullptr);
-        ~MainWindow();
 
     private slots:
         void initRegisterWidget();
         void initLoginWidget();
     private:
-        QSharedPointer<QStackedWidget> stackedWidget_;
         QSharedPointer<QWidget> connectionWidget_;
+        QPointer<WidgetsHandler> widgetsHandler_;
 
         void registered();
         void logged();
-        void closeRegister();
-        void closeLogin();
+        void returnToConnectionWidget();
 
-        void removeLastWidget();
+        void initFriendListWidget();
     };
 }
 

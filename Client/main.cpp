@@ -13,7 +13,7 @@
 int main(int argc, char *argv[])
 {
     QApplication babelApp(argc, argv);
-    ui::FriendListWidget w;
+    ui::MainWindow w;
 
     w.resize(500, 500);
     w.show();

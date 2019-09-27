@@ -13,7 +13,7 @@ ui::CallWidget::CallWidget(QWidget *parent) : QWidget(parent)
 
     connect(closeButton_.get(), SIGNAL(clicked()), this, SLOT(closeTap()));
     connect(startCallButton_.get(), SIGNAL(clicked()), this, SLOT(startTap()));
-    connect(closeButton_.get(), SIGNAL(clicked()), this, SLOT(stopTap()));
+    connect(stopCallButton_.get(), SIGNAL(clicked()), this, SLOT(stopTap()));
 
     QPointer<QGridLayout> mainLayout = new QGridLayout();
 
@@ -27,7 +27,12 @@ ui::CallWidget::CallWidget(QWidget *parent) : QWidget(parent)
 
 void ui::CallWidget::closeTap()
 {
-    std::cout << "close" << std::endl;
+    for (auto action : actions()) {
+        if (action->text() == "close") {
+            action->trigger();
+            break;
+        }
+    }
 }
 
 void ui::CallWidget::startTap()

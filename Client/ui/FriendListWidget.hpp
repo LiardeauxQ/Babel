@@ -9,6 +9,9 @@
 #include <QSharedPointer>
 #include <iostream>
 
+#include "WidgetsHandler.hpp"
+#include "CallWidget.hpp"
+
 namespace ui {
     class FriendListWidget : public QWidget {
     Q_OBJECT
@@ -16,12 +19,16 @@ namespace ui {
         explicit FriendListWidget(QWidget *parent = nullptr);
 
     private:
-        QSharedPointer<QListWidget> friendList_;
-        QSharedPointer<QLabel> usernameLabel_;
-        QSharedPointer<QPushButton> disconnectButton_;
+        QPointer<QListWidget> friendList_;
+        QPointer<QLabel> usernameLabel_;
+        QPointer<QPushButton> disconnectButton_;
+        QSharedPointer<QWidget> userProfilWidget_;
+        QPointer<WidgetsHandler> widgetsHandler_;
 
     private slots:
         void disconnectTap();
+        void selectListItem(QListWidgetItem *item);
+        void stopCall();
     };
 }
 
