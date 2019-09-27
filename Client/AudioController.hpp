@@ -5,52 +5,39 @@
 #ifndef BABEL_AUDIO_HPP
 #define BABEL_AUDIO_HPP
 
-#include "SoundStream.hpp"
-#include "portaudio.h"
+#include "AudioControllerError.hpp"
+#include "SoundManager.hpp"
 #include <exception>
 #include <memory>
+#include <portaudio.h>
 #include <vector>
 
 class AudioController {
 public:
-  // Initialize the AudioController can fail and throw `AudioControllerError`.
-  AudioController();
-  ~AudioController();
+    // Initialize the AudioController can fail and throw `AudioControllerError`.
+    AudioController();
 
-  // Get number version of the program.
-  static int getVersion();
+    ~AudioController();
 
-  // Get text version of the program.
-  static std::string getTextVersion();
+    // Get number version of the program.
+    static int getVersion() { return Pa_GetVersion(); }
 
-  [[nodiscard]] std::vector<const PaDeviceInfo *> getDevicesInfo() const;
+    // Get text version of the program.
+    static std::string getTextVersion() { return std::string(Pa_GetVersionText()); }
 
-    SoundStream createStream(const PaDeviceInfo *dev,
-                             PaStreamCallback *callback,
-                             void *linkedData,
-                             const std::string &name);
+    [[nodiscard]] std::vector<const PaDeviceInfo*> getDevicesInfo() const;
 
-    SoundStream createCustomStream(PaStreamParameters *outputStream,
-                                   PaStreamParameters *inputStream,
-                                   PaStreamCallback *callback, void *userData,
-                                   PaStreamFlags flags, const std::string &name);
+    [[nodiscard]] std::unique_ptr<SoundManager> createManager() const;
 
-  [[nodiscard]] const PaDeviceInfo *getDefaultInputDevice() const;
-  [[nodiscard]] const PaDeviceInfo *getDefaultOutputDevice() const;
-  [[nodiscard]] int getDefaultOutputId() const;
-  [[nodiscard]] int getDefaultInputId() const;
+    [[nodiscard]] const PaDeviceInfo* getDefaultInputDevice() const;
 
-  inline void sleep(long ms) { Pa_Sleep(ms); }
-};
+    [[nodiscard]] const PaDeviceInfo* getDefaultOutputDevice() const;
 
-class AudioControllerError : std::exception {
-public:
-  explicit AudioControllerError(int error);
+    [[nodiscard]] int getDefaultOutputId() const;
 
-  [[nodiscard]] const char *what() const noexcept final;
+    [[nodiscard]] int getDefaultInputId() const;
 
-private:
-  int error_;
+    inline void sleep(long ms) { Pa_Sleep(ms); }
 };
 
 #endif // BABEL_AUDIO_HPP

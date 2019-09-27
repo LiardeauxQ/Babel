@@ -8,6 +8,7 @@
 #include "protocol.h"
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <glob.h>
 #include <iostream>
 
 static const size_t MAX_LEN = 1024 * 256;
@@ -16,12 +17,14 @@ class Message {
 public:
     // Construct a message from it's id and it's payload.
     Message(int id, int payload_len, void *payload)
-        : requestUnion_ {}
+        : requestUnion_ {
+            .req = {
+                id,
+                payload_len }
+        }
         , payload_(payload)
         , allocated_(true)
     {
-        requestUnion_.req.id = id;
-        requestUnion_.req.request_len = payload_len;
     }
 
     Message() = default;
