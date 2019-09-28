@@ -5,7 +5,7 @@
 #ifndef BABEL_SERVER_MAINWINDOW_HPP
 #define BABEL_SERVER_MAINWINDOW_HPP
 
-#include <QTWidgets>
+#include <QtWidgets>
 #include <QSharedMemory>
 
 #include "RegisterWidget.hpp"
