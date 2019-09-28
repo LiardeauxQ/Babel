@@ -7,7 +7,7 @@
 
 // Should be updated at each modification.
 
-#include <bits/types/time_t.h>
+#include <ctime>
 #include <glob.h>
 
 #define VERSION 0x04
@@ -28,6 +28,7 @@ const size_t HEADER_SIZE = sizeof(request_header_t);
 
 #define USERNAME_LEN 1024
 #define PASSWORD_LEN 1024
+#define MAX_USERS 5
 
 /// Client's request id.
 enum CLIENT_REQ_ID {
@@ -112,7 +113,7 @@ const size_t CLIENT_REGISTER_SIZE = sizeof(client_register_t);
 
 typedef struct {
     // Array of username to call.
-    char usernames[USERNAME_LEN];
+    char usernames[MAX_USERS][USERNAME_LEN];
 
     // The number of user stored in usernames.
     int number;
@@ -153,7 +154,7 @@ const size_t SERVER_FRIEND_REQUEST_SIZE = sizeof(server_friend_request_t);
 
 typedef struct {
     // The asker username.
-    char usernames[USERNAME_LEN];
+    char usernames[MAX_USERS][USERNAME_LEN];
 
     // Number of user inside usernames.
     int number;

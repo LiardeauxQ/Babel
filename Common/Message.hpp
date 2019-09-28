@@ -23,6 +23,7 @@ public:
                 payload_len }
         }
         , payload_(payload)
+        , data_(RawData{requestUnion_.headerRaw, payload})
         , allocated_(true)
     {
     }
@@ -33,9 +34,13 @@ public:
 
     [[nodiscard]] int getPayloadSize() const { return requestUnion_.req.request_len; }
 
+    [[nodiscard]] size_t getTotalSize() const { return requestUnion_.req.request_len + HEADER_SIZE; }
+
     [[nodiscard]] void* getPayload() const { return payload_; }
 
     void* getHeaderRaw() { return requestUnion_.headerRaw; }
+
+    void* getData() { return static_cast<void*>(&data_); }
 
     void setupPayload()
     {
@@ -84,7 +89,13 @@ private:
         request_header_t req;
     } requestUnion_;
 
+    struct RawData {
+        void *header;
+        void *payload;
+    }__attribute__((packed));
+
     void *payload_;
+    RawData data_;
     bool allocated_;
 };
 
