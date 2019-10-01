@@ -5,73 +5,141 @@ set(CMAKE_CXX_STANDARD 17)
 project(babel-client)
 project(babel-server)
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-if (APPLE)
-    set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
+# Set compiler arguments
+if (NOT WIN32)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++17")
 endif ()
 
-include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
-include_directories("./Common")
-include_directories("./Client")
-include_directories("./Server")
+# Set Qt specific information
+if (APPLE)
+    set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
+elseif (WIN32)
+	set(CMAKE_PREFIX_PATH "C:\\Qt\\5.13.1\\msvc2017_64\\" ${CMAKE_PREFIX_PATH})
+	set(GUI_TYPE WIN32)
+endif (APPLE)
 
-set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
+# Include conan headers
+if (UNIX)
+	include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
+endif ()
 
 set(SERVER_PATH "${CMAKE_SOURCE_DIR}/Server")
 set(CLIENT_PATH "${CMAKE_SOURCE_DIR}/Client")
 set(COMMON_PATH "${CMAKE_SOURCE_DIR}/Common")
 
+# Include headers
+include_directories(${SERVER_PATH})
+include_directories(${COMMON_PATH})
+include_directories(${CLIENT_PATH})
+
+set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
+
 set(BABEL_SERVER
-        ${SERVER_PATH}/main.cpp
-        ${SERVER_PATH}/ServerApplication.hpp
-        ${SERVER_PATH}/ServerApplication.cpp
-        ${SERVER_PATH}/ServerConfig.cpp
-        ${SERVER_PATH}/ServerConfig.hpp
-        ${SERVER_PATH}/ServerError.hpp
-        ${SERVER_PATH}/ServerError.cpp
-        ${SERVER_PATH}/Session.hpp
-        ${SERVER_PATH}/Session.cpp
-        ${SERVER_PATH}/RequestHandler.cpp
-        ${SERVER_PATH}/RequestHandler.hpp
-        ${SERVER_PATH}/SharedData.hpp)
+    ${SERVER_PATH}/main.cpp
+    ${SERVER_PATH}/ServerApplication.hpp
+    ${SERVER_PATH}/ServerApplication.cpp
+    ${SERVER_PATH}/ServerConfig.cpp
+    ${SERVER_PATH}/ServerConfig.hpp
+    ${SERVER_PATH}/ServerError.hpp
+    ${SERVER_PATH}/ServerError.cpp
+    ${SERVER_PATH}/Session.hpp
+    ${SERVER_PATH}/Session.cpp
+    ${SERVER_PATH}/SharedData.hpp)
 
 set(BABEL_CLIENT
-        ${CLIENT_PATH}/main.cpp
-        ${CLIENT_PATH}/AudioController.cpp
-        ${CLIENT_PATH}/AudioController.hpp
-        ${CLIENT_PATH}/AudioControllerError.hpp
-        ${CLIENT_PATH}/AudioControllerError.cpp
-        ${CLIENT_PATH}/SoundManager.hpp
-        ${CLIENT_PATH}/SoundManager.cpp)
+	${CLIENT_PATH}/main.cpp
+	${CLIENT_PATH}/AudioController.cpp
+	${CLIENT_PATH}/AudioController.hpp
+	${CLIENT_PATH}/AudioControllerError.hpp
+	${CLIENT_PATH}/AudioControllerError.cpp
+	${CLIENT_PATH}/SoundManager.hpp
+	${CLIENT_PATH}/SoundManager.cpp
+	${CLIENT_PATH}/Error.cpp
+	${CLIENT_PATH}/Error.hpp
+	${CLIENT_PATH}/Packet.hpp
+	${CLIENT_PATH}/opus/Encoder.cpp
+	${CLIENT_PATH}/opus/Encoder.hpp
+	${CLIENT_PATH}/opus/Decoder.cpp
+	${CLIENT_PATH}/opus/Decoder.hpp
+	${CLIENT_PATH}/opus/Opus.hpp
+	${CLIENT_PATH}/ui/LoginWidget.cpp
+	${CLIENT_PATH}/ui/LoginWidget.hpp
+	${CLIENT_PATH}/ui/RegisterWidget.cpp
+	${CLIENT_PATH}/ui/RegisterWidget.hpp
+	${CLIENT_PATH}/ui/MainWindow.cpp
+	${CLIENT_PATH}/ui/MainWindow.hpp
+	${CLIENT_PATH}/ui/FriendListWidget.cpp
+	${CLIENT_PATH}/ui/FriendListWidget.hpp
+	${CLIENT_PATH}/ui/CallWidget.cpp
+	${CLIENT_PATH}/ui/CallWidget.hpp
+	${CLIENT_PATH}/ui/WidgetsHandler.cpp
+	${CLIENT_PATH}/ui/WidgetsHandler.hpp)
 
 set(BABEL_COMMON
-        ${COMMON_PATH}/User.hpp
-        ${COMMON_PATH}/User.cpp
-        ${COMMON_PATH}/Database.hpp
-        ${COMMON_PATH}/Database.cpp
-        ${COMMON_PATH}/DatabaseError.hpp
-        ${COMMON_PATH}/DatabaseError.cpp
-        ${COMMON_PATH}/Message.hpp
-        ${COMMON_PATH}/protocol.h)
+    ${COMMON_PATH}/User.hpp
+    ${COMMON_PATH}/User.cpp
+    ${COMMON_PATH}/Database.hpp
+    ${COMMON_PATH}/Database.cpp
+    ${COMMON_PATH}/DatabaseError.hpp
+    ${COMMON_PATH}/DatabaseError.cpp
+    ${COMMON_PATH}/Message.hpp
+    ${COMMON_PATH}/protocol.h)
 
-add_executable(babel-client ${BABEL_CLIENT} ${BABEL_COMMON})
+add_executable(babel-client
+    ${GUI_TYPE}
+    ${BABEL_CLIENT}
+    ${BABEL_COMMON})
 
-add_executable(babel-server ${BABEL_SERVER} ${BABEL_COMMON})
+add_executable(babel-server
+    ${BABEL_SERVER}
+    ${BABEL_COMMON})
 
+# Find conan package + Qt5
 find_package(portaudio)
 find_package(opus)
 find_package(boost_asio)
 find_package(boost_circular_buffer)
 find_package(sqlite3)
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 
-target_link_libraries(babel-client portaudio::portaudio opus::opus boost_circular_buffer::boost_circular_buffer sqlite3::sqlite3 Qt5::Widgets)
+# Client link
+target_link_libraries(babel-client
+	portaudio::portaudio
+	opus::opus
+	boost_circular_buffer::boost_circular_buffer
+	sqlite3::sqlite3
+	Qt5::Widgets)
 
-target_link_libraries(babel-server sqlite3::sqlite3 boost_asio::boost_asio)
+# Server link
+target_link_libraries(babel-server
+	sqlite3::sqlite3
+	boost_asio::boost_asio)
 
+# Copy dll to the binary folder
+if(WIN32)
+    if ($<CONFIG:Debug>)
+        get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_DEBUG)
+    else ($<CONFIG:Debug>)
+        get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_RELEASE)
+	endif ($<CONFIG:Debug>)
+
+	add_custom_command (
+    	TARGET babel-client POST_BUILD
+    	COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Widgets> $<TARGET_FILE_DIR:babel-client>
+    	COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Core> $<TARGET_FILE_DIR:babel-client>
+    	COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Gui> $<TARGET_FILE_DIR:babel-client>
+	)
+endif(WIN32)
+
+# Link linux `asound` and `jack` library
 if (UNIX AND NOT APPLE)
-    target_link_libraries(babel-client jack asound)
+    target_link_libraries(babel-client
+        jack
+        asound)
 endif ()
