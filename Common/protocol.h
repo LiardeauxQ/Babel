@@ -10,7 +10,7 @@
 #include <bits/types/time_t.h>
 #include <glob.h>
 
-#define VERSION 0x04
+#define VERSION 0x05
 
 // 1 if the request id come from the server.
 #define IS_SERVER_REQUEST(x) ((x)&0b10000000)
@@ -27,7 +27,14 @@ typedef struct {
 const size_t HEADER_SIZE = sizeof(request_header_t);
 
 #define USERNAME_LEN 1024
+#define MESSAGE_LEN 1024
 #define PASSWORD_LEN 1024
+#define MAX_FRIENDS 20
+
+enum RESULT {
+    OK = 0b10101010,
+    KO = 0b01010101
+};
 
 /// Client's request id.
 enum CLIENT_REQ_ID {
@@ -59,22 +66,25 @@ enum CLIENT_REQ_ID {
     CLIENT_ACCEPT_FRIEND = 0b00001001,
 };
 
-// Server's request id.
+/// Client's request id.
 enum SERVER_REQ_ID {
-    // Answer to the client PING.
-    SERVER_PONG = 0b10000000,
+        SERVER_PING = 0b10000000,
 
-    // Forward friend request.
-    SERVER_FRIEND_REQUEST = 0b10000101,
+        SERVER_HELLO = 0b10000001,
 
-    // Forward call request.
-    SERVER_CALL = 0b10000111,
+        SERVER_GOODBYE = 0b10000010,
 
-    // Forward bye request.
-    SERVER_BYE = 0b10001000,
+        SERVER_FRIEND_STATUS = 0b10000011,
 
-    // Forward the friend request acceptation.
-    SERVER_ACCEPT_FRIEND = 0b10001001,
+        SERVER_REGISTER = 0b10000100,
+
+        SERVER_FRIEND_REQUEST = 0b10000101,
+
+        SERVER_CALL = 0b10000111,
+
+        SERVER_BYE = 0b10001000,
+
+        SERVER_ACCEPT_FRIEND = 0b10001001,
 };
 
 // ----------------- Client's payloads definitions ------------------------ //
@@ -140,9 +150,34 @@ const size_t CLIENT_FRIEND_STATUS_SIZE = sizeof(client_friend_status_t);
 
 typedef struct {
     time_t stamp;
-} server_pong_t;
+} server_ping_t;
 
-const size_t SERVER_PONG_SIZE = sizeof(server_pong_t);
+const size_t SERVER_PING_SIZE = sizeof(server_ping_t);
+
+typedef struct {
+    int result;
+} server_hello_t;
+
+const size_t SERVER_HELLO_SIZE = sizeof(server_hello_t);
+
+typedef struct {
+    char message[MESSAGE_LEN];
+} server_goodbye_t;
+
+const size_t SERVER_GOODBYE_SIZE = sizeof(server_goodbye_t);
+
+typedef struct {
+    char usernames[MAX_FRIENDS][USERNAME_LEN];
+    int status[MAX_FRIENDS];
+} server_friend_status_t;
+
+const size_t SERVER_FRIEND_STATUS_SIZE = sizeof(server_friend_status_t);
+
+typedef struct {
+    int result;
+} server_register_t;
+
+const size_t SERVER_REGISTER_SIZE = sizeof(server_register_t);
 
 typedef struct {
     // The asker username.
