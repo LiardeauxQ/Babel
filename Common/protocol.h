@@ -7,8 +7,7 @@
 
 // Should be updated at each modification.
 
-#include <bits/types/time_t.h>
-#include <glob.h>
+#include <time.h>
 
 #define VERSION 0x05
 
@@ -122,7 +121,7 @@ const size_t CLIENT_REGISTER_SIZE = sizeof(client_register_t);
 
 typedef struct {
     // Array of username to call.
-    char usernames[USERNAME_LEN];
+    char usernames[MAX_FRIENDS][USERNAME_LEN];
 
     // The number of user stored in usernames.
     int number;
@@ -136,7 +135,7 @@ typedef struct {
 const size_t CLIENT_BYE_SIZE = sizeof(client_bye_t);
 
 typedef struct {
-    char username[USERNAME_LEN];
+    char message[MESSAGE_LEN];
 } client_accept_friend_t;
 
 const size_t CLIENT_ACCEPT_FRIEND_SIZE = sizeof(client_accept_friend_t);
@@ -188,7 +187,7 @@ const size_t SERVER_FRIEND_REQUEST_SIZE = sizeof(server_friend_request_t);
 
 typedef struct {
     // The asker username.
-    char usernames[USERNAME_LEN];
+    char usernames[MAX_FRIENDS][USERNAME_LEN];
 
     // Number of user inside usernames.
     int number;
@@ -204,7 +203,7 @@ typedef struct {
 const size_t SERVER_BYE_SIZE = sizeof(server_bye_t);
 
 typedef struct {
-    // Acceptor username.
+    // Message acceptation.
     char username[USERNAME_LEN];
 } server_accept_friend_t;
 

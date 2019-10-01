@@ -52,7 +52,6 @@ int SoundManager::callback(const void* inputBuffer, void* outputBuffer,
 
     for (size_t i = 0; i < framesPerBuffer; i++) {
         shared->toRead->push_front(*in++);
-
         if (shared->toWrite->empty()) {
             *out++ = 0;
             *out++ = 0;
@@ -62,6 +61,5 @@ int SoundManager::callback(const void* inputBuffer, void* outputBuffer,
             shared->toWrite->pop_back();
         }
     }
-
     return paContinue;
 }

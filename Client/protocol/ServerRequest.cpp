@@ -112,7 +112,7 @@ void ServerRequest::sendCall(const std::vector<std::string> &usernames)
     int i = 0;
 
     for (const auto username : usernames) {
-        if (i > MAX_USERS)
+        if (i > MAX_FRIENDS)
             break;
         if (username.size() < USERNAME_LEN)
             strcpy(clt.usernames[i++], username.c_str());

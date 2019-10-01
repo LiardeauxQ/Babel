@@ -79,7 +79,9 @@ set(BABEL_CLIENT
 	${CLIENT_PATH}/ui/CallWidget.cpp
 	${CLIENT_PATH}/ui/CallWidget.hpp
 	${CLIENT_PATH}/ui/WidgetsHandler.cpp
-	${CLIENT_PATH}/ui/WidgetsHandler.hpp)
+	${CLIENT_PATH}/ui/WidgetsHandler.hpp
+    ${CLIENT_PATH}/protocol/ServerRequest.cpp
+    ${CLIENT_PATH}/protocol/ServerRequest.hpp)
 
 set(BABEL_COMMON
     ${COMMON_PATH}/User.hpp
@@ -113,6 +115,7 @@ target_link_libraries(babel-client
 	portaudio::portaudio
 	opus::opus
 	boost_circular_buffer::boost_circular_buffer
+    boost_asio::boost_asio
 	sqlite3::sqlite3
 	Qt5::Widgets)
 

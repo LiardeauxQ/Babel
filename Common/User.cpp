@@ -30,11 +30,11 @@ User::User(Database& connection, int id)
     , password_()
     , id_(id)
 {
-    callbackData data {
-        .name = name_,
-        .password = password_,
-        .id = id_,
-        .used = false,
+    callbackData data = {
+        name_,
+        password_,
+        id_,
+        false,
     };
 
     connection.exec("SELECT * FROM `users` WHERE id=" + std::to_string(id), takeUser, &data);
@@ -48,11 +48,11 @@ User::User(Database& connection, const std::string& username)
     , name_()
     , password_()
 {
-    callbackData data {
-        .name = name_,
-        .password = password_,
-        .id = id_,
-        .used = false,
+    callbackData data = {
+        name_,
+        password_,
+        id_,
+        false,
     };
 
     connection.exec("SELECT * FROM `users` WHERE username='" + username + "'", takeUser, &data);
