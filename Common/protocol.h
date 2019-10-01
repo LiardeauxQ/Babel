@@ -10,7 +10,7 @@
 #include <ctime>
 #include <glob.h>
 
-#define VERSION 0x04
+#define VERSION 0x05
 
 // 1 if the request id come from the server.
 #define IS_SERVER_REQUEST(x) ((x)&0b10000000)
@@ -28,6 +28,7 @@ const size_t HEADER_SIZE = sizeof(request_header_t);
 
 #define USERNAME_LEN 1024
 #define PASSWORD_LEN 1024
+#define MESSAGE_LEN 2048
 #define MAX_USERS 5
 
 /// Client's request id.
@@ -127,7 +128,7 @@ typedef struct {
 const size_t CLIENT_BYE_SIZE = sizeof(client_bye_t);
 
 typedef struct {
-    char username[USERNAME_LEN];
+    char message[MESSAGE_LEN];
 } client_accept_friend_t;
 
 const size_t CLIENT_ACCEPT_FRIEND_SIZE = sizeof(client_accept_friend_t);
@@ -170,7 +171,7 @@ typedef struct {
 const size_t SERVER_BYE_SIZE = sizeof(server_bye_t);
 
 typedef struct {
-    // Acceptor username.
+    // Message acceptation.
     char username[USERNAME_LEN];
 } server_accept_friend_t;
 
