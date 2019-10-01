@@ -46,7 +46,7 @@ void ServerRequest::sendHello(const std::string &username, const std::string &pa
     if (password.size() < PASSWORD_LEN)
         strcpy(clt.password, password.c_str());
 
-    Message message(CLIENT_PING, CLIENT_PING_SIZE, &clt);
+    Message message(CLIENT_HELLO, CLIENT_HELLO_SIZE, &clt);
 
     boost::asio::async_write(
             socket_,
