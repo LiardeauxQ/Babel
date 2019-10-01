@@ -23,9 +23,14 @@ public:
                 payload_len }
         }
         , payload_(payload)
-        , data_(RawData{requestUnion_.headerRaw, payload})
+        , data_(nullptr)
         , allocated_(true)
     {
+    }
+
+    ~Message()
+    {
+        free(data_);
     }
 
     Message() = default;
@@ -40,7 +45,15 @@ public:
 
     void* getHeaderRaw() { return requestUnion_.headerRaw; }
 
-    void* getData() { return static_cast<void*>(&data_); }
+    void* getData()
+    {
+        if (data_ == nullptr) {
+            data_ = malloc(getTotalSize());
+        }
+        memcpy(data_, requestUnion_.headerRaw, HEADER_SIZE);
+        memcpy(((unsigned char*)data_) + HEADER_SIZE, payload_, getPayloadSize());
+        return data_;
+    }
 
     void setupPayload()
     {
@@ -89,13 +102,8 @@ private:
         request_header_t req;
     } requestUnion_;
 
-    struct RawData {
-        void *header;
-        void *payload;
-    }__attribute__((packed));
-
     void *payload_;
-    RawData data_;
+    void *data_;
     bool allocated_;
 };
 
