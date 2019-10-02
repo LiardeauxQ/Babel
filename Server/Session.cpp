@@ -13,7 +13,7 @@ Session::Session(boost::asio::io_context& context, Database& conn, std::vector<b
     : username_()
     , socket_(context)
     , request_()
-    , data_ { conn, socket_, sessions}
+    , data_ { conn, socket_, sessions }
 {
 }
 
@@ -39,10 +39,6 @@ void Session::receivePacket(const boost::system::error_code& ec)
 {
     if (!ec) {
         request_.setupPayload();
-
-        std::cout << "Id: " << request_.getId() << std::endl;
-        std::cout << "Size payload: " << request_.getPayloadSize() << std::endl;
-
         boost::asio::async_read(
             socket_,
             boost::asio::buffer(request_.getPayload(), request_.getPayloadSize()),
@@ -55,7 +51,6 @@ void Session::receivePacket(const boost::system::error_code& ec)
 void Session::receiveBody(const boost::system::error_code& ec)
 {
     if (!ec) {
-        std::cout << "Body received" << std::endl;
         Session::handleRequest(request_, data_);
     } else {
         std::cerr << "Error while receiving body." << ec.message() << std::endl;
@@ -68,11 +63,11 @@ void Session::ping(client_ping_t* payload, SharedData& data)
 
     struct {
         request_header_t hdr;
-        server_ping_t payload;
+        server_ping_response_t payload;
     } request = {
         {
-            SERVER_PING,
-            SERVER_PING_SIZE,
+            SERVER_PING_RESPONSE,
+            SERVER_PING_RESPONSE_SIZE,
         },
         { time(nullptr) }
     };
@@ -103,15 +98,15 @@ int checkUserExist(void* data, int argc, char** argv, char** colName)
 
     infos->used = true;
 
+    for (int i = 0; i < argc; ++i) {
+        std::cout << argv[i] << std::endl;
+    }
     if (strcmp(argv[0], infos->username) == 0)
         infos->valid = true;
 }
 
 void Session::hello(client_hello_t* payload, SharedData& data)
 {
-    std::cout << "Username: " << payload->username << std::endl;
-    std::cout << "Password: " << payload->password << std::endl;
-
     Session::UserInformations infos {
         false,
         false,
@@ -128,10 +123,10 @@ void Session::hello(client_hello_t* payload, SharedData& data)
 
     struct {
         request_header_t hdr;
-        server_hello_t payload;
+        server_hello_response_t payload;
     } res {
-        { SERVER_HELLO,
-            SERVER_HELLO_SIZE },
+        { SERVER_HELLO_RESPONSE,
+            SERVER_HELLO_RESPONSE_SIZE },
         { infos.valid ? OK : KO }
     };
 
@@ -157,10 +152,10 @@ void Session::clientRegister(client_register_t* payload, SharedData& data)
 
     struct {
         request_header_t hdr;
-        server_register_t payload;
+        server_register_response_t payload;
     } res = {
-        { SERVER_REGISTER,
-            SERVER_REGISTER_SIZE },
+        { SERVER_REGISTER_RESPONSE,
+            SERVER_REGISTER_RESPONSE_SIZE },
         { OK }
     };
 
@@ -172,6 +167,8 @@ void Session::clientRegister(client_register_t* payload, SharedData& data)
         res.payload.result = KO;
     }
 
+    std::cout << "Registered: " << (res.payload.result == OK ? "OK" : "KO") << std::endl;
+
     boost::asio::async_write(
         data.socket,
         boost::asio::buffer(&res, sizeof(res)),
@@ -181,6 +178,19 @@ void Session::clientRegister(client_register_t* payload, SharedData& data)
 void Session::call(client_call_t* payload, SharedData& data)
 {
     int number_client = payload->number;
+
+    struct {
+        request_header_t hdr;
+        server_call_response_t payload;
+    } res = {
+        {
+            SERVER_CALL_RESPONSE,
+            SERVER_CALL_RESPONSE_SIZE
+        },
+        {
+            KO
+        }
+    };
 
     for (int i = 0; i < number_client; ++i) {
         UserInformations infos {
@@ -205,13 +215,14 @@ void Session::call(client_call_t* payload, SharedData& data)
             memcpy(req.payload.username, username_.c_str(), username_.length());
             bool sent = false;
 
-            for (auto& session: data.sessions) {
+            for (auto& session : data.sessions) {
                 if (session->username_.empty())
                     continue;
 
                 if (session->username_ == infos.username) {
                     sent = true;
                     boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
+                    res.payload.result = OK;
                     break;
                 }
             }
@@ -222,7 +233,13 @@ void Session::call(client_call_t* payload, SharedData& data)
             std::cerr << "Invalid user." << std::endl;
         }
     }
-    waitHeader(boost::system::error_code());
+
+    std::cout << "Response to call: " << (res.payload.result == OK ? "OK" : "KO") << std::endl;
+
+    boost::asio::async_write(
+        socket_,
+        boost::asio::buffer(&res, sizeof(res)),
+        boost::bind(&Session::waitHeader, this, boost::asio::placeholders::error));
 }
 
 void Session::bye(client_bye_t*, SharedData& data)
