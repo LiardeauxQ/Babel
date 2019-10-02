@@ -9,7 +9,7 @@
 
 #include <time.h>
 
-#define VERSION 0x05
+#define VERSION 0x06
 
 // 1 if the request id come from the server.
 #define IS_SERVER_REQUEST(x) ((x)&0b10000000)
@@ -67,23 +67,27 @@ enum CLIENT_REQ_ID {
 
 /// Client's request id.
 enum SERVER_REQ_ID {
-        SERVER_PING = 0b10000000,
+    SERVER_PING_RESPONSE = 0b10000000,
 
-        SERVER_HELLO = 0b10000001,
+    SERVER_HELLO_RESPONSE = 0b10000001,
 
-        SERVER_GOODBYE = 0b10000010,
+    SERVER_GOODBYE_RESPONSE = 0b10000010,
 
-        SERVER_FRIEND_STATUS = 0b10000011,
+    SERVER_FRIEND_STATUS = 0b10000011,
 
-        SERVER_REGISTER = 0b10000100,
+    SERVER_REGISTER = 0b10000100,
 
-        SERVER_FRIEND_REQUEST = 0b10000101,
+    SERVER_REGISTER_RESPONSE = 0b10000101,
 
-        SERVER_CALL = 0b10000111,
+    SERVER_FRIEND_REQUEST = 0b10000111,
 
-        SERVER_BYE = 0b10001000,
+    SERVER_CALL = 0b10001000,
 
-        SERVER_ACCEPT_FRIEND = 0b10001001,
+    SERVER_CALL_RESPONSE = 0b10001001,
+
+    SERVER_BYE = 0b10001011,
+
+    SERVER_ACCEPT_FRIEND = 0b10001111,
 };
 
 // ----------------- Client's payloads definitions ------------------------ //
@@ -149,15 +153,15 @@ const size_t CLIENT_FRIEND_STATUS_SIZE = sizeof(client_friend_status_t);
 
 typedef struct {
     time_t stamp;
-} server_ping_t;
+} server_ping_response_t;
 
-const size_t SERVER_PING_SIZE = sizeof(server_ping_t);
+const size_t SERVER_PING_RESPONSE_SIZE = sizeof(server_ping_response_t);
 
 typedef struct {
     int result;
-} server_hello_t;
+} server_hello_response_t;
 
-const size_t SERVER_HELLO_SIZE = sizeof(server_hello_t);
+const size_t SERVER_HELLO_RESPONSE_SIZE = sizeof(server_hello_response_t);
 
 typedef struct {
     char message[MESSAGE_LEN];
@@ -174,9 +178,9 @@ const size_t SERVER_FRIEND_STATUS_SIZE = sizeof(server_friend_status_t);
 
 typedef struct {
     int result;
-} server_register_t;
+} server_register_response_t;
 
-const size_t SERVER_REGISTER_SIZE = sizeof(server_register_t);
+const size_t SERVER_REGISTER_RESPONSE_SIZE = sizeof(server_register_response_t);
 
 typedef struct {
     // The asker username.
@@ -187,13 +191,17 @@ const size_t SERVER_FRIEND_REQUEST_SIZE = sizeof(server_friend_request_t);
 
 typedef struct {
     // The asker username.
-    char usernames[MAX_FRIENDS][USERNAME_LEN];
-
-    // Number of user inside usernames.
-    int number;
+    char username[USERNAME_LEN];
 } server_call_t;
 
 const size_t SERVER_CALL_SIZE = sizeof(server_call_t);
+
+typedef struct {
+    // The asker username.
+    int result;
+} server_call_response_t;
+
+const size_t SERVER_CALL_RESPONSE_SIZE = sizeof(server_call_response_t);
 
 typedef struct {
     // Leaver username.
@@ -201,6 +209,13 @@ typedef struct {
 } server_bye_t;
 
 const size_t SERVER_BYE_SIZE = sizeof(server_bye_t);
+
+typedef struct {
+    // Leaver username.
+    char username[USERNAME_LEN];
+} server_bye_response_t;
+
+const size_t SERVER_BYE_RESPONSE_SIZE = sizeof(server_bye_response_t);
 
 typedef struct {
     // Message acceptation.

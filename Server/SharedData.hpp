@@ -6,11 +6,15 @@
 #define BABEL_SERVER_SHAREDDATA_HPP
 
 #include "Database.hpp"
+#include "Session.hpp"
 #include "boost/asio/ip/tcp.hpp"
+
+class Session;
 
 struct SharedData {
     Database& database;
     boost::asio::ip::tcp::socket& socket;
+    std::vector<boost::shared_ptr<Session>>& sessions;
 };
 
 #endif //BABEL_SERVER_SHAREDDATA_HPP

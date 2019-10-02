@@ -3,16 +3,18 @@
 //
 
 #include "Session.hpp"
+#include <Common/User.hpp>
 
-boost::shared_ptr<Session> Session::create(boost::asio::io_context& context, Database& conn)
+boost::shared_ptr<Session> Session::create(boost::asio::io_context& context, Database& conn, std::vector<boost::shared_ptr<Session>>& sessions)
 {
-    return boost::shared_ptr<Session>(new Session(context, conn));
+    return boost::shared_ptr<Session>(new Session(context, conn, sessions));
 }
 
-Session::Session(boost::asio::io_context& context, Database& conn)
-    : socket_(context)
+Session::Session(boost::asio::io_context& context, Database& conn, std::vector<boost::shared_ptr<Session>>& sessions)
+    : username_()
+    , socket_(context)
     , request_()
-    , data_ { conn, socket_ }
+    , data_ { conn, socket_, sessions }
 {
 }
 
@@ -38,10 +40,6 @@ void Session::receivePacket(const boost::system::error_code& ec)
 {
     if (!ec) {
         request_.setupPayload();
-
-        std::cout << "Id: " << request_.getId() << std::endl;
-        std::cout << "Size payload: " << request_.getPayloadSize() << std::endl;
-
         boost::asio::async_read(
             socket_,
             boost::asio::buffer(request_.getPayload(), request_.getPayloadSize()),
@@ -54,7 +52,6 @@ void Session::receivePacket(const boost::system::error_code& ec)
 void Session::receiveBody(const boost::system::error_code& ec)
 {
     if (!ec) {
-        std::cout << "Body received" << std::endl;
         Session::handleRequest(request_, data_);
     } else {
         std::cerr << "Error while receiving body." << ec.message() << std::endl;
@@ -65,70 +62,66 @@ void Session::ping(client_ping_t* payload, SharedData& data)
 {
     std::cout << "Client: " << data.socket.native_handle() << " ping at: " << payload->stamp << "." << std::endl;
 
-    struct {
-        request_header_t hdr;
-        server_ping_t payload;
-    } request = {
+    Packet<server_ping_response_t> req {
         {
-            SERVER_PING,
-            SERVER_PING_SIZE,
+            SERVER_PING_RESPONSE,
+            SERVER_PING_RESPONSE_SIZE,
         },
         { time(nullptr) }
     };
 
     boost::asio::async_write(
         data.socket,
-        boost::asio::buffer(&request, sizeof(request)),
-        boost::bind(&Session::waitHeader, this, boost::asio::placeholders::error));
+        boost::asio::buffer(&req, sizeof(req)),
+        boost::bind(&Session::waitHeader, shared_from_this(), boost::asio::placeholders::error));
 }
 
-int checkUserPassword(void* data, int argc, char** argv, char** colName)
+int appendUserComplete(void* data, int argc, char** argv, char** colName)
 {
-    auto infos = static_cast<Session::UserInformations*>(data);
+    auto users = static_cast<std::vector<User>*>(data);
 
-    if (argc < 2)
-        return 1;
+    users->push_back(User(argv[0], argv[1]));
+    return 0;
+}
 
-    infos->used = true;
+int appendUser(void* data, int argc, char** argv, char** colName)
+{
+    auto users = static_cast<std::vector<std::string>*>(data);
 
-    if (strcmp(argv[0], infos->username) == 0 && strcmp(argv[1], infos->password) == 0)
-        infos->valid = true;
+    users->push_back(argv[0]);
     return 0;
 }
 
 void Session::hello(client_hello_t* payload, SharedData& data)
 {
-    std::cout << "Username: " << payload->username << std::endl;
-    std::cout << "Password: " << payload->password << std::endl;
-
-    Session::UserInformations infos {
-        false,
-        false,
-        payload->username,
-        payload->password
+    Packet<server_hello_response_t> res {
+        { SERVER_HELLO_RESPONSE,
+            SERVER_HELLO_RESPONSE_SIZE },
+        { KO }
     };
 
-    // TODO: hash password.
+    std::vector<User> users;
 
-    data.database.exec("SELECT username, password FROM users", checkUserPassword, &infos);
-
-    if (infos.valid)
-        std::cout << "User connected!" << std::endl;
-    // TODO: Add real action on connection.
-
-    struct {
-        request_header_t hdr;
-        server_hello_t payload;
-    } res {
-        { SERVER_HELLO,
-            SERVER_HELLO_SIZE },
-        { infos.valid ? OK : KO }
+    try {
+        data.database.exec("SELECT username, password FROM users", appendUserComplete, &users);
+    } catch (const DatabaseError& e) {
+        std::cerr << "Cannot fetch users: " << e.what() << "." << std::endl;
+        res.payload.result = KO;
     };
+
+    for (auto& user : users) {
+        if (std::strcmp(user.username.c_str(), payload->username) == 0 && std::strcmp(user.password.c_str(), payload->password) == 0) {
+            res.payload.result = OK;
+            username_ = std::string(payload->username);
+        }
+    }
+
+    std::cout << "Hello: " << (res.payload.result == OK ? "OK" : "KO") << std::endl;
 
     boost::asio::async_write(
         data.socket,
         boost::asio::buffer(&res, sizeof(res)),
-        boost::bind(&Session::waitHeader, this, boost::asio::placeholders::error));
+        boost::bind(&Session::waitHeader, shared_from_this(), boost::asio::placeholders::error));
 }
 
 void Session::friendRequest(client_friend_request_t* payload, SharedData& data)
@@ -145,12 +138,9 @@ void Session::clientRegister(client_register_t* payload, SharedData& data)
 
     sqlReq += (std::string(payload->username) + "\", \"" + payload->password + "\")");
 
-    struct {
-        request_header_t hdr;
-        server_register_t payload;
-    } res = {
-        { SERVER_REGISTER,
-            SERVER_REGISTER_SIZE },
+    Packet<server_register_response_t> res {
+        { SERVER_REGISTER_RESPONSE,
+            SERVER_REGISTER_RESPONSE_SIZE },
         { OK }
     };
 
@@ -162,14 +152,66 @@ void Session::clientRegister(client_register_t* payload, SharedData& data)
         res.payload.result = KO;
     }
 
+    std::cout << "Registered: " << (res.payload.result == OK ? "OK" : "KO") << std::endl;
+
     boost::asio::async_write(
         data.socket,
         boost::asio::buffer(&res, sizeof(res)),
-        boost::bind(&Session::waitHeader, this, boost::asio::placeholders::error));
+        boost::bind(&Session::waitHeader, shared_from_this(), boost::asio::placeholders::error));
 }
 
 void Session::call(client_call_t* payload, SharedData& data)
 {
+    Packet<server_call_response_t> res {
+        { SERVER_CALL_RESPONSE,
+            SERVER_CALL_RESPONSE_SIZE },
+        { KO }
+    };
+
+    std::vector<std::string> users;
+    bool userFound = false;
+
+    try {
+        data.database.exec("SELECT username FROM users", appendUser, &users);
+
+        for (int i = 0; i < payload->number; ++i) {
+            for (auto& user : users) {
+                if (std::strcmp(user.c_str(), payload->usernames[i]) == 0) {
+                    userFound = true;
+                    Packet<server_call_t> req {
+                        { SERVER_CALL,
+                            SERVER_CALL_SIZE },
+                        { {} }
+                    };
+
+                    memcpy(req.payload.username, username_.c_str(), username_.length());
+
+                    for (auto& session : data.sessions) {
+                        if (session->username_.empty())
+                            continue;
+
+                        if (session->username_ == user) {
+                            boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
+                            res.payload.result = OK;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    } catch (const DatabaseError& e) {
+        std::cerr << "Failed to fetch username: " << e.what() << "." << std::endl;
+    };
+
+    if (userFound && res.payload.result == KO)
+        std::cerr << "User found but not connected." << std::endl;
+    else if (!userFound)
+        std::cerr << "User doesn't exist." << std::endl;
+
+    boost::asio::async_write(
+        socket_,
+        boost::asio::buffer(&res, sizeof(res)),
+        boost::bind(&Session::waitHeader, shared_from_this(), boost::asio::placeholders::error));
 }
 
 void Session::bye(client_bye_t*, SharedData& data)
@@ -186,6 +228,7 @@ void Session::friendStatus(client_friend_status_t*, SharedData& data)
 
 void Session::handleRequest(Message& request, SharedData& data)
 {
+    std::cout << std::endl;
     switch (request.getId()) {
     case CLIENT_HELLO:
         hello((client_hello_t*)request.getPayload(), data);
