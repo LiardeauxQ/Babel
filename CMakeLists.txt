@@ -13,7 +13,7 @@ set(CMAKE_AUTOUIC ON)
 
 # Set compiler arguments
 if (NOT WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++17 -Wno-unused")
 endif ()
 
 # Set Qt specific information
