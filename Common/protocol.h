@@ -9,7 +9,7 @@
 
 #include <time.h>
 
-#define VERSION 0x05
+#define VERSION 0x06
 
 // 1 if the request id come from the server.
 #define IS_SERVER_REQUEST(x) ((x)&0b10000000)
@@ -187,10 +187,7 @@ const size_t SERVER_FRIEND_REQUEST_SIZE = sizeof(server_friend_request_t);
 
 typedef struct {
     // The asker username.
-    char usernames[MAX_FRIENDS][USERNAME_LEN];
-
-    // Number of user inside usernames.
-    int number;
+    char username[USERNAME_LEN];
 } server_call_t;
 
 const size_t SERVER_CALL_SIZE = sizeof(server_call_t);
