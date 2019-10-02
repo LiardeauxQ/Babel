@@ -12,7 +12,11 @@
 #include <sqlite3.h>
 #include <string>
 
-static const char* CREATE_USERS_TABLE = "CREATE TABLE `users` (`id` INT PRIMARY KEY, `username` TEXT NOT NULL,`password` TEXT NOT NULL)";
+
+
+
+
+static const char* CREATE_USERS_TABLE = "CREATE TABLE `users` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `username` TEXT NOT NULL UNIQUE, `password` TEXT NOT NULL)";
 static const char* CREATE_FRIENDSHIP_TABLE = "CREATE TABLE `friendship` (`user` INT NOT NULL, `friend` INT NOT NULL, FOREIGN KEY (user) REFERENCES users(id), FOREIGN KEY (friend) REFERENCES users(id))";
 static const char* CHECK_USERS_TABLE = "SELECT name FROM sqlite_master WHERE type='table' AND name='users'";
 static const char* CHECK_FRIENDSHIP_TABLE = "SELECT name FROM sqlite_master WHERE type='table' AND name='friendship'";
