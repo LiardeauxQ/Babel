@@ -17,7 +17,7 @@ typedef boost::asio::ip::tcp BoostTcp;
 
 class Session : public boost::enable_shared_from_this<Session> {
 public:
-    static boost::shared_ptr<Session> create(boost::asio::io_context& context, Database& conn);
+    static boost::shared_ptr<Session> create(boost::asio::io_context& context, Database& conn, std::vector<boost::shared_ptr<Session>>& session);
 
     [[nodiscard]] BoostTcp::socket& getSocket()
     {
@@ -60,7 +60,9 @@ public:
     };
 
 private:
-    explicit Session(boost::asio::io_context& context, Database& conn);
+    explicit Session(boost::asio::io_context& context, Database& conn, std::vector<boost::shared_ptr<Session>>& sessions);
+
+    std::string username_;
 
     BoostTcp::socket socket_;
 

@@ -22,7 +22,7 @@ ServerApplication::ServerApplication(const ServerConfig& config)
 
 void ServerApplication::accept()
 {
-    auto session = Session::create(context_, database_);
+    auto session = Session::create(context_, database_, sessions_);
 
     acceptor_.async_accept(
         session->getSocket(),

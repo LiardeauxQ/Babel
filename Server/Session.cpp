@@ -4,15 +4,16 @@
 
 #include "Session.hpp"
 
-boost::shared_ptr<Session> Session::create(boost::asio::io_context& context, Database& conn)
+boost::shared_ptr<Session> Session::create(boost::asio::io_context& context, Database& conn, std::vector<boost::shared_ptr<Session>>& sessions)
 {
-    return boost::shared_ptr<Session>(new Session(context, conn));
+    return boost::shared_ptr<Session>(new Session(context, conn, sessions));
 }
 
-Session::Session(boost::asio::io_context& context, Database& conn)
-    : socket_(context)
+Session::Session(boost::asio::io_context& context, Database& conn, std::vector<boost::shared_ptr<Session>>& sessions)
+    : username_()
+    , socket_(context)
     , request_()
-    , data_ { conn, socket_ }
+    , data_ { conn, socket_, sessions}
 {
 }
 
@@ -96,6 +97,16 @@ int checkUserPassword(void* data, int argc, char** argv, char** colName)
     return 0;
 }
 
+int checkUserExist(void* data, int argc, char** argv, char** colName)
+{
+    auto infos = static_cast<Session::UserInformations*>(data);
+
+    infos->used = true;
+
+    if (strcmp(argv[0], infos->username) == 0)
+        infos->valid = true;
+}
+
 void Session::hello(client_hello_t* payload, SharedData& data)
 {
     std::cout << "Username: " << payload->username << std::endl;
@@ -113,8 +124,7 @@ void Session::hello(client_hello_t* payload, SharedData& data)
     data.database.exec("SELECT username, password FROM users", checkUserPassword, &infos);
 
     if (infos.valid)
-        std::cout << "User connected!" << std::endl;
-    // TODO: Add real action on connection.
+        username_ = std::string(payload->username);
 
     struct {
         request_header_t hdr;
@@ -145,6 +155,47 @@ void Session::clientRegister(client_register_t* payload, SharedData& data)
 
 void Session::call(client_call_t* payload, SharedData& data)
 {
+    int number_client = payload->number;
+
+    for (int i = 0; i < number_client; ++i) {
+        UserInformations infos {
+            false,
+            false,
+            payload->usernames[i],
+            nullptr,
+        };
+
+        data.database.exec("SELECT username FROM users", checkUserExist, &infos);
+
+        if (infos.valid) {
+            struct {
+                request_header_t hdr;
+                server_call_t payload;
+            } req {
+                { SERVER_CALL,
+                    SERVER_CALL_SIZE },
+                { {} }
+            };
+
+            memcpy(req.payload.username, infos.username, strlen(infos.username));
+            bool sent = false;
+
+            for (auto& session: data.sessions) {
+                if (session->username_ == req.payload.username) {
+                    if (session->username_.empty())
+                        continue;
+                    sent = true;
+                    boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
+                    break;
+                }
+            }
+
+            if (!sent)
+                std::cerr << "User doesn't exist or is not logged." << std::endl;
+        } else {
+            std::cerr << "Invalid user." << std::endl;
+        }
+    }
 }
 
 void Session::bye(client_bye_t*, SharedData& data)
