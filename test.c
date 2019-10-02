@@ -83,6 +83,44 @@ int send_hello(int s) {
     return 0;
 }
 
+int send_register(int s)
+{
+    struct {
+        request_header_t hdr;
+        client_register_t payload;
+    } request = {
+        {
+            .id = CLIENT_REGISTER,
+            .request_len = CLIENT_REGISTER_SIZE
+        },
+        {
+            .username = {0},
+            .password = {0}
+        }
+    };
+
+    memcpy(&request.payload.username, "Richard!", 8);
+    memcpy(&request.payload.password, "BoomBoom", 8);
+
+    write(s, &request, sizeof(request));
+
+    request_header_t hdr = {0};
+
+    read(s, &hdr, sizeof(hdr));
+
+    if (hdr.id != SERVER_REGISTER) {
+        printf("Error hdr = %c\n", hdr.id);
+        return 1;
+    }
+
+    server_hello_t server = {0};
+
+    read(s, &server, sizeof(server));
+
+    printf("Registering: %s\n", server.result == OK ? "Succeed" : "Failed");
+    return 0;
+}
+
 int main()
 {
     int s = socket(AF_INET, SOCK_STREAM, 0);
@@ -109,5 +147,9 @@ int main()
     
     printf("Sending Hello!\n");
     if (send_hello(s))
+        return 1;
+
+    printf("Sending Register!\n");
+    if (send_register(s))
         return 1;
 }
