@@ -41,7 +41,7 @@ private:
     std::vector<boost::shared_ptr<Session>> sessions_;
 
     // Private logic
-    void handleAccept(boost::shared_ptr<Session> session, const boost::system::error_code& ec);
+    void handleAccept(const boost::shared_ptr<Session>& session, const boost::system::error_code& ec);
 };
 
 #endif //BABEL_SERVER_SERVERAPPLICATION_HPP

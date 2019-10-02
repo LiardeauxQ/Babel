@@ -2,7 +2,6 @@
 // Created by alex on 9/23/19.
 //
 
-
 #include "ServerApplication.hpp"
 
 void ServerApplication::run()
@@ -32,7 +31,7 @@ void ServerApplication::accept()
             boost::asio::placeholders::error));
 }
 
-void ServerApplication::handleAccept(boost::shared_ptr<Session> session, const boost::system::error_code& ec)
+void ServerApplication::handleAccept(const boost::shared_ptr<Session>& session, const boost::system::error_code& ec)
 {
     if (!ec)
         session->run(sessions_);
