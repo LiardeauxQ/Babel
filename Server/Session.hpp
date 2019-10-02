@@ -52,11 +52,10 @@ public:
 
     void friendStatus(client_friend_status_t *, SharedData& data);
 
-    struct UserInformations {
-        bool used;
-        bool valid;
-        char *username;
-        char *password;
+    template <typename T>
+    struct Packet {
+        request_header_t header;
+        T payload;
     };
 
 private:

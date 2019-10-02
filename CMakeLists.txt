@@ -85,7 +85,6 @@ set(BABEL_CLIENT
 
 set(BABEL_COMMON
     ${COMMON_PATH}/User.hpp
-    ${COMMON_PATH}/User.cpp
     ${COMMON_PATH}/Database.hpp
     ${COMMON_PATH}/Database.cpp
     ${COMMON_PATH}/DatabaseError.hpp

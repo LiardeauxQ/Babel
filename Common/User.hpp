@@ -12,14 +12,17 @@
 class User {
 public:
     // Create user from connection and username.
-    User(Database& connection, const std::string& username);
-
-    // Create user from connection and id.
-    User(Database& connection, int id);
-
-    User(const User&) = delete;
+    User(const std::string& username, const std::string& password)
+        : username(username)
+        , password(password)
+        , id(-1)
+    {}
 
     ~User() = default;
+
+    std::string username;
+    std::string password;
+    int id;
 
 private:
     static int takeUser(void* toChange, int argc, char** argv, char** azColName);
@@ -30,10 +33,6 @@ private:
         size_t& id;
         bool used;
     };
-
-    std::string name_;
-    std::string password_;
-    size_t id_;
 
     friend std::ostream& operator<<(std::ostream& os, const User& user);
 };

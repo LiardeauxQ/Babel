@@ -61,8 +61,8 @@ int send_hello(int s) {
         }
     };
 
-    memcpy(&request.payload.username, "Alexandra", 9);
-    memcpy(&request.payload.password, "OuiOuiOui", 9);
+    memcpy(&request.payload.username, "Alexandre", 9);
+    memcpy(&request.payload.password, "Fourcat", 7);
 
     write(s, &request, sizeof(request));
 
@@ -187,8 +187,7 @@ int main()
         return 1;
 
     printf("Sending Register!\n");
-    if (send_register(s))
-        return 1;
+    send_register(s);
 
     printf("Sending Call!\n");
     if (send_call(s))
