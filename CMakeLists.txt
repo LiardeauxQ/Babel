@@ -25,6 +25,14 @@ elseif (WIN32)
 endif (APPLE)
 
 # Include conan headers
+
+if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+	include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+	conan_basic_setup()
+else()
+	message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
+endif()
+
 if (UNIX)
 	include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
 endif ()
