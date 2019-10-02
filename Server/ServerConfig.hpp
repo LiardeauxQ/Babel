@@ -9,17 +9,10 @@
 #include <fstream>
 #include <string>
 
-static const char* DEFAULT_DB = "data.db";
-static const char* DEFAULT_CONFIG_PATH = "server.cfg";
-static const size_t DEFAULT_MAX_USER = 100;
-static const size_t DEFAULT_PORT = 8080;
-static const char* DEFAULT_HOST = "0.0.0.0";
 
 struct ServerConfig {
 public:
-    ServerConfig(const char* path);
-
-    ServerConfig();
+    explicit ServerConfig(const char* path = "server.cfg");
 
     std::string databaseUrl;
     size_t maxUser;

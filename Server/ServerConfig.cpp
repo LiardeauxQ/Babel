@@ -4,22 +4,22 @@
 
 #include "ServerConfig.hpp"
 
+static const char* DEFAULT_DB = "data.db";
+static const size_t DEFAULT_MAX_USER = 100;
+static const size_t DEFAULT_PORT = 8080;
+static const char* DEFAULT_HOST = "0.0.0.0";
+
 ServerConfig::ServerConfig(const char* path)
-    : configPath_(path)
-    , databaseUrl(DEFAULT_DB)
+    : databaseUrl(DEFAULT_DB)
     , maxUser(DEFAULT_MAX_USER)
     , port(DEFAULT_PORT)
     , host(DEFAULT_HOST)
+    , configPath_(path)
 {
     std::ifstream file(path);
 
     if (file.good())
         parseFile(file);
-}
-
-ServerConfig::ServerConfig()
-    : configPath_(DEFAULT_CONFIG_PATH)
-{
 }
 
 void ServerConfig::parseFile(std::ifstream& file)
