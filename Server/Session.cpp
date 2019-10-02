@@ -177,13 +177,14 @@ void Session::call(client_call_t* payload, SharedData& data)
                 { {} }
             };
 
-            memcpy(req.payload.username, infos.username, strlen(infos.username));
+            memcpy(req.payload.username, username_.c_str(), username_.length());
             bool sent = false;
 
             for (auto& session: data.sessions) {
-                if (session->username_ == req.payload.username) {
-                    if (session->username_.empty())
-                        continue;
+                if (session->username_.empty())
+                    continue;
+
+                if (session->username_ == infos.username) {
                     sent = true;
                     boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
                     break;
@@ -196,6 +197,7 @@ void Session::call(client_call_t* payload, SharedData& data)
             std::cerr << "Invalid user." << std::endl;
         }
     }
+    waitHeader(boost::system::error_code());
 }
 
 void Session::bye(client_bye_t*, SharedData& data)
