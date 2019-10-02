@@ -33,12 +33,12 @@ int send_ping(int s) {
 
     read(s, &hdr, sizeof(hdr));
 
-    if (hdr.id != SERVER_PING) {
+    if (hdr.id != SERVER_PING_RESPONSE) {
         printf("Error !!\n");
         return 1;
     }
 
-    server_ping_t server = {0};
+    server_ping_response_t server = {0};
 
     read(s, &server, sizeof(server));
 
@@ -70,12 +70,12 @@ int send_hello(int s) {
 
     read(s, &hdr, sizeof(hdr));
 
-    if (hdr.id != SERVER_HELLO) {
+    if (hdr.id != SERVER_HELLO_RESPONSE) {
         printf("Error hdr = %c\n", hdr.id);
         return 1;
     }
 
-    server_hello_t server = {0};
+    server_hello_response_t server = {0};
 
     read(s, &server, sizeof(server));
 
@@ -108,12 +108,49 @@ int send_register(int s)
 
     read(s, &hdr, sizeof(hdr));
 
-    if (hdr.id != SERVER_REGISTER) {
+    if (hdr.id != SERVER_REGISTER_RESPONSE) {
         printf("Error hdr = %c\n", hdr.id);
         return 1;
     }
 
-    server_hello_t server = {0};
+    server_register_response_t server = {0};
+
+    read(s, &server, sizeof(server));
+
+    printf("Registering: %s\n", server.result == OK ? "Succeed" : "Failed");
+    return 0;
+}
+
+int send_call(int s)
+{
+    struct {
+        request_header_t hdr;
+        client_call_t payload;
+    } request = {
+        {
+            .id = CLIENT_CALL,
+            .request_len = CLIENT_CALL_SIZE
+        },
+        {
+            .usernames = { {0} },
+            .number = 1
+        }
+    };
+
+    memcpy(&request.payload.usernames[0], "Thomas", 9);
+
+    write(s, &request, sizeof(request));
+
+    request_header_t hdr = {0};
+
+    read(s, &hdr, sizeof(hdr));
+
+    if (hdr.id != SERVER_CALL_RESPONSE) {
+        printf("Error hdr = %c\n", hdr.id);
+        return 1;
+    }
+
+    server_call_response_t server = {0};
 
     read(s, &server, sizeof(server));
 
@@ -151,5 +188,9 @@ int main()
 
     printf("Sending Register!\n");
     if (send_register(s))
+        return 1;
+
+    printf("Sending Call!\n");
+    if (send_call(s))
         return 1;
 }
