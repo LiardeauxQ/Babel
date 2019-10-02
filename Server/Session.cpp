@@ -80,7 +80,7 @@ int appendUserComplete(void* data, int argc, char** argv, char** colName)
 {
     auto users = static_cast<std::vector<User>*>(data);
 
-    users->push_back(User(argv[0], argv[1]));
+    users->push_back(User(argv[0], argv[1], std::atoi(argv[2])));
     return 0;
 }
 
@@ -103,7 +103,7 @@ void Session::hello(client_hello_t* payload, SharedData& data)
     std::vector<User> users;
 
     try {
-        data.database.exec("SELECT username, password FROM users", appendUserComplete, &users);
+        data.database.exec("SELECT username, password, id FROM users", appendUserComplete, &users);
     } catch (const DatabaseError& e) {
         std::cerr << "Cannot fetch users: " << e.what() << "." << std::endl;
         res.payload.result = KO;
