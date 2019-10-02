@@ -151,6 +151,31 @@ void Session::goodbye(client_goodbye_t* payload, SharedData& data)
 
 void Session::clientRegister(client_register_t* payload, SharedData& data)
 {
+    std::string sqlReq("INSERT INTO users (username, password) VALUES (\"");
+
+    sqlReq += (std::string(payload->username) + "\", \"" + payload->password + "\")");
+
+    struct {
+        request_header_t hdr;
+        server_register_t payload;
+    } res = {
+        { SERVER_REGISTER,
+            SERVER_REGISTER_SIZE },
+        { OK }
+    };
+
+    try {
+        data.database.exec(sqlReq);
+    } catch (DatabaseError& e) {
+        std::cout << "Failed to register user: " << e.what() << std::endl;
+
+        res.payload.result = KO;
+    }
+
+    boost::asio::async_write(
+        data.socket,
+        boost::asio::buffer(&res, sizeof(res)),
+        boost::bind(&Session::waitHeader, this, boost::asio::placeholders::error));
 }
 
 void Session::call(client_call_t* payload, SharedData& data)
