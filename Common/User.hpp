@@ -12,10 +12,9 @@
 class User {
 public:
     // Create user from connection and username.
-    User(const std::string& username, const std::string& password)
+    User(const std::string& username, const std::string& password, int id)
         : username(username)
         , password(password)
-        , id(-1)
     {}
 
     ~User() = default;
@@ -23,17 +22,7 @@ public:
     std::string username;
     std::string password;
     int id;
-
 private:
-    static int takeUser(void* toChange, int argc, char** argv, char** azColName);
-
-    struct callbackData {
-        std::string& name;
-        std::string& password;
-        size_t& id;
-        bool used;
-    };
-
     friend std::ostream& operator<<(std::ostream& os, const User& user);
 };
 
