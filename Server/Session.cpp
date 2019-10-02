@@ -5,12 +5,12 @@
 #include "Session.hpp"
 #include <Common/User.hpp>
 
-boost::shared_ptr<Session> Session::create(boost::asio::io_context& context, Database& conn, std::vector<boost::shared_ptr<Session>>& sessions)
+boost::shared_ptr<Session> Session::create(boost::asio::io_context& context, Database& conn, std::list<boost::shared_ptr<Session>>& sessions)
 {
     return boost::shared_ptr<Session>(new Session(context, conn, sessions));
 }
 
-Session::Session(boost::asio::io_context& context, Database& conn, std::vector<boost::shared_ptr<Session>>& sessions)
+Session::Session(boost::asio::io_context& context, Database& conn, std::list<boost::shared_ptr<Session>>& sessions)
     : username_()
     , socket_(context)
     , request_()
@@ -18,22 +18,29 @@ Session::Session(boost::asio::io_context& context, Database& conn, std::vector<b
 {
 }
 
-void Session::run(std::vector<boost::shared_ptr<Session>>& sessions)
+void Session::run()
 {
-    sessions.push_back(shared_from_this());
+    data_.sessions.push_back(shared_from_this());
 
     waitHeader(boost::system::error_code());
 }
 
 void Session::waitHeader(const boost::system::error_code& ec)
 {
-    if (ec)
+    if (ec) {
         std::cerr << ec.message() << std::endl;
+    } else {
+        boost::asio::async_read(
+            socket_,
+            boost::asio::buffer(request_.getHeaderRaw(), HEADER_SIZE),
+            boost::bind(&Session::receivePacket, shared_from_this(), boost::asio::placeholders::error));
+    }
+}
 
-    boost::asio::async_read(
-        socket_,
-        boost::asio::buffer(request_.getHeaderRaw(), HEADER_SIZE),
-        boost::bind(&Session::receivePacket, shared_from_this(), boost::asio::placeholders::error));
+Session::~Session()
+{
+    socket_.close();
+    std::cout << "Deleting: " << username_ << "." << std::endl;
 }
 
 void Session::receivePacket(const boost::system::error_code& ec)
@@ -44,6 +51,16 @@ void Session::receivePacket(const boost::system::error_code& ec)
             socket_,
             boost::asio::buffer(request_.getPayload(), request_.getPayloadSize()),
             boost::bind(&Session::receiveBody, shared_from_this(), boost::asio::placeholders::error));
+    } else if (ec == boost::asio::error::eof) {
+        std::cout << "Disconnecting client: " << username_ << "." << std::endl;
+
+        data_.sessions.remove_if([this](boost::shared_ptr<Session>& session){
+            return session->getSocket().native_handle() == socket_.native_handle();
+        });
+
+        for (auto& e : data_.sessions) {
+            std::cout << "Username: " << e->username_ << std::endl;
+        }
     } else {
         std::cerr << "Error while receiving packet." << ec.message() << std::endl;
     }
@@ -187,7 +204,7 @@ void Session::call(client_call_t* payload, SharedData& data)
                     memcpy(req.payload.username, username_.c_str(), username_.length());
 
                     for (auto& session : data.sessions) {
-                        if (session->username_.empty())
+                        if (session->username_.empty() || session->username_ == username_)
                             continue;
 
                         if (session->username_ == user) {

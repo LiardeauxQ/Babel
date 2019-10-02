@@ -8,13 +8,14 @@
 #include "Database.hpp"
 #include "Session.hpp"
 #include "boost/asio/ip/tcp.hpp"
+#include <list>
 
 class Session;
 
 struct SharedData {
     Database& database;
     boost::asio::ip::tcp::socket& socket;
-    std::vector<boost::shared_ptr<Session>>& sessions;
+    std::list<boost::shared_ptr<Session>>& sessions;
 };
 
 #endif //BABEL_SERVER_SHAREDDATA_HPP

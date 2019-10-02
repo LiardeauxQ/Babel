@@ -34,6 +34,6 @@ void ServerApplication::accept()
 void ServerApplication::handleAccept(const boost::shared_ptr<Session>& session, const boost::system::error_code& ec)
 {
     if (!ec)
-        session->run(sessions_);
+        session->run();
     accept();
 }

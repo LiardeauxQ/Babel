@@ -137,7 +137,7 @@ int send_call(int s)
         }
     };
 
-    memcpy(&request.payload.usernames[0], "Thomas", 9);
+    memcpy(&request.payload.usernames[0], "Thomas", 6);
 
     write(s, &request, sizeof(request));
 
@@ -154,7 +154,7 @@ int send_call(int s)
 
     read(s, &server, sizeof(server));
 
-    printf("Registering: %s\n", server.result == OK ? "Succeed" : "Failed");
+    printf("Call: %s\n", server.result == OK ? "Succeed" : "Failed");
     return 0;
 }
 

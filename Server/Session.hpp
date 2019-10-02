@@ -11,21 +11,22 @@
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <iostream>
-#include <vector>
+#include <list>
 
 typedef boost::asio::ip::tcp BoostTcp;
 
 class Session
     : public boost::enable_shared_from_this<Session> {
 public:
+
     // Can only be instanced with a shared_ptr.
-    static boost::shared_ptr<Session> create(boost::asio::io_context& context, Database& conn, std::vector<boost::shared_ptr<Session>>& session);
+    static boost::shared_ptr<Session> create(boost::asio::io_context& context, Database& conn, std::list<boost::shared_ptr<Session>>& session);
 
     [[nodiscard]] BoostTcp::socket& getSocket() { return socket_; }
 
     void waitHeader(const boost::system::error_code& ec);
 
-    void run(std::vector<boost::shared_ptr<Session>>& sessions);
+    void run();
 
     void receivePacket(const boost::system::error_code& ec);
 
@@ -59,8 +60,9 @@ public:
         T payload;
     };
 
+    ~Session();
 private:
-    explicit Session(boost::asio::io_context& context, Database& conn, std::vector<boost::shared_ptr<Session>>& sessions);
+    explicit Session(boost::asio::io_context& context, Database& conn, std::list<boost::shared_ptr<Session>>& sessions);
 
     std::string username_;
 
