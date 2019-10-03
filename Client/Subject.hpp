@@ -6,6 +6,7 @@
 #define BABEL_SERVER_SUBJECT_HPP
 
 #include <vector>
+#include <map>
 #include <string>
 
 #include "Observer.hpp"
@@ -22,11 +23,10 @@ public:
     void dettachAll();
 
     const std::string &getLabel() const { return label_; }
-    void notify();
+    void notify(std::map<std::string, void*>);
 private:
     std::string label_;
     std::vector<Observer*> observables_;
 };
-
 
 #endif //BABEL_SERVER_SUBJECT_HPP

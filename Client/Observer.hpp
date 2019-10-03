@@ -14,9 +14,9 @@ class Observer {
 public:
     Observer(Subject *sub = nullptr);
 
-    virtual void update() = 0;
+    virtual void update(std::map<std::string, void*>) = 0;
 protected:
-    const Subject *getSubject() const;
+    const Subject *getSubject() const { return sub_; }
 private:
     Subject *sub_;
 };

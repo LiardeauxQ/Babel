@@ -36,10 +36,10 @@ void Subject::dettachAll()
     observables_.empty();
 }
 
-void Subject::notify()
+void Subject::notify(std::map<std::string, void*> userInfo)
 {
     for (auto obs : observables_) {
         std::cout << "notify" << std::endl;
-        obs->update();
+        obs->update(userInfo);
     }
 }

@@ -5,13 +5,8 @@
 #include "Observer.hpp"
 
 Observer::Observer(Subject *sub) :
-    sub_(sub)
+        sub_(sub)
 {
     if (sub_)
         sub_->attach(this);
-}
-
-const Subject *Observer::getSubject() const
-{
-    return sub_;
 }
