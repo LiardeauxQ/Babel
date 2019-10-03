@@ -7,7 +7,8 @@
 Observer::Observer(Subject *sub) :
     sub_(sub)
 {
-    sub_->attach(this);
+    if (sub_)
+        sub_->attach(this);
 }
 
 const Subject *Observer::getSubject() const

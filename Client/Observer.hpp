@@ -6,12 +6,13 @@
 #define BABEL_SERVER_OBSERVER_HPP
 
 #include "Subject.hpp"
+#include <iostream>
 
 class Subject;
 
 class Observer {
 public:
-    Observer(Subject *sub);
+    Observer(Subject *sub = nullptr);
 
     virtual void update() = 0;
 protected:
@@ -19,6 +20,5 @@ protected:
 private:
     Subject *sub_;
 };
-
 
 #endif //BABEL_SERVER_OBSERVER_HPP
