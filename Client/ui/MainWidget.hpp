@@ -14,10 +14,10 @@
 #include "WidgetsHandler.hpp"
 
 namespace ui {
-    class MainWindow : public QWidget {
+    class MainWidget : public QWidget {
         Q_OBJECT
     public:
-        explicit MainWindow(QWidget *parent = nullptr);
+        explicit MainWidget(QWidget *parent = nullptr);
 
     private slots:
         void initRegisterWidget();
