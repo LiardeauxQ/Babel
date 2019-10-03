@@ -2,8 +2,8 @@
 // Created by Quentin Liardeaux on 9/26/19.
 //
 
-#ifndef BABEL_SERVER_MAINWINDOW_HPP
-#define BABEL_SERVER_MAINWINDOW_HPP
+#ifndef BABEL_SERVER_MAINWIDGET_HPP
+#define BABEL_SERVER_MAINWIDGET_HPP
 
 #include <QtWidgets>
 #include <QSharedMemory>
@@ -35,4 +35,4 @@ namespace ui {
 }
 
 
-#endif //BABEL_SERVER_MAINWINDOW_HPP
+#endif //BABEL_SERVER_MAINWIDGET_HPP
