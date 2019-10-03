@@ -3,31 +3,19 @@
 //
 
 #include "AudioController.hpp"
-#include "AudioControllerError.hpp"
-#include <iostream>
 #include <QApplication>
-#include "ui/MainWindow.hpp"
 #include "protocol/ServerRequest.hpp"
-#include <boost/asio.hpp>
+#include "AppManager.hpp"
+#include <memory>
 
-int main(int argc, char *argv[])
-{
-    ServerRequest request("127.0.0.1", 1234);
-
-    request.sendHello("Quentin", "password");
-    return 0;
-}
-
-/*
 int main(int argc, char *argv[])
 {
     QApplication babelApp(argc, argv);
-    ui::MainWindow w;
+    AppManager app(std::make_unique<ServerRequest>("127.0.0.1", 1234));
 
-    w.resize(500, 500);
-    w.show();
+    app.start();
     return babelApp.exec();
-}*/
+}
 
 /*
 int main(int argc, char* argv[])
