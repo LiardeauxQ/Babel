@@ -4,7 +4,12 @@
 
 #include "MainWidget.hpp"
 
-ui::MainWidget::MainWidget(QWidget *parent) : QWidget(parent)
+#include <utility>
+
+ui::MainWidget::MainWidget(QWidget *parent, QSharedPointer<NotificationHandler> notifHandler) :
+    QWidget(parent),
+    notifHandler_(notifHandler),
+    sub(Subject("test"))
 {
     connectionWidget_ = QSharedPointer<QWidget>(new QWidget());
     widgetsHandler_ = new WidgetsHandler();
@@ -23,6 +28,8 @@ ui::MainWidget::MainWidget(QWidget *parent) : QWidget(parent)
     widgetsHandler_->push(connectionWidget_.get());
     mainLayout->addWidget(widgetsHandler_);
     setLayout(mainLayout);
+
+    notifHandler_->registerEvent(&sub);
 }
 
 void ui::MainWidget::initRegisterWidget()
@@ -49,6 +56,7 @@ void ui::MainWidget::initLoginWidget()
     connect(closeAction, &QAction::triggered, this, &ui::MainWidget::returnToConnectionWidget);
     wLogin->addAction(closeAction);
     widgetsHandler_->replaceLastWidget(wLogin);
+    sub.notify();
 }
 
 void ui::MainWidget::initFriendListWidget()

@@ -4,7 +4,9 @@
 
 #include "LoginWidget.hpp"
 
-ui::LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent)
+ui::LoginWidget::LoginWidget(QWidget *parent, QSharedPointer<NotificationHandler> notifHandler) :
+    QWidget(parent),
+    notifHandler_(notifHandler)
 {
     QPointer<QPushButton> closeButton = new QPushButton(tr("Close"));
     button_ = QSharedPointer<QPushButton>(new QPushButton(tr("Login")));

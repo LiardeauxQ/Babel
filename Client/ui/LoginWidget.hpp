@@ -5,10 +5,11 @@
 #ifndef BABEL_SERVER_LOGINWIDGET_HPP
 #define BABEL_SERVER_LOGINWIDGET_HPP
 
-#include <memory>
 #include <QtWidgets>
 #include <QSharedPointer>
 #include <iostream>
+
+#include "../NotificationHandler.hpp"
 
 namespace ui {
 
@@ -20,12 +21,13 @@ namespace ui {
     Q_OBJECT
 
     public:
-        explicit LoginWidget(QWidget *parent = nullptr);
+        explicit LoginWidget(QWidget *parent = nullptr, QSharedPointer<NotificationHandler> notifHandler = nullptr);
 
     private:
         QSharedPointer<QPushButton> button_;
         QSharedPointer<QLineEdit> usernameLineEdit_;
         QSharedPointer<QLineEdit> passwordLineEdit_;
+        QSharedPointer<NotificationHandler> notifHandler_;
 
     private slots:
         void loginTap();

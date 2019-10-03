@@ -12,12 +12,14 @@
 #include "LoginWidget.hpp"
 #include "FriendListWidget.hpp"
 #include "WidgetsHandler.hpp"
+#include "../NotificationHandler.hpp"
+#include "../Subject.hpp"
 
 namespace ui {
     class MainWidget : public QWidget {
         Q_OBJECT
     public:
-        explicit MainWidget(QWidget *parent = nullptr);
+        explicit MainWidget(QWidget *parent = nullptr, QSharedPointer<NotificationHandler> notifHandler = nullptr);
 
     private slots:
         void initRegisterWidget();
@@ -25,6 +27,9 @@ namespace ui {
     private:
         QSharedPointer<QWidget> connectionWidget_;
         QPointer<WidgetsHandler> widgetsHandler_;
+        QSharedPointer<NotificationHandler> notifHandler_;
+
+        Subject sub;
 
         void registered();
         void logged();

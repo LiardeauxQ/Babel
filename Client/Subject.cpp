@@ -38,5 +38,8 @@ void Subject::dettachAll()
 
 void Subject::notify()
 {
-
+    for (auto obs : observables_) {
+        std::cout << "notify" << std::endl;
+        obs->update();
+    }
 }

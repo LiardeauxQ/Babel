@@ -7,10 +7,9 @@
 AppManager::AppManager(std::unique_ptr<ServerRequest> request) :
     request_(std::move(request)),
     session_(UserSession()),
-    notifHandler_(NotificationHandler()),
-    widget_(ui::MainWidget())
+    notifHandler_(QSharedPointer<NotificationHandler>(new NotificationHandler())),
+    widget_(ui::MainWidget(nullptr, notifHandler_))
 {
-
 }
 
 void AppManager::start()
@@ -20,6 +19,28 @@ void AppManager::start()
 }
 
 void AppManager::askToLog()
+{
+}
+
+void AppManager::askToRegister()
+{
+}
+
+void AppManager::call()
+{
+}
+
+void AppManager::requestFriends()
+{
+}
+
+AppManager::AppManagerObservable::AppManagerObservable(AppManager *manager) :
+    Observer(nullptr),
+    manager_(manager)
+{
+}
+
+void AppManager::AppManagerObservable::update()
 {
 
 }
