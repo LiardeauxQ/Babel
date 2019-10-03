@@ -54,7 +54,7 @@ void Session::receivePacket(const boost::system::error_code& ec)
     } else if (ec == boost::asio::error::eof) {
         std::cout << "Disconnecting client: " << username_ << "." << std::endl;
 
-        data_.sessions.remove_if([this](boost::shared_ptr<Session>& session){
+        data_.sessions.remove_if([this](boost::shared_ptr<Session>& session) {
             return session->getSocket().native_handle() == socket_.native_handle();
         });
 
@@ -198,7 +198,7 @@ void Session::call(client_call_t* payload, SharedData& data)
                     Packet<server_call_t> req {
                         { SERVER_CALL,
                             SERVER_CALL_SIZE },
-                        { {} }
+                        { {}, 8080, "192.168.0.0" }
                     };
 
                     memcpy(req.payload.username, username_.c_str(), username_.length());
