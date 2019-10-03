@@ -7,13 +7,20 @@
 ServerRequest::ServerRequest(const std::string &ipAddress, int port) :
     context_()
     , socket_(BoostTcp::socket(context_))
+    , ipAddress_(ipAddress)
+    , port_(port)
 {
-    socket_.connect(BoostTcp::endpoint(boost::asio::ip::address::from_string(ipAddress), port));
 }
 
 ServerRequest::~ServerRequest()
 {
     socket_.close();
+}
+
+void ServerRequest::start()
+{
+    socket_.connect(BoostTcp::endpoint(
+            boost::asio::ip::address::from_string(ipAddress_), port_));
 }
 
 void ServerRequest::callbackWrite(const boost::system::error_code& ec)

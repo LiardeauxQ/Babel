@@ -23,6 +23,8 @@ public:
 
     ~ServerRequest();
 
+    void start();
+
     void sendPing(time_t timeSent);
     void sendHello(const std::string &username, const std::string &password);
     void sendGoodbye();
@@ -42,6 +44,8 @@ private:
 
     boost::asio::io_context context_;
     BoostTcp::socket socket_;
+    std::string ipAddress_;
+    int port_;
 };
 
 
