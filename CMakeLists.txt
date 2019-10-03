@@ -92,7 +92,12 @@ set(BABEL_CLIENT
     ${CLIENT_PATH}/protocol/ServerRequest.hpp
 	${CLIENT_PATH}/AppManager.cpp
 	${CLIENT_PATH}/AppManager.hpp
-	${CLIENT_PATH}/protocol/UserSession.hpp Client/Subject.cpp Client/Subject.hpp Client/Observer.cpp Client/Observer.hpp Client/NotificationHandler.cpp Client/NotificationHandler.hpp)
+	${CLIENT_PATH}/protocol/UserSession.hpp
+	${CLIENT_PATH}/Subject.cpp
+	${CLIENT_PATH}/Subject.hpp
+	${CLIENT_PATH}/Observer.hpp
+	${CLIENT_PATH}/NotificationHandler.cpp
+	${CLIENT_PATH}/NotificationHandler.hpp Client/Observer.cpp)
 
 set(BABEL_COMMON
     ${COMMON_PATH}/User.hpp

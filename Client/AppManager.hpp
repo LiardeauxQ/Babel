@@ -22,18 +22,18 @@ public:
 
 private:
 
-    class AppManagerObservable: public Observer {
+    class AppManagerObserver: public Observer {
     public:
-        explicit AppManagerObservable(AppManager *manager);
-        ~AppManagerObservable() = default;
+        explicit AppManagerObserver(AppManager *manager);
+        ~AppManagerObserver() = default;
 
-        void update() final;
+        void update(std::map<std::string, void*>) final;
     private:
         AppManager *manager_;
     };
 
-    void askToLog();
-    void askToRegister();
+    void askToLog(const std::string &username, const std::string &password);
+    void askToRegister(const std::string &username, const std::string &password);
     void call();
     void requestFriends();
 
@@ -41,6 +41,7 @@ private:
     UserSession session_;
     QSharedPointer<NotificationHandler> notifHandler_;
     ui::MainWidget widget_;
+    AppManagerObserver observer_;
 };
 
 #endif //BABEL_SERVER_APPMANAGER_HPP
