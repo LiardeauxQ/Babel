@@ -9,7 +9,7 @@
 
 #include <time.h>
 
-#define VERSION 0x06
+#define VERSION 0x07
 
 // 1 if the request id come from the server.
 #define IS_SERVER_REQUEST(x) ((x)&0b10000000)
@@ -63,6 +63,9 @@ enum CLIENT_REQ_ID {
 
     // Accept a pending friend request.
     CLIENT_ACCEPT_FRIEND = 0b00001001,
+
+    // Accept pending call
+    CLIENT_ACCEPT_CALL = 0b00001011,
 };
 
 /// Client's request id.
@@ -88,6 +91,10 @@ enum SERVER_REQ_ID {
     SERVER_BYE = 0b10001011,
 
     SERVER_ACCEPT_FRIEND = 0b10001111,
+
+    SERVER_ACCEPT_CALL = 0b10010001,
+
+    SERVER_ACCEPT_CALL_RESPONSE = 0b10010000,
 };
 
 // ----------------- Client's payloads definitions ------------------------ //
@@ -129,9 +136,28 @@ typedef struct {
 
     // The number of user stored in usernames.
     int number;
+
+    // Port of the opened udp connexion.
+    short port;
+
+    // ip of the opened connection.
+    char ip[16];
 } client_call_t;
 
 const size_t CLIENT_CALL_SIZE = sizeof(client_call_t);
+
+typedef struct {
+    // Caller username.
+    char username[USERNAME_LEN];
+
+    // port of opened udp connexion.
+    short port;
+
+    // ip of the opened connexion.
+    char ip[16];
+} client_accept_call_t;
+
+const size_t CLIENT_ACCEPT_CALL_SIZE = sizeof(client_accept_call_t);
 
 typedef struct {
 } client_bye_t;
@@ -192,6 +218,10 @@ const size_t SERVER_FRIEND_REQUEST_SIZE = sizeof(server_friend_request_t);
 typedef struct {
     // The asker username.
     char username[USERNAME_LEN];
+
+    short port;
+
+    char ip[16];
 } server_call_t;
 
 const size_t SERVER_CALL_SIZE = sizeof(server_call_t);
@@ -223,5 +253,19 @@ typedef struct {
 } server_accept_friend_t;
 
 const size_t SERVER_ACCEPT_FRIEND_SIZE = sizeof(server_accept_friend_t);
+
+typedef struct {
+    char username[USERNAME_LEN];
+    short port;
+    char ip[16];
+} server_accept_call_t;
+
+const size_t SERVER_ACCEPT_CALL_SIZE = sizeof(server_accept_call_t);
+
+typedef struct {
+    int result;
+} server_accept_call_response_t;
+
+const size_t SERVER_ACCEPT_CALL_RESPONSE_SIZE = sizeof(server_accept_call_response_t);
 
 #endif //BABEL_SERVER_PROTOCOL_H
