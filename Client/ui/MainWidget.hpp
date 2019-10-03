@@ -29,8 +29,6 @@ namespace ui {
         QPointer<WidgetsHandler> widgetsHandler_;
         QSharedPointer<NotificationHandler> notifHandler_;
 
-        Subject sub;
-
         void registered();
         void logged();
         void returnToConnectionWidget();

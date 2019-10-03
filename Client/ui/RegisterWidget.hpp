@@ -7,23 +7,26 @@
 
 #include <QtWidgets>
 #include "LoginWidget.hpp"
+#include "../NotificationHandler.hpp"
 
 namespace ui {
     class RegisterWidget: public QWidget {
         Q_OBJECT
 
     public:
-        explicit RegisterWidget(QWidget *parent = nullptr);
+        explicit RegisterWidget(QWidget *parent = nullptr, QSharedPointer<NotificationHandler> notifHandler = nullptr);
 
     private slots:
         void registerTap();
         void closeTap();
     private:
-        QSharedPointer <QPushButton> button_;
-        QSharedPointer <QPushButton> closeButton_;
-        QSharedPointer <QLineEdit> usernameLineEdit_;
-        QSharedPointer <QLineEdit> passwordLineEdit_;
-        QSharedPointer <QLineEdit> confirmPassLineEdit_;
+        QSharedPointer<QPushButton> button_;
+        QSharedPointer<QPushButton> closeButton_;
+        QSharedPointer<QLineEdit> usernameLineEdit_;
+        QSharedPointer<QLineEdit> passwordLineEdit_;
+        QSharedPointer<QLineEdit> confirmPassLineEdit_;
+        QSharedPointer<NotificationHandler> notifHandler_;
+        Subject registerEvent_;
     };
 }
 

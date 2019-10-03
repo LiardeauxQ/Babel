@@ -6,7 +6,8 @@
 
 ui::LoginWidget::LoginWidget(QWidget *parent, QSharedPointer<NotificationHandler> notifHandler) :
     QWidget(parent),
-    notifHandler_(notifHandler)
+    notifHandler_(notifHandler),
+    loginEvent_(Subject("login"))
 {
     QPointer<QPushButton> closeButton = new QPushButton(tr("Close"));
     button_ = QSharedPointer<QPushButton>(new QPushButton(tr("Login")));
@@ -30,12 +31,24 @@ ui::LoginWidget::LoginWidget(QWidget *parent, QSharedPointer<NotificationHandler
 
     setLayout(formLayout);
     setWindowTitle(tr("Login to Babel"));
+    notifHandler_->registerEvent(&loginEvent_);
 }
 
 void ui::LoginWidget::loginTap()
 {
+    std::map<std::string, void*> userInfo;
+
+    userInfo.insert(std::pair<std::string, void*>(std::string("type"),
+            (void*)(std::string("login").c_str())));
+    userInfo.insert(std::pair<std::string, void*>(
+            std::string("username"),
+            (void*)(usernameLineEdit_->text().toStdString().c_str())));
+    userInfo.insert(std::pair<std::string, void*>(
+            std::string("password"),
+            (void*)(passwordLineEdit_->text().toStdString().c_str())));
     for (auto action : actions()) {
         if (action->text() == "login") {
+            loginEvent_.notify(userInfo);
             action->trigger();
             break;
         }

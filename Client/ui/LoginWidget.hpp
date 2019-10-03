@@ -29,6 +29,8 @@ namespace ui {
         QSharedPointer<QLineEdit> passwordLineEdit_;
         QSharedPointer<NotificationHandler> notifHandler_;
 
+        Subject loginEvent_;
+
     private slots:
         void loginTap();
         void closeTap();

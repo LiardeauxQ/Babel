@@ -4,7 +4,10 @@
 
 #include "RegisterWidget.hpp"
 
-ui::RegisterWidget::RegisterWidget(QWidget *parent) : QWidget(parent)
+ui::RegisterWidget::RegisterWidget(QWidget *parent, QSharedPointer<NotificationHandler> notifHandler) :
+    QWidget(parent),
+    notifHandler_(notifHandler),
+    registerEvent_(Subject("register"))
 {
     closeButton_ = QSharedPointer<QPushButton>(new QPushButton(tr("Close")));
     button_ = QSharedPointer<QPushButton>(new QPushButton(tr("Register")));
@@ -32,12 +35,25 @@ ui::RegisterWidget::RegisterWidget(QWidget *parent) : QWidget(parent)
 
     setLayout(formLayout);
     setWindowTitle(tr("Register to Babel"));
+    notifHandler_->registerEvent(&registerEvent_);
 }
 
 void ui::RegisterWidget::registerTap()
 {
+    std::map<std::string, void*> userInfo;
+
+    userInfo.insert(std::pair<std::string, void*>(
+            std::string("type"),
+            (void*)(std::string("register").c_str())));
+    userInfo.insert(std::pair<std::string, void*>(
+            std::string("username"),
+            (void*)(usernameLineEdit_->text().toStdString().c_str())));
+    userInfo.insert(std::pair<std::string, void*>(
+            std::string("password"),
+            (void*)(passwordLineEdit_->text().toStdString().c_str())));
     for (auto action : actions()) {
         if (action->text() == "register") {
+            registerEvent_.notify(userInfo);
             action->trigger();
             break;
         }

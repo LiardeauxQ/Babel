@@ -8,8 +8,7 @@
 
 ui::MainWidget::MainWidget(QWidget *parent, QSharedPointer<NotificationHandler> notifHandler) :
     QWidget(parent),
-    notifHandler_(notifHandler),
-    sub(Subject("test"))
+    notifHandler_(notifHandler)
 {
     connectionWidget_ = QSharedPointer<QWidget>(new QWidget());
     widgetsHandler_ = new WidgetsHandler();
@@ -28,13 +27,11 @@ ui::MainWidget::MainWidget(QWidget *parent, QSharedPointer<NotificationHandler> 
     widgetsHandler_->push(connectionWidget_.get());
     mainLayout->addWidget(widgetsHandler_);
     setLayout(mainLayout);
-
-    notifHandler_->registerEvent(&sub);
 }
 
 void ui::MainWidget::initRegisterWidget()
 {
-    QPointer<RegisterWidget> wRegister = new RegisterWidget();
+    QPointer<RegisterWidget> wRegister = new RegisterWidget(nullptr, notifHandler_);
     QPointer<QAction> registerAction = new QAction("register");
     QPointer<QAction> closeAction = new QAction("close");
 
@@ -47,7 +44,7 @@ void ui::MainWidget::initRegisterWidget()
 
 void ui::MainWidget::initLoginWidget()
 {
-    auto wLogin = new LoginWidget();
+    auto wLogin = new LoginWidget(nullptr, notifHandler_);
     auto loginAction = new QAction("login");
     auto closeAction = new QAction("close");
 
@@ -56,7 +53,6 @@ void ui::MainWidget::initLoginWidget()
     connect(closeAction, &QAction::triggered, this, &ui::MainWidget::returnToConnectionWidget);
     wLogin->addAction(closeAction);
     widgetsHandler_->replaceLastWidget(wLogin);
-    sub.notify();
 }
 
 void ui::MainWidget::initFriendListWidget()
