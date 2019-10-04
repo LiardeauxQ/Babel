@@ -4,15 +4,16 @@
 
 #include "AppManager.hpp"
 
-AppManager::AppManager(std::unique_ptr<ServerRequest> request) :
-    request_(std::move(request)),
+AppManager::AppManager(boost::shared_ptr<ServerRequest> request,
+        boost::shared_ptr<NotificationHandler> notifHandler) :
+    notifHandler_(notifHandler),
+    request_(request),
     session_(UserSession()),
-    notifHandler_(QSharedPointer<NotificationHandler>(new NotificationHandler())),
-    widget_(ui::MainWidget(nullptr, notifHandler_)),
-    observer_(AppManagerObserver(this))
+    widget_(ui::MainWidget(notifHandler_, nullptr)),
+    observer_(new AppManagerObserver(*this))
 {
-    notifHandler_->attachToEvent(&observer_, "login");
-    notifHandler_->attachToEvent(&observer_, "register");
+    notifHandler_->attachToEvent(observer_, "login");
+    notifHandler_->attachToEvent(observer_, "register");
 }
 
 void AppManager::start()
@@ -44,7 +45,7 @@ void AppManager::requestFriends()
 {
 }
 
-AppManager::AppManagerObserver::AppManagerObserver(AppManager *manager) :
+AppManager::AppManagerObserver::AppManagerObserver(AppManager &manager) :
     Observer(nullptr),
     manager_(manager)
 {
@@ -59,8 +60,8 @@ void AppManager::AppManagerObserver::update(std::map<std::string, void*> userInf
         auto passwordValue = (char*)(userInfo.find("password")->second);
 
         if (!strcmp(typeValue, "login"))
-            manager_->askToLog(usernameValue, passwordValue);
+            manager_.askToLog(usernameValue, passwordValue);
         else if (!strcmp(typeValue, "register"))
-            manager_->askToRegister(usernameValue, passwordValue);
+            manager_.askToRegister(usernameValue, passwordValue);
     }
 }

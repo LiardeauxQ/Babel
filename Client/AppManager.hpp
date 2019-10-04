@@ -15,7 +15,8 @@
 
 class AppManager {
 public:
-    explicit AppManager(std::unique_ptr<ServerRequest> request);
+    explicit AppManager(boost::shared_ptr<ServerRequest> request,
+            boost::shared_ptr<NotificationHandler> notifHandler);
     ~AppManager() = default;
 
     void start();
@@ -24,12 +25,12 @@ private:
 
     class AppManagerObserver: public Observer {
     public:
-        explicit AppManagerObserver(AppManager *manager);
+        explicit AppManagerObserver(AppManager &manager);
         ~AppManagerObserver() = default;
 
         void update(std::map<std::string, void*>) final;
-    private:
-        AppManager *manager_;
+
+        AppManager &manager_;
     };
 
     void askToLog(const std::string &username, const std::string &password);
@@ -37,11 +38,11 @@ private:
     void call();
     void requestFriends();
 
-    std::unique_ptr<ServerRequest> request_;
+    boost::shared_ptr<NotificationHandler> notifHandler_;
+    boost::shared_ptr<ServerRequest> request_;
     UserSession session_;
-    QSharedPointer<NotificationHandler> notifHandler_;
     ui::MainWidget widget_;
-    AppManagerObserver observer_;
+    boost::shared_ptr<AppManagerObserver> observer_;
 };
 
 #endif //BABEL_SERVER_APPMANAGER_HPP
