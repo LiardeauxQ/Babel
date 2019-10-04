@@ -9,19 +9,26 @@
 #include <vector>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <iostream>
 #include <time.h>
 
 #include "Message.hpp"
 #include "protocol.h"
+#include "../NotificationHandler.hpp"
 
 typedef boost::asio::ip::tcp BoostTcp;
 
-class ServerRequest {
+class ServerRequest
+    : public boost::enable_shared_from_this<ServerRequest> {
 public:
-    ServerRequest(const std::string &ipAddress, int port);
+    ServerRequest(const std::string &ipAddress, int port,
+            boost::shared_ptr<NotificationHandler> notifHandler);
 
     ~ServerRequest();
+
+    static boost::shared_ptr<ServerRequest> create(const std::string &ipAddress, int port,
+            boost::shared_ptr<NotificationHandler> notifHandler);
 
     void start();
 
@@ -39,13 +46,26 @@ public:
     void receiveCall();
     void receiveBye();
 
-    static void callbackWrite(const boost::system::error_code &ec);
 private:
+    void pingResponse(server_ping_response_t *srv);
+    void helloResponse(server_hello_response_t *srv);
+    void registerResponse(server_register_response_t *srv);
+    void callResponse(server_call_response_t *srv);
+    void byeResponse(server_bye_response_t *srv);
 
+    void sendData(Message &message);
+    void waitForResponse(const boost::system::error_code &ec);
+    void receivePacket(const boost::system::error_code &ec);
+    void receiveBody(const boost::system::error_code &ec);
+    void handleResponse(Message &message);
+
+    boost::shared_ptr<NotificationHandler> notifHandler_;
     boost::asio::io_context context_;
     BoostTcp::socket socket_;
     std::string ipAddress_;
+    Message response_;
     int port_;
+    std::vector<boost::shared_ptr<Subject>> subjects_;
 };
 
 
