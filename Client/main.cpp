@@ -4,7 +4,7 @@
 
 #include "AudioController.hpp"
 #include <QApplication>
-#include "protocol/ServerRequest.hpp"
+#include "protocol/ServerHandler.hpp"
 #include "AppManager.hpp"
 #include <memory>
 
@@ -12,8 +12,9 @@ int main(int argc, char *argv[])
 {
     QApplication babelApp(argc, argv);
     boost::shared_ptr<NotificationHandler> notificationHandler(new NotificationHandler());
-    boost::shared_ptr<ServerRequest> serverRequest = ServerRequest::create("127.0.0.1", 1234, notificationHandler);
-    AppManager app(serverRequest, notificationHandler);
+    //boost::shared_ptr<ServerRequest> serverRequest = ServerRequest::create("127.0.0.1", 1234, notificationHandler);
+    boost::shared_ptr<ServerHandler> serverHandler = boost::shared_ptr<ServerHandler>(new ServerHandler("127.0.0.1", 1234, notificationHandler));
+    AppManager app(serverHandler, notificationHandler);
 
     app.start();
     return babelApp.exec();

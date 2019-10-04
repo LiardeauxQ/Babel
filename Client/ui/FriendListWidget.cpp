@@ -3,7 +3,7 @@
 //
 
 #include "FriendListWidget.hpp"
-#include "MainWidget.hpp"
+#include "BabelMainWindow.hpp"
 
 ui::FriendListWidget::FriendListWidget(QWidget *parent) : QWidget(parent)
 {

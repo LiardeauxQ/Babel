@@ -8,14 +8,14 @@
 #include <memory>
 #include <QSharedPointer>
 
-#include "protocol/ServerRequest.hpp"
+#include "protocol/ServerHandler.hpp"
 #include "protocol/UserSession.hpp"
-#include "ui/MainWidget.hpp"
+#include "ui/BabelMainWindow.hpp"
 #include "NotificationHandler.hpp"
 
 class AppManager {
 public:
-    explicit AppManager(boost::shared_ptr<ServerRequest> request,
+    explicit AppManager(boost::shared_ptr<ServerHandler> serverHandler,
             boost::shared_ptr<NotificationHandler> notifHandler);
     ~AppManager() = default;
 
@@ -35,13 +35,14 @@ private:
 
     void askToLog(const std::string &username, const std::string &password);
     void askToRegister(const std::string &username, const std::string &password);
+    void close();
     void call();
     void requestFriends();
 
     boost::shared_ptr<NotificationHandler> notifHandler_;
-    boost::shared_ptr<ServerRequest> request_;
+    boost::shared_ptr<ServerHandler> serverHandler_;
     UserSession session_;
-    ui::MainWidget widget_;
+    ui::BabelMainWindow widget_;
     boost::shared_ptr<AppManagerObserver> observer_;
 };
 

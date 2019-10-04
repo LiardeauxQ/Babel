@@ -80,8 +80,8 @@ set(BABEL_CLIENT
 	${CLIENT_PATH}/ui/LoginWidget.hpp
 	${CLIENT_PATH}/ui/RegisterWidget.cpp
 	${CLIENT_PATH}/ui/RegisterWidget.hpp
-	${CLIENT_PATH}/ui/MainWidget.cpp
-	${CLIENT_PATH}/ui/MainWidget.hpp
+	${CLIENT_PATH}/ui/BabelMainWindow.cpp
+	${CLIENT_PATH}/ui/BabelMainWindow.hpp
 	${CLIENT_PATH}/ui/FriendListWidget.cpp
 	${CLIENT_PATH}/ui/FriendListWidget.hpp
 	${CLIENT_PATH}/ui/CallWidget.cpp
@@ -97,7 +97,12 @@ set(BABEL_CLIENT
 	${CLIENT_PATH}/Subject.hpp
 	${CLIENT_PATH}/Observer.hpp
 	${CLIENT_PATH}/NotificationHandler.cpp
-	${CLIENT_PATH}/NotificationHandler.hpp Client/Observer.cpp)
+	${CLIENT_PATH}/NotificationHandler.hpp
+	Client/Observer.cpp
+	Client/protocol/ServerCommunication.cpp
+	Client/protocol/ServerCommunication.hpp
+	Client/protocol/ServerHandler.cpp
+	Client/protocol/ServerHandler.hpp)
 
 set(BABEL_COMMON
     ${COMMON_PATH}/User.hpp
