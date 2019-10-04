@@ -4,7 +4,7 @@
 
 #include "NotificationHandler.hpp"
 
-void NotificationHandler::registerEvent(Subject *sub)
+void NotificationHandler::registerEvent(boost::shared_ptr<Subject> sub)
 {
     subjects_.push_back(sub);
     for (const auto& status : observers_) {
@@ -15,7 +15,7 @@ void NotificationHandler::registerEvent(Subject *sub)
     }
 }
 
-void NotificationHandler::unregisterEvent(Subject *sub)
+void NotificationHandler::unregisterEvent(boost::shared_ptr<Subject> sub)
 {
     size_t i = 0;
 
@@ -29,7 +29,7 @@ void NotificationHandler::unregisterEvent(Subject *sub)
     }
 }
 
-void NotificationHandler::attachToEvent(Observer *obs, const std::string &label)
+void NotificationHandler::attachToEvent(boost::shared_ptr<Observer> obs, const std::string &label)
 {
     ObserverStatus status = {obs, label, false};
 
@@ -43,18 +43,18 @@ void NotificationHandler::attachToEvent(Observer *obs, const std::string &label)
     observers_.push_back(status);
 }
 
-void NotificationHandler::dettachToEvent(Observer *obs, const std::string &label)
+void NotificationHandler::dettachToEvent(boost::shared_ptr<Observer> obs, const std::string &label)
 {
     size_t i = 0;
 
-    for (auto sub :subjects_) {
+    for (auto sub : subjects_) {
         if (sub->getLabel() == label) {
             sub->dettach(obs);
             break;
         }
     }
     for (const auto &status : observers_) {
-        if  (status.obs == obs) {
+        if  (status.obs.get() == obs.get()) {
             observers_.erase(observers_.begin() + i);
             break;
         }

@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 #include "Observer.hpp"
 
@@ -18,15 +19,15 @@ public:
     Subject(const std::string &label);
     ~Subject();
 
-    void attach(Observer *obs);
-    void dettach(Observer *obs);
+    void attach(boost::shared_ptr<Observer> obs);
+    void dettach(boost::shared_ptr<Observer> obs);
     void dettachAll();
 
     const std::string &getLabel() const { return label_; }
-    void notify(std::map<std::string, void*>);
+    void notify(std::map<std::string, void*> userInfo);
 private:
     std::string label_;
-    std::vector<Observer*> observables_;
+    std::vector<boost::shared_ptr<Observer>> observables_;
 };
 
 #endif //BABEL_SERVER_SUBJECT_HPP

@@ -12,20 +12,20 @@
 
 class NotificationHandler {
 public:
-    void registerEvent(Subject *sub);
-    void unregisterEvent(Subject *sub);
+    void registerEvent(boost::shared_ptr<Subject> sub);
+    void unregisterEvent(boost::shared_ptr<Subject> sub);
 
-    void attachToEvent(Observer *obs, const std::string &label);
-    void dettachToEvent(Observer *obs, const std::string &label);
+    void attachToEvent(boost::shared_ptr<Observer> obs, const std::string &label);
+    void dettachToEvent(boost::shared_ptr<Observer> obs, const std::string &label);
 private:
     struct ObserverStatus {
-        Observer *obs;
+        boost::shared_ptr<Observer> obs;
         std::string label;
         bool isAttach;
     };
 
     std::vector<ObserverStatus> observers_;
-    std::vector<Subject *> subjects_;
+    std::vector<boost::shared_ptr<Subject>> subjects_;
 };
 
 #endif //BABEL_SERVER_NOTIFICATIONHANDLER_HPP

@@ -11,7 +11,9 @@
 int main(int argc, char *argv[])
 {
     QApplication babelApp(argc, argv);
-    AppManager app(std::make_unique<ServerRequest>("127.0.0.1", 1234));
+    boost::shared_ptr<NotificationHandler> notificationHandler(new NotificationHandler());
+    boost::shared_ptr<ServerRequest> serverRequest = ServerRequest::create("127.0.0.1", 1234, notificationHandler);
+    AppManager app(serverRequest, notificationHandler);
 
     app.start();
     return babelApp.exec();

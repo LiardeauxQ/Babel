@@ -7,6 +7,7 @@
 
 #include <QtWidgets>
 #include <QSharedMemory>
+#include <boost/shared_ptr.hpp>
 
 #include "RegisterWidget.hpp"
 #include "LoginWidget.hpp"
@@ -19,7 +20,7 @@ namespace ui {
     class MainWidget : public QWidget {
         Q_OBJECT
     public:
-        explicit MainWidget(QWidget *parent = nullptr, QSharedPointer<NotificationHandler> notifHandler = nullptr);
+        explicit MainWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent = nullptr);
 
     private slots:
         void initRegisterWidget();
@@ -27,7 +28,7 @@ namespace ui {
     private:
         QSharedPointer<QWidget> connectionWidget_;
         QPointer<WidgetsHandler> widgetsHandler_;
-        QSharedPointer<NotificationHandler> notifHandler_;
+        boost::shared_ptr<NotificationHandler> notifHandler_;
 
         void registered();
         void logged();

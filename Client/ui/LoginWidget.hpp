@@ -8,8 +8,10 @@
 #include <QtWidgets>
 #include <QSharedPointer>
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 
 #include "../NotificationHandler.hpp"
+#include "protocol.h"
 
 namespace ui {
 
@@ -21,17 +23,31 @@ namespace ui {
     Q_OBJECT
 
     public:
-        explicit LoginWidget(QWidget *parent = nullptr, QSharedPointer<NotificationHandler> notifHandler = nullptr);
+        explicit LoginWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent = nullptr);
 
     private:
+
+        class LoginObserver: public Observer {
+        public:
+            LoginObserver(LoginWidget &widget);
+            ~LoginObserver() = default;
+
+            void update(std::map<std::string, void*> userInfo) final;
+
+            LoginWidget &widget_;
+        };
+
+        void loginEvent() const;
+
         QSharedPointer<QPushButton> button_;
         QSharedPointer<QLineEdit> usernameLineEdit_;
         QSharedPointer<QLineEdit> passwordLineEdit_;
-        QSharedPointer<NotificationHandler> notifHandler_;
+        boost::shared_ptr<NotificationHandler> notifHandler_;
 
-        Subject loginEvent_;
+        boost::shared_ptr<Subject> loginEvent_;
+        boost::shared_ptr<LoginObserver> observer_;
 
-    private slots:
+    protected slots:
         void loginTap();
         void closeTap();
     };

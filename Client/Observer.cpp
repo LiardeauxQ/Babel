@@ -4,9 +4,9 @@
 
 #include "Observer.hpp"
 
-Observer::Observer(Subject *sub) :
+Observer::Observer(boost::shared_ptr<Subject> sub) :
         sub_(sub)
 {
     if (sub_)
-        sub_->attach(this);
+        sub_->attach(boost::shared_ptr<Observer>(this));
 }

@@ -6,6 +6,8 @@
 #define BABEL_SERVER_REGISTERWIDGET_HPP
 
 #include <QtWidgets>
+#include <boost/shared_ptr.hpp>
+
 #include "LoginWidget.hpp"
 #include "../NotificationHandler.hpp"
 
@@ -14,7 +16,7 @@ namespace ui {
         Q_OBJECT
 
     public:
-        explicit RegisterWidget(QWidget *parent = nullptr, QSharedPointer<NotificationHandler> notifHandler = nullptr);
+        explicit RegisterWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent = nullptr);
 
     private slots:
         void registerTap();
@@ -25,8 +27,8 @@ namespace ui {
         QSharedPointer<QLineEdit> usernameLineEdit_;
         QSharedPointer<QLineEdit> passwordLineEdit_;
         QSharedPointer<QLineEdit> confirmPassLineEdit_;
-        QSharedPointer<NotificationHandler> notifHandler_;
-        Subject registerEvent_;
+        boost::shared_ptr<NotificationHandler> notifHandler_;
+        boost::shared_ptr<Subject> registerEvent_;
     };
 }
 

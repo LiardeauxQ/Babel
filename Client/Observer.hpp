@@ -12,13 +12,13 @@ class Subject;
 
 class Observer {
 public:
-    Observer(Subject *sub = nullptr);
+    Observer(boost::shared_ptr<Subject> sub = nullptr);
 
-    virtual void update(std::map<std::string, void*>) = 0;
+    virtual void update(std::map<std::string, void*> userInfo) = 0;
 protected:
-    const Subject *getSubject() const { return sub_; }
+    const boost::shared_ptr<Subject> getSubject() const { return sub_; }
 private:
-    Subject *sub_;
+    boost::shared_ptr<Subject> sub_;
 };
 
 #endif //BABEL_SERVER_OBSERVER_HPP

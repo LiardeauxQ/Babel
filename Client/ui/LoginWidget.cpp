@@ -2,12 +2,14 @@
 // Created by Quentin Liardeaux on 9/25/19.
 //
 
+#include <notify.h>
 #include "LoginWidget.hpp"
 
-ui::LoginWidget::LoginWidget(QWidget *parent, QSharedPointer<NotificationHandler> notifHandler) :
+ui::LoginWidget::LoginWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent) :
     QWidget(parent),
     notifHandler_(notifHandler),
-    loginEvent_(Subject("login"))
+    loginEvent_(new Subject("login")),
+    observer_(new LoginObserver(*this))
 {
     QPointer<QPushButton> closeButton = new QPushButton(tr("Close"));
     button_ = QSharedPointer<QPushButton>(new QPushButton(tr("Login")));
@@ -31,24 +33,25 @@ ui::LoginWidget::LoginWidget(QWidget *parent, QSharedPointer<NotificationHandler
 
     setLayout(formLayout);
     setWindowTitle(tr("Login to Babel"));
-    notifHandler_->registerEvent(&loginEvent_);
+    notifHandler_->registerEvent(loginEvent_);
+    notifHandler_->attachToEvent(observer_, "loginResponse");
+    notifHandler_->attachToEvent(observer_, "registerResponse");
 }
 
 void ui::LoginWidget::loginTap()
 {
     std::map<std::string, void*> userInfo;
 
-    userInfo.insert(std::pair<std::string, void*>(std::string("type"),
-            (void*)(std::string("login").c_str())));
-    userInfo.insert(std::pair<std::string, void*>(
-            std::string("username"),
-            (void*)(usernameLineEdit_->text().toStdString().c_str())));
-    userInfo.insert(std::pair<std::string, void*>(
-            std::string("password"),
-            (void*)(passwordLineEdit_->text().toStdString().c_str())));
+    userInfo["type"] = (void*)(std::string("login").c_str());
+    userInfo["username"] = (void*)(usernameLineEdit_->text().toStdString().c_str());
+    userInfo["password"] = (void*)(passwordLineEdit_->text().toStdString().c_str());
+    loginEvent_->notify(userInfo);
+}
+
+void ui::LoginWidget::loginEvent() const
+{
     for (auto action : actions()) {
         if (action->text() == "login") {
-            loginEvent_.notify(userInfo);
             action->trigger();
             break;
         }
@@ -62,5 +65,20 @@ void ui::LoginWidget::closeTap()
             action->trigger();
             break;
         }
+    }
+}
+
+ui::LoginWidget::LoginObserver::LoginObserver(LoginWidget &widget) :
+    widget_(widget)
+{
+}
+
+void ui::LoginWidget::LoginObserver::update(std::map<std::string, void*> userInfo)
+{
+    auto type = userInfo.find("type")->second;
+    auto response = (RESULT*)(userInfo.find("result")->second);
+
+    if (response != nullptr && *response == RESULT::OK) {
+        widget_.loginEvent();
     }
 }

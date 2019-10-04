@@ -6,7 +6,7 @@
 
 #include <utility>
 
-ui::MainWidget::MainWidget(QWidget *parent, QSharedPointer<NotificationHandler> notifHandler) :
+ui::MainWidget::MainWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent) :
     QWidget(parent),
     notifHandler_(notifHandler)
 {
@@ -31,7 +31,7 @@ ui::MainWidget::MainWidget(QWidget *parent, QSharedPointer<NotificationHandler> 
 
 void ui::MainWidget::initRegisterWidget()
 {
-    QPointer<RegisterWidget> wRegister = new RegisterWidget(nullptr, notifHandler_);
+    QPointer<RegisterWidget> wRegister = new RegisterWidget(notifHandler_, nullptr);
     QPointer<QAction> registerAction = new QAction("register");
     QPointer<QAction> closeAction = new QAction("close");
 
@@ -44,7 +44,7 @@ void ui::MainWidget::initRegisterWidget()
 
 void ui::MainWidget::initLoginWidget()
 {
-    auto wLogin = new LoginWidget(nullptr, notifHandler_);
+    auto wLogin = new LoginWidget(notifHandler_, nullptr);
     auto loginAction = new QAction("login");
     auto closeAction = new QAction("close");
 

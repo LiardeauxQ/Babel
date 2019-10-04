@@ -13,17 +13,17 @@ Subject::~Subject()
     observables_.empty();
 }
 
-void Subject::attach(Observer *obs)
+void Subject::attach(boost::shared_ptr<Observer> obs)
 {
     observables_.push_back(obs);
 }
 
-void Subject::dettach(Observer *obs)
+void Subject::dettach(boost::shared_ptr<Observer> obs)
 {
     size_t i = 0;
 
     for (auto observer : observables_) {
-        if (observer == obs) {
+        if (observer.get() == obs.get()) {
             observables_.erase(observables_.begin() + i);
             return;
         }
@@ -39,7 +39,6 @@ void Subject::dettachAll()
 void Subject::notify(std::map<std::string, void*> userInfo)
 {
     for (auto obs : observables_) {
-        std::cout << "notify" << std::endl;
         obs->update(userInfo);
     }
 }
