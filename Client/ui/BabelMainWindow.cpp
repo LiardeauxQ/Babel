@@ -7,7 +7,7 @@
 #include <utility>
 
 ui::MainWidget::MainWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent) :
-    QWidget(parent),
+    QMainWindow(parent),
     notifHandler_(notifHandler)
 {
     connectionWidget_ = QSharedPointer<QWidget>(new QWidget());
@@ -19,14 +19,11 @@ ui::MainWidget::MainWidget(boost::shared_ptr<NotificationHandler> notifHandler, 
     connect(registerButton, SIGNAL(clicked()), this, SLOT(initRegisterWidget()));
     connect(loginButton, SIGNAL(clicked()), this, SLOT(initLoginWidget()));
 
-    QPointer<QLayout> mainLayout = new QGridLayout();
-
     connectionWidget_->setLayout(new QGridLayout());
     connectionWidget_->layout()->addWidget(registerButton);
     connectionWidget_->layout()->addWidget(loginButton);
     widgetsHandler_->push(connectionWidget_.get());
-    mainLayout->addWidget(widgetsHandler_);
-    setLayout(mainLayout);
+    setCentralWidget(widgetsHandler_);
 }
 
 void ui::MainWidget::initRegisterWidget()
@@ -78,4 +75,9 @@ void ui::MainWidget::logged()
 void ui::MainWidget::returnToConnectionWidget()
 {
     widgetsHandler_->replaceLastWidget(connectionWidget_.get());
+}
+
+void ui::MainWidget::closeEvent(QCloseEvent *event)
+{
+    std::cout << "test" << std::endl;
 }

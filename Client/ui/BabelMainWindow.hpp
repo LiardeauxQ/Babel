@@ -17,11 +17,13 @@
 #include "../Subject.hpp"
 
 namespace ui {
-    class MainWidget : public QWidget {
+    class MainWidget : public QMainWindow {
         Q_OBJECT
     public:
         explicit MainWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent = nullptr);
 
+    protected:
+        void closeEvent(QCloseEvent *event);
     private slots:
         void initRegisterWidget();
         void initLoginWidget();

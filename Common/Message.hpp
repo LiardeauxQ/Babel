@@ -30,7 +30,13 @@ public:
         free(data_);
     }
 
-    Message() = default;
+    Message()
+        : requestUnion_ {}
+        , payload_(nullptr)
+        , data_(nullptr)
+        , allocated_(false)
+    {
+    }
 
     [[nodiscard]] int getId() const { return requestUnion_.req.id; }
 
