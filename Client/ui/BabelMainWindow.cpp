@@ -2,13 +2,14 @@
 // Created by Quentin Liardeaux on 9/26/19.
 //
 
-#include "MainWidget.hpp"
+#include "BabelMainWindow.hpp"
 
 #include <utility>
 
-ui::MainWidget::MainWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent) :
+ui::BabelMainWindow::BabelMainWindow(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent) :
     QMainWindow(parent),
-    notifHandler_(notifHandler)
+    notifHandler_(notifHandler),
+    closeEvent_(new Subject("close"))
 {
     connectionWidget_ = QSharedPointer<QWidget>(new QWidget());
     widgetsHandler_ = new WidgetsHandler();
@@ -24,60 +25,65 @@ ui::MainWidget::MainWidget(boost::shared_ptr<NotificationHandler> notifHandler, 
     connectionWidget_->layout()->addWidget(loginButton);
     widgetsHandler_->push(connectionWidget_.get());
     setCentralWidget(widgetsHandler_);
+    notifHandler_->registerEvent(closeEvent_);
 }
 
-void ui::MainWidget::initRegisterWidget()
+void ui::BabelMainWindow::initRegisterWidget()
 {
     QPointer<RegisterWidget> wRegister = new RegisterWidget(notifHandler_, nullptr);
     QPointer<QAction> registerAction = new QAction("register");
     QPointer<QAction> closeAction = new QAction("close");
 
-    connect(registerAction, &QAction::triggered, this, &ui::MainWidget::initFriendListWidget);
+    connect(registerAction, &QAction::triggered, this, &ui::BabelMainWindow::initFriendListWidget);
     wRegister->addAction(registerAction);
-    connect(closeAction,&QAction::triggered, this, &ui::MainWidget::returnToConnectionWidget);
+    connect(closeAction,&QAction::triggered, this, &ui::BabelMainWindow::returnToConnectionWidget);
     wRegister->addAction(closeAction);
     widgetsHandler_->replaceLastWidget(wRegister);
 }
 
-void ui::MainWidget::initLoginWidget()
+void ui::BabelMainWindow::initLoginWidget()
 {
     auto wLogin = new LoginWidget(notifHandler_, nullptr);
     auto loginAction = new QAction("login");
     auto closeAction = new QAction("close");
 
-    connect(loginAction, &QAction::triggered, this, &ui::MainWidget::initFriendListWidget);
+    connect(loginAction, &QAction::triggered, this, &ui::BabelMainWindow::initFriendListWidget);
     wLogin->addAction(loginAction);
-    connect(closeAction, &QAction::triggered, this, &ui::MainWidget::returnToConnectionWidget);
+    connect(closeAction, &QAction::triggered, this, &ui::BabelMainWindow::returnToConnectionWidget);
     wLogin->addAction(closeAction);
     widgetsHandler_->replaceLastWidget(wLogin);
 }
 
-void ui::MainWidget::initFriendListWidget()
+void ui::BabelMainWindow::initFriendListWidget()
 {
     auto wFriendList = new FriendListWidget();
     auto disconnectAction = new QAction("disconnect");
 
-    connect(disconnectAction, &QAction::triggered, this, &ui::MainWidget::returnToConnectionWidget);
+    connect(disconnectAction, &QAction::triggered, this, &ui::BabelMainWindow::returnToConnectionWidget);
     wFriendList->addAction(disconnectAction);
     widgetsHandler_->replaceLastWidget(wFriendList);
 }
 
-void ui::MainWidget::registered()
+void ui::BabelMainWindow::registered()
 {
     std::cout << "test register" << std::endl;
 }
 
-void ui::MainWidget::logged()
+void ui::BabelMainWindow::logged()
 {
     std::cout << "test loggin" << std::endl;
 }
 
-void ui::MainWidget::returnToConnectionWidget()
+void ui::BabelMainWindow::returnToConnectionWidget()
 {
     widgetsHandler_->replaceLastWidget(connectionWidget_.get());
 }
 
-void ui::MainWidget::closeEvent(QCloseEvent *event)
+void ui::BabelMainWindow::closeEvent(QCloseEvent *event)
 {
-    std::cout << "test" << std::endl;
+    std::map<std::string, void*> userInfo;
+
+    std::cout << "close" << std::endl;
+    userInfo["type"] = (void*)(std::string("close").c_str());
+    closeEvent_->notify(userInfo);
 }
