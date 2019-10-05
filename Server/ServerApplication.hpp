@@ -14,7 +14,7 @@
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <memory>
-#include <vector>
+#include <list>
 
 typedef boost::asio::ip::tcp BoostTcp;
 
@@ -38,7 +38,7 @@ private:
     // Network
     boost::asio::io_context context_;
     BoostTcp::acceptor acceptor_;
-    std::vector<boost::shared_ptr<Session>> sessions_;
+    std::list<boost::shared_ptr<Session>> sessions_;
 
     // Private logic
     void handleAccept(const boost::shared_ptr<Session>& session, const boost::system::error_code& ec);
