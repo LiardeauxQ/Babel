@@ -7,6 +7,8 @@
 
 #include "Message.hpp"
 #include "SharedData.hpp"
+#include "Packet.hpp"
+
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -52,12 +54,6 @@ public:
     void acceptFriend(client_accept_friend_t* payload, SharedData& data);
 
     void friendStatus(client_friend_status_t*, SharedData& data);
-
-    template <typename T>
-    struct Packet {
-        request_header_t header;
-        T payload;
-    };
 
 private:
     explicit Session(boost::asio::io_context& context, Database& conn, std::vector<boost::shared_ptr<Session>>& sessions);
