@@ -11,7 +11,8 @@
 
 #include "Opus.hpp"
 #include "../Error.hpp"
-#include "../Packet.hpp"
+
+#define DATA_PACKET_SIZE 0
 
 namespace opus {
     class Encoder {
