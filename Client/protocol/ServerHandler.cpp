@@ -6,48 +6,43 @@
 
 ServerHandler::ServerHandler(const std::string &ipAddress, int port, boost::shared_ptr<NotificationHandler> notifHandler) :
     notifHandler_(notifHandler),
-    communicationHandler_(ServerCommunication(ipAddress, port))
+    communicationHandler_(ServerCommunication(ipAddress, port)),
+    requestsMutex_(boost::shared_ptr<boost::mutex>(new boost::mutex())),
+    requests_(boost::shared_ptr<std::queue<Message>>(new std::queue<Message>())),
+    responsesMutex_(boost::shared_ptr<boost::mutex>(new boost::mutex())),
+    responses_(boost::shared_ptr<std::queue<Message>>(new std::queue<Message>())),
+    responsesHandler_(new ServerResponse(responses_, responsesMutex_, notifHandler_)),
+    ipAddress_(ipAddress),
+    port_(port)
 {
-    requestMutex_ = boost::shared_ptr<boost::mutex>(new boost::mutex());
-    requests_ = boost::shared_ptr<std::queue<Message>>(new std::queue<Message>());
-    responseMutex_ = boost::shared_ptr<boost::mutex>(new boost::mutex());
-    responses_ = boost::shared_ptr<std::queue<Message>>(new std::queue<Message>());
-    requestThread_ = boost::thread(&ServerCommunication::sendRequest, &communicationHandler_, requestMutex_, requests_);
 }
 
 ServerHandler::~ServerHandler()
 {
-    requestThread_.join();
+    delete responsesHandler_;
 }
 
 void ServerHandler::start()
 {
     communicationHandler_.start();
+    requestsThread_ = boost::thread(&ServerCommunication::sendRequest, &communicationHandler_, requestsMutex_, requests_);
+    responsesThread_ = boost::thread(&ServerCommunication::receiveResponse, &communicationHandler_, responsesHandler_, responsesMutex_, responses_);
 }
 
-void *ServerHandler::send(int id, std::map<std::string, void *> userInfo)
+void ServerHandler::stop()
 {
-    requestMutex_->lock();
+    communicationHandler_.stop();
+    requestsThread_.join();
+    responsesThread_.join();
+}
+
+void ServerHandler::send(int id, std::map<std::string, void *> userInfo)
+{
+    requestsMutex_->lock();
     if (id != -1)
         requests_->push(ServerRequest::createRequest(id, userInfo));
     else
         requests_->push(Message(-1, 0, nullptr));
-    requestMutex_->unlock();
-    if (id != -1)
-        return receive();
-    return nullptr;
+    requestsMutex_->unlock();
 }
 
-void *ServerHandler::receive() {
-    responseThread_ = boost::thread(&ServerCommunication::receiveResponse, &communicationHandler_, responseMutex_,
-                                    responses_);
-    responseThread_.join();
-    if (responses_->size() > 0) {
-        void *payload =responses_->front().getPayload();
-
-        responses_->pop();
-        return payload;
-    } else
-        std::cout << "no responses" << std::endl;
-    return nullptr;
-}

@@ -10,8 +10,9 @@ AppManager::AppManager(boost::shared_ptr<ServerHandler> serverHandler,
     serverHandler_(serverHandler),
     widget_(ui::BabelMainWindow(notifHandler_, nullptr)),
     observer_(new AppManagerObserver(*this))
-{
+    {
 }
+
 
 void AppManager::start()
 {
@@ -22,34 +23,11 @@ void AppManager::start()
 
 void AppManager::initNotifications()
 {
-    subjects_.push_back(boost::shared_ptr<Subject>(new Subject("loginResponse")));
-    subjects_.push_back(boost::shared_ptr<Subject>(new Subject("loginResponse")));
-    for (auto sub : subjects_)
-        notifHandler_->registerEvent(sub);
     notifHandler_->attachToEvent(observer_, "close");
     notifHandler_->attachToEvent(observer_, "login");
     notifHandler_->attachToEvent(observer_, "register");
     notifHandler_->attachToEvent(observer_, "fetchFriends");
-}
-
-void AppManager::notifySubject(const std::string &label, std::map<std::string, void*> &userInfo)
-{
-    for (auto sub : subjects_) {
-        if (sub->getLabel() == label) {
-            sub->notify(userInfo);
-            break;
-        }
-    }
-}
-
-void AppManager::notifyResponse(const std::string &label, RESULT result)
-{
-    std::map<std::string, void*> userInfo;
-
-    std::cout << label << std::endl;
-    userInfo["type"] = (void*)(std::string("result").c_str());
-    userInfo["result"] = (void*)(&result);
-    notifySubject("loginResponse", userInfo);
+    notifHandler_->attachToEvent(observer_, "call");
 }
 
 void AppManager::askToLog(const std::string &username, const std::string &password)
@@ -61,12 +39,7 @@ void AppManager::askToLog(const std::string &username, const std::string &passwo
     userInfo["username"] = (void *)(username.c_str());
     userInfo["password"] = (void *)(password.c_str());
 
-    void *payload = serverHandler_->send(CLIENT_HELLO, userInfo);
-    int result = (*(server_hello_response_t*)payload).result;
-
-    if (result == RESULT::OK)
-        UserSession::get()->connectUser(username);
-    notifyResponse("loginResponse", result == RESULT::OK ? RESULT::OK : RESULT::KO);
+    serverHandler_->send(CLIENT_HELLO, userInfo);
 }
 
 void AppManager::askToRegister(const std::string &username, const std::string &password)
@@ -78,30 +51,32 @@ void AppManager::askToRegister(const std::string &username, const std::string &p
     userInfo["username"] = (void *)(username.c_str());
     userInfo["password"] = (void *)(password.c_str());
 
-    void *payload = serverHandler_->send(CLIENT_REGISTER, userInfo);
-    int result = (*(server_register_response_t*)payload).result;
-
-    if (result == RESULT::OK)
-        UserSession::get()->connectUser(username);
-    notifyResponse("registerResponse", result == RESULT::OK ? RESULT::OK : RESULT::KO);
+    serverHandler_->send(CLIENT_REGISTER, userInfo);
 }
 
 void AppManager::askToFetchFriends()
 {
     std::map<std::string, void*> userInfo;
 
-    void *payload = serverHandler_->send(CLIENT_FRIEND_STATUS, userInfo);
-    server_friend_status_t *srv = (server_friend_status_t*)payload;
+    serverHandler_->send(CLIENT_FRIEND_STATUS, userInfo);
+}
 
-    std::cout << "friends" << std::endl;
-    for (int i = 0 ; i < MAX_FRIENDS ; i++) {
-        std::cout << srv->usernames[i] << std::endl;
-    }
+void AppManager::askToCall(const std::string &username)
+{
+    std::map<std::string, void*> userInfo;
+    int port = serverHandler_->getPort() + 1;
+
+    userInfo["username"] = (void*)(username.c_str());
+    userInfo["addressIp"] = (void*)(serverHandler_->getIpAddress().c_str());
+    userInfo["port"] = (void*)(&port);
+    std::cout << "test call" << std::endl;
+    serverHandler_->send(CLIENT_CALL, userInfo);
 }
 
 void AppManager::close()
 {
     serverHandler_->send(-1, std::map<std::string, void*>());
+    serverHandler_->stop();
 }
 
 void AppManager::call()
@@ -134,4 +109,6 @@ void AppManager::AppManagerObserver::update(std::map<std::string, void*> userInf
         manager_.close();
     if (!strcmp(typeValue, "fetchFriends"))
         manager_.askToFetchFriends();
+    if (!strcmp(typeValue, "call"))
+        manager_.askToCall((char*)userInfo.find("username")->second);
 }

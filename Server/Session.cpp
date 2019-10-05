@@ -193,6 +193,7 @@ void Session::call(client_call_t* payload, SharedData& data)
 
         for (int i = 0; i < payload->number; ++i) {
             for (auto& user : users) {
+                std::cout << user << " " << payload->usernames[i] << std::endl;
                 if (std::strcmp(user.c_str(), payload->usernames[i]) == 0) {
                     userFound = true;
                     Packet<server_call_t> req {
@@ -320,6 +321,9 @@ void Session::handleRequest(Message& request, SharedData& data)
     case CLIENT_ACCEPT_FRIEND:
         acceptFriend((client_accept_friend_t*)request.getPayload(), data);
         break;
+        case CLIENT_FRIEND_STATUS:
+            friendStatus((client_friend_status_t*)request.getPayload(), data);
+            break;
     case CLIENT_FRIEND_REQUEST:
         friendRequest((client_friend_request_t*)request.getPayload(), data);
         break;
