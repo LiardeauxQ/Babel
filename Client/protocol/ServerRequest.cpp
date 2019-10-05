@@ -75,7 +75,7 @@ Message ServerRequest::goodbye(std::map<std::string, void*> userInfo)
 
 Message ServerRequest::friendStatus(std::map<std::string, void*> userInfo)
 {
-    client_friend_status_t *clt = (client_friend_status_t*)calloc(CLIENT_FRIEND_REQUEST_SIZE, 1);
+    client_friend_status_t *clt = (client_friend_status_t*)calloc(CLIENT_FRIEND_STATUS_SIZE, 1);
     Message message(CLIENT_FRIEND_STATUS, CLIENT_FRIEND_STATUS_SIZE, clt);
 
     return message;
@@ -126,22 +126,26 @@ Message ServerRequest::friendRequest(std::map<std::string, void*> userInfo)
 
 Message ServerRequest::call(std::map<std::string, void*> userInfo)
 {
-    auto usersIt = userInfo.find("usernames");
-    auto countIt = userInfo.find("count");
+    auto userIt = userInfo.find("username");
+    auto addressIpIt = userInfo.find("addressIp");
+    auto portIt = userInfo.find("port");
 
-    if (usersIt == userInfo.end())
+    if (userIt == userInfo.end())
         throw "Cannot find usernames key";
-    else if (countIt == userInfo.end())
-        throw "Cannot find count key";
+    else if (addressIpIt == userInfo.end())
+        throw "Cannot find addressIp key";
+    else if (portIt == userInfo.end())
+        throw "Cannot find port key";
 
-    char **usernames = (char**)(usersIt->second);
-    int count = *(int*)(countIt->second);
+    char *username = (char*)(userIt->second);
+    char *addressIp = (char*)(addressIpIt->second);
+    int port = *(int*)portIt->second;
     client_call_t *clt = (client_call_t*)calloc(CLIENT_CALL_SIZE, 1);
 
-    for (int i = 0 ; i < count && i < MAX_FRIENDS ; i++) {
-        if (strlen(usernames[i]) < USERNAME_LEN)
-            strcpy(clt->usernames[i], usernames[i]);
-    }
+    strcpy(clt->usernames[0], username);
+    strcpy(clt->ip, addressIp);
+    clt->port = port;
+    clt->number = 1;
 
     Message message(CLIENT_CALL, CLIENT_CALL_SIZE, clt);
 

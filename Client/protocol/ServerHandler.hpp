@@ -14,6 +14,7 @@
 #include "../NotificationHandler.hpp"
 #include "ServerCommunication.hpp"
 #include "ServerRequest.hpp"
+#include "ServerResponse.hpp"
 #include "protocol.h"
 
 class ServerHandler {
@@ -22,19 +23,25 @@ public:
     ~ServerHandler();
 
     void start();
+    void stop();
 
-    void *send(int id, std::map<std::string, void*> userInfo);
-    void *receive();
+    void send(int id, std::map<std::string, void*> userInfo);
+
+    const std::string &getIpAddress() const { return ipAddress_; }
+    int getPort() const { return port_; }
 private:
     boost::shared_ptr<NotificationHandler> notifHandler_;
     ServerCommunication communicationHandler_;
-    ServerRequest requestHandler_;
-    boost::thread requestThread_;
-    boost::shared_ptr<boost::mutex> requestMutex_;
+    ServerRequest requestsHandler_;
+    boost::thread requestsThread_;
+    boost::thread responsesThread_;
+    boost::shared_ptr<boost::mutex> requestsMutex_;
     boost::shared_ptr<std::queue<Message>> requests_;
-    boost::thread responseThread_;
-    boost::shared_ptr<boost::mutex> responseMutex_;
+    boost::shared_ptr<boost::mutex> responsesMutex_;
     boost::shared_ptr<std::queue<Message>> responses_;
+    ServerResponse *responsesHandler_;
+    std::string ipAddress_;
+    int port_;
 };
 
 #endif //BABEL_SERVER_SERVERHANDLER_HPP
