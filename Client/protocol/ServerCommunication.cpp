@@ -48,3 +48,27 @@ void ServerCommunication::write(Message &message)
     socket_.send(boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
     socket_.send(boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
 }
+
+void ServerCommunication::receiveResponse(boost::shared_ptr<boost::mutex> mutex, boost::shared_ptr<std::queue<Message>> queue)
+{
+    Message message = read();
+
+    if (message.getId() <= 0)
+        return;
+    std::cout << message.getId() << " " << message.getPayloadSize() << std::endl;
+    mutex->lock();
+    queue->push(message);
+    mutex->unlock();
+}
+
+Message ServerCommunication::read()
+{
+    Message message;
+
+    socket_.receive(boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
+    if (message.getId() >= 0) {
+        message.setupPayload();
+        socket_.receive(boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
+    }
+    return message;
+}

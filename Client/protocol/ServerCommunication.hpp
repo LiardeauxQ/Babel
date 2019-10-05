@@ -26,9 +26,11 @@ public:
     void start();
 
     void sendRequest(boost::shared_ptr<boost::mutex> mutex, boost::shared_ptr<std::queue<Message>> queue);
+    void receiveResponse(boost::shared_ptr<boost::mutex> mutex, boost::shared_ptr<std::queue<Message>> queue);
 private:
 
     void write(Message &message);
+    Message read();
 
     boost::asio::io_context context_;
     BoostTcp::socket socket_;
