@@ -6,9 +6,6 @@ date: 2019-10-05
 category: info
 ipr: trust200902
 
-stand_alone: yes
-pi: [toc, sortrefs, symrefs]
-
 author:
  -
     ins: A. Fourcat
@@ -34,19 +31,16 @@ author:
     organization: Epitech.
     email: kilian.perrier@epitech.eu
 
-normative:
-  RFC2119:
+---
 
-informative:
-
---- abstract
+# Abstract
 
 The RFC is written for the Babel project.
 It will present the binary protocol written to sustain the clients of the Babel software.
 
 The Babel is a multi-platform (Windows, Linux, MacOs) VOIP software.
 
---- middle
+---
 
 # Introduction
 
@@ -55,17 +49,28 @@ The binary protocol permit transfer of instruction and is hardly typed.
 
 (The response are structure based on request etc...)
 
+Each request contain an header.
+
+Under this form.
+
+* int id
+* size_t payload_len
+
+The MSB is encoded with 1 for Server's requests and 0 for Client's requests.
+
 
 ## Terminology
 
 We need you to understand the concepts of "SOCKET", "PORT", "USER", "DATABASE"
 The project will be done with C like struct and types.
 
-USERNAME_SIZE tell to the protocol's users the max size of the username.
+USERNAME_SIZE: tell to the protocol's users the max size of the username.
 
-PASSWORD_SIZE tell to the protocol's users the max size of the password.
+PASSWORD_SIZE: tell to the protocol's users the max size of the password.
 
-MAX_USER_IN_CALL tell to the protocol's users the max user in a VOIP conversation.
+MAX_USER_IN_CALL: tell to the protocol's users the max user in a VOIP conversation.
+
+MSB: Most significant bit.
 
 # Client requests
 
@@ -170,10 +175,10 @@ Response: SERVER_ACCEPT_FRIEND_RESPONSE
 Accept call requested from CLIENT_CALL.
 
 Content:
-
 * char username[USERNAME_LEN]
 * short port
 * char ip[16]
+
 
 Response: SERVER_ACCEPT_CALL_RESPONSE
 
