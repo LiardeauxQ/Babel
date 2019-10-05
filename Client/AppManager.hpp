@@ -45,7 +45,6 @@ private:
 
     boost::shared_ptr<NotificationHandler> notifHandler_;
     boost::shared_ptr<ServerHandler> serverHandler_;
-    UserSession session_;
     ui::BabelMainWindow widget_;
     boost::shared_ptr<AppManagerObserver> observer_;
     std::vector<boost::shared_ptr<Subject>> subjects_;

@@ -8,7 +8,7 @@
 ui::FriendListWidget::FriendListWidget(QWidget *parent) : QWidget(parent)
 {
     friendList_ =new QListWidget();
-    usernameLabel_ = new QLabel("Quentin Liardeaux");
+    usernameLabel_ = new QLabel("");
     disconnectButton_ = new QPushButton("disconnect");
     userProfilWidget_ = QSharedPointer<QWidget>(new QWidget());
     widgetsHandler_ = new WidgetsHandler();
@@ -29,6 +29,9 @@ ui::FriendListWidget::FriendListWidget(QWidget *parent) : QWidget(parent)
     userProfilWidget_->layout()->addWidget(friendList_);
     userProfilWidget_->layout()->addWidget(disconnectButton_);
     widgetsHandler_->push(userProfilWidget_.get());
+
+    if (UserSession::get() != nullptr)
+        usernameLabel_->setText(QString(UserSession::get()->getUsername().c_str()));
 
     mainLayout->addWidget(widgetsHandler_);
     setLayout(mainLayout);

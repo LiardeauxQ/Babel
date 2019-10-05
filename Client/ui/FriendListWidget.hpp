@@ -11,6 +11,7 @@
 
 #include "WidgetsHandler.hpp"
 #include "CallWidget.hpp"
+#include "../protocol/UserSession.hpp"
 
 namespace ui {
     class FriendListWidget : public QWidget {

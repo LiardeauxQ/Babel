@@ -10,11 +10,12 @@
 
 class UserSession {
 public:
-    UserSession() :
-        isConnected_(false)
-    {}
-
-    ~UserSession() = default;
+    static UserSession *get()
+    {
+        if (!session_)
+            session_ = new UserSession();
+        return session_;
+    }
 
     void connectUser(const std::string &username)
     {
@@ -33,10 +34,23 @@ public:
     {
         return friends_;
     }
+
+    const std::string &getUsername() const { return username_; }
+
 private:
+    UserSession() :
+            isConnected_(false)
+    {}
+
+    ~UserSession()
+    {
+        delete session_;
+    }
+
     bool isConnected_;
     std::string username_;
     std::vector<std::string> friends_;
+    static UserSession *session_;
 };
 
 #endif //BABEL_SERVER_USERSESSION_HPP

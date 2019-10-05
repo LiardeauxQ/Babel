@@ -8,10 +8,10 @@ AppManager::AppManager(boost::shared_ptr<ServerHandler> serverHandler,
         boost::shared_ptr<NotificationHandler> notifHandler) :
     notifHandler_(notifHandler),
     serverHandler_(serverHandler),
-    session_(UserSession()),
     widget_(ui::BabelMainWindow(notifHandler_, nullptr)),
     observer_(new AppManagerObserver(*this))
-{}
+{
+}
 
 void AppManager::start()
 {
@@ -59,8 +59,12 @@ void AppManager::askToLog(const std::string &username, const std::string &passwo
     std::cout << username << std::endl;
     userInfo["username"] = (void *)(username.c_str());
     userInfo["password"] = (void *)(password.c_str());
-    notifyResponse("loginResponse",
-            serverHandler_->send(CLIENT_HELLO, userInfo));
+
+    RESULT result = serverHandler_->send(CLIENT_HELLO, userInfo);
+
+    if (result == RESULT::OK)
+        UserSession::get()->connectUser(username);
+    notifyResponse("loginResponse", result);
 }
 
 void AppManager::askToRegister(const std::string &username, const std::string &password)
@@ -71,8 +75,12 @@ void AppManager::askToRegister(const std::string &username, const std::string &p
     std::cout << username << std::endl;
     userInfo["username"] = (void *)(username.c_str());
     userInfo["password"] = (void *)(password.c_str());
-    notifyResponse("registerResponse",
-            serverHandler_->send(CLIENT_REGISTER, userInfo));
+
+    RESULT result = serverHandler_->send(CLIENT_REGISTER, userInfo);
+
+    if (result == RESULT::OK)
+        UserSession::get()->connectUser(username);
+    notifyResponse("registerResponse", result);
 }
 
 void AppManager::close()

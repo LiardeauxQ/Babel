@@ -103,7 +103,7 @@ set(BABEL_CLIENT
 	Client/protocol/ServerHandler.cpp
 	Client/protocol/ServerHandler.hpp
 	Client/protocol/ServerResponse.cpp
-	Client/protocol/ServerResponse.hpp)
+	Client/protocol/ServerResponse.hpp Client/protocol/UserSession.cpp)
 
 set(BABEL_COMMON
     ${COMMON_PATH}/User.hpp
