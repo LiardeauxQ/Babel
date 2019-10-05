@@ -56,6 +56,8 @@ public:
 
     void friendStatus(client_friend_status_t*, SharedData& data);
 
+    void acceptCall(client_accept_call_t*, SharedData& data);
+
     ~Session();
 private:
     explicit Session(boost::asio::io_context& context, Database& conn, std::list<boost::shared_ptr<Session>>& sessions);
