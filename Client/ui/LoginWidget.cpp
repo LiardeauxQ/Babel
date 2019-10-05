@@ -78,7 +78,6 @@ void ui::LoginWidget::LoginObserver::update(std::map<std::string, void*> userInf
     auto type = userInfo.find("type")->second;
     auto response = (RESULT*)(userInfo.find("result")->second);
 
-    if (response != nullptr && *response == RESULT::OK) {
+    if (response != nullptr && *response == RESULT::OK)
         widget_.loginEvent();
-    }
 }

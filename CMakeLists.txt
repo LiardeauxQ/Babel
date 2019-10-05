@@ -70,7 +70,6 @@ set(BABEL_CLIENT
 	${CLIENT_PATH}/SoundManager.cpp
 	${CLIENT_PATH}/Error.cpp
 	${CLIENT_PATH}/Error.hpp
-	${CLIENT_PATH}/Packet.hpp
 	${CLIENT_PATH}/opus/Encoder.cpp
 	${CLIENT_PATH}/opus/Encoder.hpp
 	${CLIENT_PATH}/opus/Decoder.cpp
@@ -102,7 +101,9 @@ set(BABEL_CLIENT
 	Client/protocol/ServerCommunication.cpp
 	Client/protocol/ServerCommunication.hpp
 	Client/protocol/ServerHandler.cpp
-	Client/protocol/ServerHandler.hpp)
+	Client/protocol/ServerHandler.hpp
+	Client/protocol/ServerResponse.cpp
+	Client/protocol/ServerResponse.hpp)
 
 set(BABEL_COMMON
     ${COMMON_PATH}/User.hpp
@@ -111,7 +112,8 @@ set(BABEL_COMMON
     ${COMMON_PATH}/DatabaseError.hpp
     ${COMMON_PATH}/DatabaseError.cpp
     ${COMMON_PATH}/Message.hpp
-    ${COMMON_PATH}/protocol.h)
+    ${COMMON_PATH}/protocol.h
+	${COMMON_PATH}/Packet.hpp)
 
 add_executable(babel-client
     ${GUI_TYPE}

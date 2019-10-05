@@ -11,17 +11,44 @@ AppManager::AppManager(boost::shared_ptr<ServerHandler> serverHandler,
     session_(UserSession()),
     widget_(ui::BabelMainWindow(notifHandler_, nullptr)),
     observer_(new AppManagerObserver(*this))
+{}
+
+void AppManager::start()
 {
+    initNotifications();
+    widget_.show();
+    serverHandler_->start();
+}
+
+void AppManager::initNotifications()
+{
+    subjects_.push_back(boost::shared_ptr<Subject>(new Subject("loginResponse")));
+    subjects_.push_back(boost::shared_ptr<Subject>(new Subject("loginResponse")));
+    for (auto sub : subjects_)
+        notifHandler_->registerEvent(sub);
     notifHandler_->attachToEvent(observer_, "close");
     notifHandler_->attachToEvent(observer_, "login");
     notifHandler_->attachToEvent(observer_, "register");
 }
 
-void AppManager::start()
+void AppManager::notifySubject(const std::string &label, std::map<std::string, void*> &userInfo)
 {
-    //widget_.resize(500, 500);
-    widget_.show();
-    serverHandler_->start();
+    for (auto sub : subjects_) {
+        if (sub->getLabel() == label) {
+            sub->notify(userInfo);
+            break;
+        }
+    }
+}
+
+void AppManager::notifyResponse(const std::string &label, RESULT result)
+{
+    std::map<std::string, void*> userInfo;
+
+    std::cout << label << std::endl;
+    userInfo["type"] = (void*)(std::string("result").c_str());
+    userInfo["result"] = (void*)(&result);
+    notifySubject("loginResponse", userInfo);
 }
 
 void AppManager::askToLog(const std::string &username, const std::string &password)
@@ -32,7 +59,8 @@ void AppManager::askToLog(const std::string &username, const std::string &passwo
     std::cout << username << std::endl;
     userInfo["username"] = (void *)(username.c_str());
     userInfo["password"] = (void *)(password.c_str());
-    serverHandler_->send(CLIENT_REGISTER, userInfo);
+    notifyResponse("loginResponse",
+            serverHandler_->send(CLIENT_HELLO, userInfo));
 }
 
 void AppManager::askToRegister(const std::string &username, const std::string &password)
@@ -43,12 +71,12 @@ void AppManager::askToRegister(const std::string &username, const std::string &p
     std::cout << username << std::endl;
     userInfo["username"] = (void *)(username.c_str());
     userInfo["password"] = (void *)(password.c_str());
-    serverHandler_->send(CLIENT_REGISTER, userInfo);
+    notifyResponse("registerResponse",
+            serverHandler_->send(CLIENT_REGISTER, userInfo));
 }
 
 void AppManager::close()
 {
-    std::cout << "close" << std::endl;
     serverHandler_->send(-1, std::map<std::string, void*>());
 }
 

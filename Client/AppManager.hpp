@@ -39,11 +39,16 @@ private:
     void call();
     void requestFriends();
 
+    void initNotifications();
+    void notifySubject(const std::string &label, std::map<std::string, void*> &userInfo);
+    void notifyResponse(const std::string &label, RESULT result);
+
     boost::shared_ptr<NotificationHandler> notifHandler_;
     boost::shared_ptr<ServerHandler> serverHandler_;
     UserSession session_;
     ui::BabelMainWindow widget_;
     boost::shared_ptr<AppManagerObserver> observer_;
+    std::vector<boost::shared_ptr<Subject>> subjects_;
 };
 
 #endif //BABEL_SERVER_APPMANAGER_HPP
