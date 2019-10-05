@@ -35,6 +35,7 @@ private:
 
     void askToLog(const std::string &username, const std::string &password);
     void askToRegister(const std::string &username, const std::string &password);
+    void askToFetchFriends();
     void close();
     void call();
     void requestFriends();

@@ -2,7 +2,6 @@
 // Created by Quentin Liardeaux on 9/25/19.
 //
 
-#include <notify.h>
 #include "LoginWidget.hpp"
 
 ui::LoginWidget::LoginWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent) :

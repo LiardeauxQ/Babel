@@ -102,8 +102,7 @@ set(BABEL_CLIENT
 	Client/protocol/ServerCommunication.hpp
 	Client/protocol/ServerHandler.cpp
 	Client/protocol/ServerHandler.hpp
-	Client/protocol/ServerResponse.cpp
-	Client/protocol/ServerResponse.hpp Client/protocol/UserSession.cpp)
+	Client/protocol/UserSession.cpp Client/ui/AddFriendWidget.cpp Client/ui/AddFriendWidget.hpp)
 
 set(BABEL_COMMON
     ${COMMON_PATH}/User.hpp

@@ -56,7 +56,7 @@ void ui::BabelMainWindow::initLoginWidget()
 
 void ui::BabelMainWindow::initFriendListWidget()
 {
-    auto wFriendList = new FriendListWidget();
+    auto wFriendList = new FriendListWidget(notifHandler_);
     auto disconnectAction = new QAction("disconnect");
 
     connect(disconnectAction, &QAction::triggered, this, &ui::BabelMainWindow::returnToConnectionWidget);

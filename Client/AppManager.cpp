@@ -29,6 +29,7 @@ void AppManager::initNotifications()
     notifHandler_->attachToEvent(observer_, "close");
     notifHandler_->attachToEvent(observer_, "login");
     notifHandler_->attachToEvent(observer_, "register");
+    notifHandler_->attachToEvent(observer_, "fetchFriends");
 }
 
 void AppManager::notifySubject(const std::string &label, std::map<std::string, void*> &userInfo)
@@ -60,11 +61,12 @@ void AppManager::askToLog(const std::string &username, const std::string &passwo
     userInfo["username"] = (void *)(username.c_str());
     userInfo["password"] = (void *)(password.c_str());
 
-    RESULT result = serverHandler_->send(CLIENT_HELLO, userInfo);
+    void *payload = serverHandler_->send(CLIENT_HELLO, userInfo);
+    int result = (*(server_hello_response_t*)payload).result;
 
     if (result == RESULT::OK)
         UserSession::get()->connectUser(username);
-    notifyResponse("loginResponse", result);
+    notifyResponse("loginResponse", result == RESULT::OK ? RESULT::OK : RESULT::KO);
 }
 
 void AppManager::askToRegister(const std::string &username, const std::string &password)
@@ -76,11 +78,25 @@ void AppManager::askToRegister(const std::string &username, const std::string &p
     userInfo["username"] = (void *)(username.c_str());
     userInfo["password"] = (void *)(password.c_str());
 
-    RESULT result = serverHandler_->send(CLIENT_REGISTER, userInfo);
+    void *payload = serverHandler_->send(CLIENT_REGISTER, userInfo);
+    int result = (*(server_register_response_t*)payload).result;
 
     if (result == RESULT::OK)
         UserSession::get()->connectUser(username);
-    notifyResponse("registerResponse", result);
+    notifyResponse("registerResponse", result == RESULT::OK ? RESULT::OK : RESULT::KO);
+}
+
+void AppManager::askToFetchFriends()
+{
+    std::map<std::string, void*> userInfo;
+
+    void *payload = serverHandler_->send(CLIENT_FRIEND_STATUS, userInfo);
+    server_friend_status_t *srv = (server_friend_status_t*)payload;
+
+    std::cout << "friends" << std::endl;
+    for (int i = 0 ; i < MAX_FRIENDS ; i++) {
+        std::cout << srv->usernames[i] << std::endl;
+    }
 }
 
 void AppManager::close()
@@ -116,4 +132,6 @@ void AppManager::AppManagerObserver::update(std::map<std::string, void*> userInf
     }
     if (!strcmp(typeValue, "close"))
         manager_.close();
+    if (!strcmp(typeValue, "fetchFriends"))
+        manager_.askToFetchFriends();
 }
