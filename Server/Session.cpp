@@ -241,6 +241,67 @@ void Session::acceptFriend(client_accept_friend_t* payload, SharedData& data)
 
 void Session::friendStatus(client_friend_status_t*, SharedData& data)
 {
+    Packet<server_friend_status_t> res {
+        { SERVER_FRIEND_STATUS,
+            SERVER_FRIEND_STATUS_SIZE },
+        { { {} },
+            {} }
+    };
+
+    int cnt = 0;
+
+    for (auto& session : data.sessions) {
+        memcpy(res.payload.usernames[cnt], session->username_.c_str(), session->username_.length());
+        res.payload.status[cnt] = OK;
+        cnt++;
+    }
+
+    boost::asio::async_write(
+        socket_,
+        boost::asio::buffer(&res, sizeof(res)),
+        boost::bind(&Session::waitHeader, shared_from_this(), boost::asio::placeholders::error));
+}
+
+void Session::acceptCall(client_accept_call_t* payload, SharedData& data)
+{
+    Packet<server_accept_call_response_t> res {
+        { SERVER_CALL_RESPONSE,
+            SERVER_CALL_RESPONSE_SIZE },
+        { OK }
+    };
+
+    bool userFound = false;
+
+    if (strcmp(payload->username, username_.c_str()) == 0) {
+        res.payload.result = KO;
+    } else {
+        for (auto& session : data.sessions) {
+            if (strcmp(session->username_.c_str(), payload->username) == 0) {
+                Packet<server_accept_call_t> req {
+                    { SERVER_ACCEPT_CALL,
+                        SERVER_ACCEPT_CALL_SIZE },
+                    { {}, payload->port, {} }
+                };
+
+                memcpy(req.payload.username, payload->username, USERNAME_LEN);
+                memcpy(req.payload.ip, payload->ip, 16);
+
+                boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
+                userFound = true;
+                break;
+            }
+        }
+
+        if (!userFound) {
+            res.payload.result = KO;
+            std::cerr << "User " << payload->username << " not found." << std::endl;
+        }
+    }
+
+    boost::asio::async_write(
+        socket_,
+        boost::asio::buffer(&res, sizeof(res)),
+        boost::bind(&Session::waitHeader, shared_from_this(), boost::asio::placeholders::error));
 }
 
 void Session::handleRequest(Message& request, SharedData& data)
@@ -270,6 +331,9 @@ void Session::handleRequest(Message& request, SharedData& data)
         break;
     case CLIENT_REGISTER:
         clientRegister((client_register_t*)request.getPayload(), data);
+        break;
+    case CLIENT_ACCEPT_CALL:
+        acceptCall((client_accept_call_t*)request.getPayload(), data);
         break;
     default:
         throw "Unknown request.";
