@@ -45,6 +45,12 @@ void ServerCommunication::sendRequest(boost::shared_ptr<boost::mutex> mutex, boo
 
 void ServerCommunication::write(Message &message)
 {
+    client_register_t *clt = (client_register_t*)(message.getPayload());
+
+    std::cout << "->>>>>>";
+    std::cout << message.getPayloadSize() << std::endl;
+    std::cout << clt->username << std::endl;
+
     socket_.send(boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
     socket_.send(boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
 }

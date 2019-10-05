@@ -33,8 +33,10 @@ Message ServerRequest::ping(std::map<std::string, void*> userInfo)
         throw "Cannot find time";
     time_t time = *(time_t*)(it->second);
 
-    client_ping_t clt = {time};
-    Message message(CLIENT_PING, CLIENT_PING_SIZE, &clt);
+    client_ping_t *clt = (client_ping_t*)calloc(CLIENT_PING_SIZE, 1);
+    clt->stamp = time;
+
+    Message message(CLIENT_PING, CLIENT_PING_SIZE, clt);
 
     return message;
 }
@@ -51,30 +53,30 @@ Message ServerRequest::hello(std::map<std::string, void*> userInfo)
 
     char *username = (char*)(userIt->second);
     char *password = (char*)(passIt->second);
-    client_hello_t clt;
+    client_hello_t *clt = (client_hello_t*)calloc(CLIENT_HELLO_SIZE, 1);
 
     if (strlen(username) < USERNAME_LEN)
-        strcpy(clt.username, username);
+        strcpy(clt->username, username);
     if (strlen(password) < PASSWORD_LEN)
-        strcpy(clt.password, password);
+        strcpy(clt->password, password);
 
-    Message message(CLIENT_HELLO, CLIENT_HELLO_SIZE, &clt);
+    Message message(CLIENT_HELLO, CLIENT_HELLO_SIZE, clt);
 
     return message;
 }
 
 Message ServerRequest::goodbye(std::map<std::string, void*> userInfo)
 {
-    client_goodbye_t clt;
-    Message message(CLIENT_GOODBYE, CLIENT_GOODBYE_SIZE, &clt);
+    client_goodbye_t *clt = (client_goodbye_t*)calloc(CLIENT_GOODBYE_SIZE, 1);
+    Message message(CLIENT_GOODBYE, CLIENT_GOODBYE_SIZE, clt);
 
     return message;
 }
 
 Message ServerRequest::friendStatus(std::map<std::string, void*> userInfo)
 {
-    client_friend_status_t clt;
-    Message message(CLIENT_FRIEND_STATUS, CLIENT_FRIEND_STATUS_SIZE, &clt);
+    client_friend_status_t *clt = (client_friend_status_t*)calloc(CLIENT_FRIEND_REQUEST_SIZE, 1);
+    Message message(CLIENT_FRIEND_STATUS, CLIENT_FRIEND_STATUS_SIZE, clt);
 
     return message;
 }
@@ -91,14 +93,15 @@ Message ServerRequest::registerRequest(std::map<std::string, void*> userInfo)
 
     char *username = (char*)(userIt->second);
     char *password = (char*)(passIt->second);
-    client_register_t clt;
+
+    client_register_t *clt = (client_register_t*)calloc(CLIENT_REGISTER_SIZE, 1);
 
     if (strlen(username) < USERNAME_LEN)
-        strcpy(clt.username, username);
+        strcpy(clt->username, username);
     if (strlen(password) < PASSWORD_LEN)
-        strcpy(clt.password, password);
+        strcpy(clt->password, password);
 
-    Message message(CLIENT_REGISTER, CLIENT_REGISTER_SIZE, &clt);
+    Message message(CLIENT_REGISTER, CLIENT_REGISTER_SIZE, clt);
 
     return message;
 }
@@ -111,12 +114,12 @@ Message ServerRequest::friendRequest(std::map<std::string, void*> userInfo)
         throw "Cannot find username key";
 
     char *username = (char*)(userIt->second);
-    client_friend_request_t clt;
+    client_friend_request_t *clt = (client_friend_request_t*)calloc(CLIENT_FRIEND_REQUEST_SIZE, 1);
 
     if (strlen(username) < USERNAME_LEN)
-        strcpy(clt.username, username);
+        strcpy(clt->username, username);
 
-    Message message(CLIENT_FRIEND_REQUEST, CLIENT_FRIEND_REQUEST_SIZE, &clt);
+    Message message(CLIENT_FRIEND_REQUEST, CLIENT_FRIEND_REQUEST_SIZE, clt);
 
     return message;
 }
@@ -133,23 +136,23 @@ Message ServerRequest::call(std::map<std::string, void*> userInfo)
 
     char **usernames = (char**)(usersIt->second);
     int count = *(int*)(countIt->second);
-    client_call_t clt;
+    client_call_t *clt = (client_call_t*)calloc(CLIENT_CALL_SIZE, 1);
 
     for (int i = 0 ; i < count && i < MAX_FRIENDS ; i++) {
         if (strlen(usernames[i]) < USERNAME_LEN)
-            strcpy(clt.usernames[i++], usernames[i]);
+            strcpy(clt->usernames[i], usernames[i]);
     }
 
-    Message message(CLIENT_CALL, CLIENT_CALL_SIZE, &clt);
+    Message message(CLIENT_CALL, CLIENT_CALL_SIZE, clt);
 
     return message;
 }
 
 Message ServerRequest::bye(std::map<std::string, void*> userInfo)
 {
-    client_bye_t clt;
+    client_bye_t *clt = (client_bye_t*)calloc(CLIENT_BYE_SIZE, 1);
 
-    Message message(CLIENT_BYE, CLIENT_BYE_SIZE, &clt);
+    Message message(CLIENT_BYE, CLIENT_BYE_SIZE, clt);
 
     return message;
 }
@@ -162,12 +165,12 @@ Message ServerRequest::acceptFriend(std::map<std::string, void*> userInfo)
         throw "Cannot find message key";
 
     char *message = (char*)(messageIt->second);
-    client_accept_friend_t clt;
+    client_accept_friend_t *clt = (client_accept_friend_t*)calloc(CLIENT_ACCEPT_FRIEND_SIZE, 1);
 
     if (strlen(message) < USERNAME_LEN)
-        strcpy(clt.message, message);
+        strcpy(clt->message, message);
 
-    Message sendingMsg(CLIENT_ACCEPT_FRIEND, CLIENT_ACCEPT_FRIEND_SIZE, &clt);
+    Message sendingMsg(CLIENT_ACCEPT_FRIEND, CLIENT_ACCEPT_FRIEND_SIZE, clt);
 
     return sendingMsg;
 }

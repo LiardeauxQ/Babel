@@ -13,6 +13,7 @@ class Subject;
 class Observer {
 public:
     Observer(boost::shared_ptr<Subject> sub = nullptr);
+    virtual ~Observer() = default;
 
     virtual void update(std::map<std::string, void*> userInfo) = 0;
 protected:
