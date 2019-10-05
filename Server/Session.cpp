@@ -251,6 +251,9 @@ void Session::friendStatus(client_friend_status_t*, SharedData& data)
     int cnt = 0;
 
     for (auto& session : data.sessions) {
+        if (session->socket_.native_handle() == socket_.native_handle())
+            continue;
+
         memcpy(res.payload.usernames[cnt], session->username_.c_str(), session->username_.length());
         res.payload.status[cnt] = OK;
         cnt++;
