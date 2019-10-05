@@ -14,6 +14,8 @@
 #include "../NotificationHandler.hpp"
 #include "ServerCommunication.hpp"
 #include "ServerRequest.hpp"
+#include "ServerResponse.hpp"
+#include "protocol.h"
 
 class ServerHandler {
 public:
@@ -22,7 +24,8 @@ public:
 
     void start();
 
-    void send(int id, std::map<std::string, void*> userInfo);
+    RESULT send(int id, std::map<std::string, void*> userInfo);
+    RESULT receive();
 private:
     boost::shared_ptr<NotificationHandler> notifHandler_;
     ServerCommunication communicationHandler_;

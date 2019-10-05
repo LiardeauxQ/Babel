@@ -25,7 +25,7 @@ void ServerHandler::start()
     communicationHandler_.start();
 }
 
-void ServerHandler::send(int id, std::map<std::string, void *> userInfo)
+RESULT ServerHandler::send(int id, std::map<std::string, void *> userInfo)
 {
     requestMutex_->lock();
     if (id != -1)
@@ -33,4 +33,21 @@ void ServerHandler::send(int id, std::map<std::string, void *> userInfo)
     else
         requests_->push(Message(-1, 0, nullptr));
     requestMutex_->unlock();
+    if (id != -1)
+        return receive();
+    return RESULT::KO;
+}
+
+RESULT ServerHandler::receive() {
+    responseThread_ = boost::thread(&ServerCommunication::receiveResponse, &communicationHandler_, responseMutex_,
+                                    responses_);
+    responseThread_.join();
+    if (responses_->size() > 0) {
+        RESULT result = ServerResponse::receiveResponse(responses_->front());
+
+        responses_->pop();
+        return result;
+    } else
+        std::cout << "no responses" << std::endl;
+    return RESULT::KO;
 }
