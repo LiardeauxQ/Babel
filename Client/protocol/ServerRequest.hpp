@@ -17,15 +17,18 @@ class ServerRequest {
 public:
     static Message createRequest(int id, std::map<std::string, void*> userInfo);
 
-    static Message createPingRequest(std::map<std::string, void*> userInfo);
-    static Message createHelloRequest(std::map<std::string, void*> userInfo);
-    static Message createGoodbyeRequest(std::map<std::string, void*> userInfo);
-    static Message createFriendStatusRequest(std::map<std::string, void*> userInfo);
-    static Message createRegisterRequest(std::map<std::string, void*> userInfo);
-    static Message createFriendRequest(std::map<std::string, void*> userInfo);
-    static Message createCallRequest(std::map<std::string, void*> userInfo);
-    static Message createByeRequest(std::map<std::string, void*> userInfo);
-    static Message createAcceptFriendRequest(std::map<std::string, void*> userInfo);
+protected:
+    static Message ping(std::map<std::string, void*> userInfo);
+    static Message hello(std::map<std::string, void*> userInfo);
+    static Message goodbye(std::map<std::string, void*> userInfo);
+    static Message friendStatus(std::map<std::string, void*> userInfo);
+    static Message registerRequest(std::map<std::string, void*> userInfo);
+    static Message friendRequest(std::map<std::string, void*> userInfo);
+    static Message call(std::map<std::string, void*> userInfo);
+    static Message bye(std::map<std::string, void*> userInfo);
+    static Message acceptFriend(std::map<std::string, void*> userInfo);
+
+    static std::vector<std::tuple<int, Message (*)(std::map<std::string, void*>)>> requests;
 };
 
 

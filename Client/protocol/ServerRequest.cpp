@@ -4,16 +4,16 @@
 
 #include "ServerRequest.hpp"
 
-static std::vector<std::tuple<int, Message (*)(std::map<std::string, void*>)>> requests = {
-        std::make_tuple(CLIENT_PING, &ServerRequest::createPingRequest),
-        std::make_tuple(CLIENT_HELLO, &ServerRequest::createHelloRequest),
-        std::make_tuple(CLIENT_GOODBYE, &ServerRequest::createGoodbyeRequest),
-        std::make_tuple(CLIENT_FRIEND_STATUS, &ServerRequest::createFriendStatusRequest),
-        std::make_tuple(CLIENT_REGISTER, &ServerRequest::createRegisterRequest),
-        std::make_tuple(CLIENT_FRIEND_REQUEST, &ServerRequest::createFriendRequest),
-        std::make_tuple(CLIENT_CALL, &ServerRequest::createCallRequest),
-        std::make_tuple(CLIENT_BYE, &ServerRequest::createByeRequest),
-        std::make_tuple(CLIENT_ACCEPT_FRIEND, &ServerRequest::createAcceptFriendRequest),
+std::vector<std::tuple<int, Message (*)(std::map<std::string, void*>)>> ServerRequest::requests = {
+        std::make_tuple(CLIENT_PING, &ServerRequest::ping),
+        std::make_tuple(CLIENT_HELLO, &ServerRequest::hello),
+        std::make_tuple(CLIENT_GOODBYE, &ServerRequest::goodbye),
+        std::make_tuple(CLIENT_FRIEND_STATUS, &ServerRequest::friendStatus),
+        std::make_tuple(CLIENT_REGISTER, &ServerRequest::registerRequest),
+        std::make_tuple(CLIENT_FRIEND_REQUEST, &ServerRequest::friendRequest),
+        std::make_tuple(CLIENT_CALL, &ServerRequest::call),
+        std::make_tuple(CLIENT_BYE, &ServerRequest::bye),
+        std::make_tuple(CLIENT_ACCEPT_FRIEND, &ServerRequest::acceptFriend),
 };
 
 Message ServerRequest::createRequest(int id, std::map<std::string, void*> userInfo)
@@ -25,7 +25,7 @@ Message ServerRequest::createRequest(int id, std::map<std::string, void*> userIn
     throw "Invalid id";
 }
 
-Message ServerRequest::createPingRequest(std::map<std::string, void*> userInfo)
+Message ServerRequest::ping(std::map<std::string, void*> userInfo)
 {
     auto it = userInfo.find("time");
 
@@ -39,7 +39,7 @@ Message ServerRequest::createPingRequest(std::map<std::string, void*> userInfo)
     return message;
 }
 
-Message ServerRequest::createHelloRequest(std::map<std::string, void*> userInfo)
+Message ServerRequest::hello(std::map<std::string, void*> userInfo)
 {
     auto userIt = userInfo.find("username");
     auto passIt = userInfo.find("password");
@@ -63,7 +63,7 @@ Message ServerRequest::createHelloRequest(std::map<std::string, void*> userInfo)
     return message;
 }
 
-Message ServerRequest::createGoodbyeRequest(std::map<std::string, void*> userInfo)
+Message ServerRequest::goodbye(std::map<std::string, void*> userInfo)
 {
     client_goodbye_t clt;
     Message message(CLIENT_GOODBYE, CLIENT_GOODBYE_SIZE, &clt);
@@ -71,7 +71,7 @@ Message ServerRequest::createGoodbyeRequest(std::map<std::string, void*> userInf
     return message;
 }
 
-Message ServerRequest::createFriendStatusRequest(std::map<std::string, void*> userInfo)
+Message ServerRequest::friendStatus(std::map<std::string, void*> userInfo)
 {
     client_friend_status_t clt;
     Message message(CLIENT_FRIEND_STATUS, CLIENT_FRIEND_STATUS_SIZE, &clt);
@@ -79,7 +79,7 @@ Message ServerRequest::createFriendStatusRequest(std::map<std::string, void*> us
     return message;
 }
 
-Message ServerRequest::createRegisterRequest(std::map<std::string, void*> userInfo)
+Message ServerRequest::registerRequest(std::map<std::string, void*> userInfo)
 {
     auto userIt = userInfo.find("username");
     auto passIt = userInfo.find("password");
@@ -103,7 +103,7 @@ Message ServerRequest::createRegisterRequest(std::map<std::string, void*> userIn
     return message;
 }
 
-Message ServerRequest::createFriendRequest(std::map<std::string, void*> userInfo)
+Message ServerRequest::friendRequest(std::map<std::string, void*> userInfo)
 {
     auto userIt = userInfo.find("username");
 
@@ -121,7 +121,7 @@ Message ServerRequest::createFriendRequest(std::map<std::string, void*> userInfo
     return message;
 }
 
-Message ServerRequest::createCallRequest(std::map<std::string, void*> userInfo)
+Message ServerRequest::call(std::map<std::string, void*> userInfo)
 {
     auto usersIt = userInfo.find("usernames");
     auto countIt = userInfo.find("count");
@@ -145,7 +145,7 @@ Message ServerRequest::createCallRequest(std::map<std::string, void*> userInfo)
     return message;
 }
 
-Message ServerRequest::createByeRequest(std::map<std::string, void*> userInfo)
+Message ServerRequest::bye(std::map<std::string, void*> userInfo)
 {
     client_bye_t clt;
 
@@ -154,7 +154,7 @@ Message ServerRequest::createByeRequest(std::map<std::string, void*> userInfo)
     return message;
 }
 
-Message ServerRequest::createAcceptFriendRequest(std::map<std::string, void*> userInfo)
+Message ServerRequest::acceptFriend(std::map<std::string, void*> userInfo)
 {
     auto messageIt = userInfo.find("message");
 
