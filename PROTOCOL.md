@@ -1,50 +1,202 @@
-# Client to Server
+---
+title: The Babel Client-Server protocol 
+abbrev: I-D
+docname: RFC draft
+date: 2019-10-05
+category: info
+ipr: trust200902
 
-```
-Given under the form:
-id name payload -> response
-```
+stand_alone: yes
+pi: [toc, sortrefs, symrefs]
 
-* [0] Ping `time sent` -> `time sent`
+author:
+ -
+    ins: A. Fourcat
+    name: Alexandre Fourcat
+    organization: Epitech.
+    email: alexandre.fourcat@epitech.eu
+ 
+ -
+    ins: T. Nicollet
+    name: Thomas Nicollet
+    organization: Epitech.
+    email: thomas.nicollet@epitech.eu
 
-Test request that should be answered `Pong`.
+ -
+    ins: L. Quentin
+    name: Quentin Liardeaux
+    organization: Epitech.
+    email: quentin.liardeaux@epitech.eu
 
-* [1] Hello `username` `password` -> `result`
+ -
+    ins: P. Kilian
+    name: Kilian Perrier
+    organization: Epitech.
+    email: kilian.perrier@epitech.eu
 
-The login request.
+normative:
+  RFC2119:
 
-* [2] Goodbye `void` -> `void`
+informative:
 
-The logout request.
+--- abstract
 
-* [3] FriendStatus `void` -> `[username status]`
+The RFC is written for the Babel project.
+It will present the binary protocol written to sustain the clients of the Babel software.
 
-Show all friends connection status.
+The Babel is a multi-platform (Windows, Linux, MacOs) VOIP software.
 
-* [4] Register `username` `password` -> `result`
+--- middle
 
-Create the user in server.
+# Introduction
 
-* [5] FriendRequest `username` -> `result`
+The binary protocol use a versioning system based on ??? versioning.
+The binary protocol permit transfer of instruction and is hardly typed.
 
-Add an user to user's friends.
+(The response are structure based on request etc...)
 
-* [6] Call `[username]` -> see communication protocol
 
-Start the communication protocol.
+## Terminology
 
-* [7] Bye `void` -> `result`
+We need you to understand the concepts of "SOCKET", "PORT", "USER", "DATABASE"
+The project will be done with C like struct and types.
 
-Stop the communication protocol.
+USERNAME_SIZE tell to the protocol's users the max size of the username.
 
-* [8] AcceptFriend `message` -> `void`
+PASSWORD_SIZE tell to the protocol's users the max size of the password.
 
-Accept stacked friend request.
+MAX_USER_IN_CALL tell to the protocol's users the max user in a VOIP conversation.
 
-# Server to client
+# Client requests
 
-* [100] FriendRequest `username` -> `void`
+The client can connect to the server, register and do lot's of actions during the runtime.
 
-* [200] Call `username ip-caller` -> see communication protocol
+## Server based request
 
-* [300] Bye `username` -> `void`
+### CLIENT_PING
+
+Ping the server to check connection and latency.
+
+Content:
+
+* time_t stamp
+
+Response: SERVER_PING_RESPONSE
+
+
+### CLIENT_HELLO
+
+This is the login request. When the connection is established  it should be the first request made from the client.
+
+Content:
+
+* char username[USERNAME_SIZE]
+* char password[PASSWORD_SIZE]
+
+Response: SERVER_HELLO_RESPONSE
+
+### CLIENT_GOODBYE
+
+This is the request to close the connection to the server from the client.
+
+Content: EMPTY
+
+Response: SERVER_GOODBYE_RESPONSE
+
+### CLIENT_FRIEND_STATUS
+
+Request for the status (Connected, InCall etc...) of the user friends.
+
+Content: EMPTY
+
+Response: SERVER_FRIEND_STATUS_RESPONSE
+
+### CLIENT_REGISTER
+
+Request to register client with username and password into the server database.
+
+Content:
+
+* char username[USERNAME_LEN]
+
+* char password[PASSWORD_LEN]
+
+Response: SERVER_REGISTER_RESPONSE
+
+## Server proxy request
+
+### CLIENT_FRIEND_REQUEST
+
+Send a friend request to the user given in payload.
+
+Content:
+
+* char username[USERNAME_LEN]
+
+Response: SERVER_FRIEND_REQUEST_RESPONSE
+
+### CLIENT_CALL
+
+Request to begin a data transfer through client.
+
+Content:
+
+* char username[MAX_USER_IN_CALL][USERNAME_LEN]
+* short port
+* char ip[16]
+
+Response: SERVER_CALL_RESPONSE
+
+### CLIENT_BYE
+
+Request to close the running VOIP conversation.
+
+Content: EMPTY
+
+Response: SERVER_BYE_RESPONSE
+
+### CLIENT_ACCEPT_FRIEND
+
+Accept friend requested from CLIENT_FRIEND_REQUEST.
+
+Content:
+
+* char message[MESSAGE_LEN]
+
+Response: SERVER_ACCEPT_FRIEND_RESPONSE
+
+### CLIENT_ACCEPT_CALL
+
+Accept call requested from CLIENT_CALL.
+
+Content:
+
+* char username[USERNAME_LEN]
+* short port
+* char ip[16]
+
+Response: SERVER_ACCEPT_CALL_RESPONSE
+
+# Server requests
+
+## *_RESPONSE
+
+All the previous client request responses.
+
+result is an int that can contain either OK or KO.
+
+Content:
+
+* int result
+
+Response: EMPTY
+
+## *
+
+In other case the server just forward and make safe ans possibility check as a proxy.
+
+Content:
+
+* Same as client's requests.
+
+Response: EMPTY
