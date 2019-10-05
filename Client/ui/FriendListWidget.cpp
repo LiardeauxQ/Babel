@@ -8,7 +8,8 @@
 ui::FriendListWidget::FriendListWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent) :
     notifHandler_(notifHandler),
     QWidget(parent),
-    fetchFriendsEvent_(new Subject("fetchFriends"))
+    fetchFriendsEvent_(new Subject("fetchFriends")),
+    observer_(new FriendListObserver(*this))
 {
     friendList_ =new QListWidget();
     usernameLabel_ = new QLabel("");
@@ -21,9 +22,6 @@ ui::FriendListWidget::FriendListWidget(boost::shared_ptr<NotificationHandler> no
     connect(disconnectButton_, SIGNAL(clicked()), this, SLOT(disconnectTap()));
     connect(friendList_, SIGNAL(itemClicked(QListWidgetItem *)), this, SLOT(selectListItem(QListWidgetItem *)));
 
-    friendList_->addItem("copain 1");
-    friendList_->addItem("copain 2");
-    friendList_->addItem("copain 3");
     friendList_->addItem("copain 4");
 
     QPointer<QGridLayout> layout = new QGridLayout();
@@ -43,6 +41,7 @@ ui::FriendListWidget::FriendListWidget(boost::shared_ptr<NotificationHandler> no
     setLayout(mainLayout);
 
     notifHandler_->registerEvent(fetchFriendsEvent_);
+    notifHandler->attachToEvent(observer_, "fetchFriendsResponse");
     fetchFriends();
 }
 
@@ -76,9 +75,10 @@ void ui::FriendListWidget::disconnectTap()
 
 void ui::FriendListWidget::selectListItem(QListWidgetItem *item)
 {
-    QPointer<CallWidget> wCall = new CallWidget();
+    QPointer<CallWidget> wCall = new CallWidget(notifHandler_);
     QPointer<QAction> closeAction = new QAction("close");
 
+    wCall->setFriendUsername(item->text().toStdString());
     connect(closeAction, &QAction::triggered, this, &ui::FriendListWidget::stopCall);
     wCall->addAction(closeAction);
     widgetsHandler_->replaceLastWidget(wCall);
@@ -92,4 +92,26 @@ void ui::FriendListWidget::stopCall()
 void ui::FriendListWidget::closeAddFriend()
 {
     widgetsHandler_->replaceLastWidget(userProfilWidget_.get());
+}
+
+void ui::FriendListWidget::fetchFriendsEvent(char usernames[MAX_FRIENDS][USERNAME_LEN])
+{
+    for (int i = 0 ; i < MAX_FRIENDS ; i++) {
+        if (strlen(usernames[i]) > 0)
+            friendList_->addItem(usernames[i]);
+    }
+}
+
+ui::FriendListWidget::FriendListObserver::FriendListObserver(ui::FriendListWidget &widget) :
+    widget_(widget)
+{
+}
+
+void ui::FriendListWidget::FriendListObserver::update(std::map<std::string, void *> userInfo)
+{
+    auto response = userInfo.find("payload")->second;
+    server_friend_status_t *srv = (server_friend_status_t*)response;
+
+    if (srv != nullptr)
+        widget_.fetchFriendsEvent(srv->usernames);
 }

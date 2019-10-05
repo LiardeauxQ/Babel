@@ -23,6 +23,17 @@ namespace ui {
         explicit FriendListWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent = nullptr);
 
     private:
+
+        class FriendListObserver: public Observer {
+        public:
+            FriendListObserver(FriendListWidget &widget);
+            ~FriendListObserver() = default;
+
+            void update(std::map<std::string, void*> userInfo) final;
+
+            FriendListWidget &widget_;
+        };
+
         QPointer<QPushButton> addFriendButton_;
         QPointer<QListWidget> friendList_;
         QPointer<QLabel> usernameLabel_;
@@ -32,8 +43,11 @@ namespace ui {
         boost::shared_ptr<NotificationHandler> notifHandler_;
 
         boost::shared_ptr<Subject> fetchFriendsEvent_;
+        boost::shared_ptr<FriendListObserver> observer_;
 
         void fetchFriends();
+
+        void fetchFriendsEvent(char usernames[MAX_FRIENDS][USERNAME_LEN]);
 
     private slots:
         void addFriendTap();
