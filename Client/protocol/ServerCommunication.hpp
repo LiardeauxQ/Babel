@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include "../NotificationHandler.hpp"
+#include "ServerResponse.hpp"
 #include "Message.hpp"
 
 typedef boost::asio::ip::tcp BoostTcp;
@@ -24,9 +25,10 @@ public:
     ~ServerCommunication();
 
     void start();
+    void stop();
 
     void sendRequest(boost::shared_ptr<boost::mutex> mutex, boost::shared_ptr<std::queue<Message>> queue);
-    void receiveResponse(boost::shared_ptr<boost::mutex> mutex, boost::shared_ptr<std::queue<Message>> queue);
+    void receiveResponse(ServerResponse *response, boost::shared_ptr<boost::mutex> mutex, boost::shared_ptr<std::queue<Message>> queue);
 private:
 
     void write(Message &message);

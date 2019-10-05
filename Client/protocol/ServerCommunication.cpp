@@ -4,6 +4,8 @@
 
 #include "ServerCommunication.hpp"
 
+#include <QApplication>
+
 ServerCommunication::ServerCommunication(const std::string &ipAddress, int port) :
         context_()
         , socket_(BoostTcp::socket(context_))
@@ -13,6 +15,10 @@ ServerCommunication::ServerCommunication(const std::string &ipAddress, int port)
 }
 
 ServerCommunication::~ServerCommunication()
+{
+}
+
+void ServerCommunication::stop()
 {
     socket_.close();
 }
@@ -51,7 +57,7 @@ void ServerCommunication::write(Message &message)
     socket_.send(boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
 }
 
-void ServerCommunication::receiveResponse(boost::shared_ptr<boost::mutex> mutex, boost::shared_ptr<std::queue<Message>> queue)
+void ServerCommunication::receiveResponse(ServerResponse *response, boost::shared_ptr<boost::mutex> mutex, boost::shared_ptr<std::queue<Message>> queue)
 {
     Message message = read();
 
@@ -60,17 +66,24 @@ void ServerCommunication::receiveResponse(boost::shared_ptr<boost::mutex> mutex,
     std::cout << message.getId() << " " << message.getPayloadSize() << std::endl;
     mutex->lock();
     queue->push(message);
+    QCoreApplication::postEvent(response, new QEvent(QEvent::User));
     mutex->unlock();
+    if (socket_.is_open())
+        receiveResponse(response, mutex, queue);
 }
 
 Message ServerCommunication::read()
 {
     Message message;
 
-    socket_.receive(boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
-    if (message.getId() >= 0) {
-        message.setupPayload();
-        socket_.receive(boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
+    try {
+        socket_.receive(boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
+        if (message.getId() >= 0) {
+            message.setupPayload();
+            socket_.receive(boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
+        }
+    } catch (std::exception e) {
+        std::cout << "Connection has been closed " << std::endl;
     }
     return message;
 }
