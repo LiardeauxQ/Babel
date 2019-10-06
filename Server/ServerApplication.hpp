@@ -5,14 +5,14 @@
 #ifndef BABEL_SERVER_SERVERAPPLICATION_HPP
 #define BABEL_SERVER_SERVERAPPLICATION_HPP
 
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include "Database.hpp"
 #include "ServerConfig.hpp"
 #include "ServerError.hpp"
 #include "Session.hpp"
 #include "SharedData.hpp"
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <memory>
 #include <list>
 

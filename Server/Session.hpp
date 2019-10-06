@@ -5,13 +5,12 @@
 #ifndef BABEL_SERVER_SESSION_HPP
 #define BABEL_SERVER_SESSION_HPP
 
-#include "Message.hpp"
-#include "SharedData.hpp"
-#include "Packet.hpp"
-
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include "Message.hpp"
+#include "SharedData.hpp"
+#include "Packet.hpp"
 #include <iostream>
 #include <list>
 
