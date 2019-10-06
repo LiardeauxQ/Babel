@@ -20,6 +20,22 @@ Session::Session(boost::asio::io_context& context, Database& conn, std::list<boo
 
 void Session::run()
 {
+    Packet<server_friend_status_t> req {
+        { SERVER_FRIEND_STATUS, SERVER_FRIEND_STATUS_SIZE },
+        { { {} }, {} }
+    };
+
+    int cnt = 0;
+
+    for (auto& session : data_.sessions) {
+        memcpy(req.payload.usernames[cnt], session->username_.c_str(), session->username_.length());
+        req.payload.status[cnt] = OK;
+        cnt++;
+    }
+
+    for (auto& session : data_.sessions)
+        boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
+
     data_.sessions.push_back(shared_from_this());
 
     waitHeader(boost::system::error_code());
@@ -321,9 +337,9 @@ void Session::handleRequest(Message& request, SharedData& data)
     case CLIENT_ACCEPT_FRIEND:
         acceptFriend((client_accept_friend_t*)request.getPayload(), data);
         break;
-        case CLIENT_FRIEND_STATUS:
-            friendStatus((client_friend_status_t*)request.getPayload(), data);
-            break;
+    case CLIENT_FRIEND_STATUS:
+        friendStatus((client_friend_status_t*)request.getPayload(), data);
+        break;
     case CLIENT_FRIEND_REQUEST:
         friendRequest((client_friend_request_t*)request.getPayload(), data);
         break;
