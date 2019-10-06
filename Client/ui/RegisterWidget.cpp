@@ -7,7 +7,8 @@
 ui::RegisterWidget::RegisterWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent) :
     QWidget(parent),
     notifHandler_(notifHandler),
-    registerEvent_(new Subject("register"))
+    registerEvent_(new Subject("register")),
+    observer_(new RegisterObserver(*this))
 {
     closeButton_ = QSharedPointer<QPushButton>(new QPushButton(tr("Close")));
     button_ = QSharedPointer<QPushButton>(new QPushButton(tr("Register")));
@@ -36,18 +37,24 @@ ui::RegisterWidget::RegisterWidget(boost::shared_ptr<NotificationHandler> notifH
     setLayout(formLayout);
     setWindowTitle(tr("Register to Babel"));
     notifHandler_->registerEvent(registerEvent_);
+    notifHandler_->attachToEvent(observer_, "registerResponse");
 }
 
 void ui::RegisterWidget::registerTap()
 {
     std::map<std::string, void*> userInfo;
 
-    userInfo["type"] = (void*)(std::string("register").c_str());
-    userInfo["username"] = (void*)(usernameLineEdit_->text().toStdString().c_str());
-    userInfo["password"] = (void*)(passwordLineEdit_->text().toStdString().c_str());
+    userInfo["type"] = strdup("register");
+    userInfo["username"] = strdup(usernameLineEdit_->text().toStdString().c_str());
+    userInfo["password"] = strdup(passwordLineEdit_->text().toStdString().c_str());
+    registerEvent_->notify(userInfo);
+}
+
+void ui::RegisterWidget::registerEvent() const
+{
     for (auto action : actions()) {
         if (action->text() == "register") {
-            registerEvent_->notify(userInfo);
+            UserSession::get()->connectUser(usernameLineEdit_->text().toStdString());
             action->trigger();
             break;
         }
@@ -62,4 +69,18 @@ void ui::RegisterWidget::closeTap()
             break;
         }
     }
+}
+
+ui::RegisterWidget::RegisterObserver::RegisterObserver(RegisterWidget &widget) :
+        widget_(widget)
+{
+}
+
+void ui::RegisterWidget::RegisterObserver::update(std::map<std::string, void*> userInfo)
+{
+    auto type = userInfo.find("type")->second;
+    auto response = (RESULT*)(userInfo.find("result")->second);
+
+    if (response != nullptr && *response == RESULT::OK)
+        widget_.registerEvent();
 }
