@@ -5,9 +5,9 @@
 #ifndef BABEL_SERVER_SHAREDDATA_HPP
 #define BABEL_SERVER_SHAREDDATA_HPP
 
+#include "boost/asio/ip/tcp.hpp"
 #include "Database.hpp"
 #include "Session.hpp"
-#include "boost/asio/ip/tcp.hpp"
 #include <list>
 
 class Session;

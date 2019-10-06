@@ -11,7 +11,6 @@
 #include <boost/thread/mutex.hpp>
 #include <queue>
 #include <string>
-#include <unistd.h>
 
 #include "../NotificationHandler.hpp"
 #include "ServerResponse.hpp"

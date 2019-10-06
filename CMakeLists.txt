@@ -22,6 +22,7 @@ if (APPLE)
 elseif (WIN32)
 	set(CMAKE_PREFIX_PATH "C:\\Qt\\5.13.1\\msvc2017_64\\" ${CMAKE_PREFIX_PATH})
 	set(GUI_TYPE WIN32)
+	add_definitions(-D_WIN32_WINNT=0x0A00)
 endif (APPLE)
 
 # Include conan headers
