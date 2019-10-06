@@ -37,6 +37,7 @@ private:
     void askToRegister(const std::string &username, const std::string &password);
     void askToFetchFriends();
     void askToCall(const std::string &username);
+    void askToAcceptCall(const std::string &username);
     void close();
     void call();
     void requestFriends();

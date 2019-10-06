@@ -22,7 +22,6 @@ bool ServerResponse::event(QEvent *event)
     dispatchPayloads(message);
     responses_->pop();
     mutex_->unlock();
-    std::cout << "event has been triggered" << QThread::currentThread() << std::endl;
     return true;
 }
 
@@ -39,7 +38,12 @@ void ServerResponse::dispatchPayloads(Message message)
             fetchFriends(message.getPayload());
             break;
         case SERVER_CALL_RESPONSE:
+            callResponse(message.getPayload());
+            break;
+        case SERVER_CALL:
             call(message.getPayload());
+        case SERVER_ACCEPT_CALL:
+            acceptCall(message.getPayload());
             break;
         default:
             break;
@@ -56,23 +60,29 @@ void ServerResponse::notifyObservers(const std::string &label, std::map<std::str
     }
 }
 
+void ServerResponse::notifyObservers(const std::string &label, const std::string &type, void *payload)
+{
+    std::map<std::string, void*> userInfo;
+
+    userInfo["type"] = strdup(type.c_str());
+    userInfo["payload"] = payload;
+    notifyObservers(label, userInfo);
+}
+
 void ServerResponse::hello(void *payload)
 {
     static bool isInit = false;
 
-    std::cout << "std::endl" << std::endl;
     if (!isInit) {
         subjects_.push_back(boost::shared_ptr<Subject>(new Subject("loginResponse")));
         notifHandler_->registerEvent(subjects_.back());
         isInit = true;
     }
-    std::cout << "std::endl" << std::endl;
     server_hello_response_t *srv = (server_hello_response_t*)payload;
     std::map<std::string, void*> userInfo;
 
-    userInfo["type"] = (void*)(std::string("result").c_str());
+    userInfo["type"] = strdup("hello");
     userInfo["result"] = (void*)(&srv->result);
-    std::cout << "std::endl" << std::endl;
     notifyObservers("loginResponse", userInfo);
 }
 
@@ -88,7 +98,7 @@ void ServerResponse::registerResponse(void *payload)
     server_register_response_t *srv = (server_register_response_t*)payload;
     std::map<std::string, void*> userInfo;
 
-    userInfo["type"] = (void*)(std::string("result").c_str());
+    userInfo["type"] = strdup("register");
     userInfo["result"] = (void*)(&srv->result);
     notifyObservers("registerResponse", userInfo);
 }
@@ -102,15 +112,10 @@ void ServerResponse::fetchFriends(void *payload)
         notifHandler_->registerEvent(subjects_.back());
         isInit = true;
     }
-    server_friend_status_t *srv = (server_friend_status_t*)payload;
-    std::map<std::string, void*> userInfo;
-
-    userInfo["type"] = (void*)(std::string("result").c_str());
-    userInfo["payload"] = payload;
-    notifyObservers("fetchFriendsResponse", userInfo);
+    notifyObservers("fetchFriendsResponse", "fetchFriends", payload);
 }
 
-void ServerResponse::call(void *payload)
+void ServerResponse::callResponse(void *payload)
 {
     static bool isInit = false;
 
@@ -119,11 +124,24 @@ void ServerResponse::call(void *payload)
         notifHandler_->registerEvent(subjects_.back());
         isInit = true;
     }
-    server_friend_status_t *srv = (server_friend_status_t*)payload;
-    std::map<std::string, void*> userInfo;
+    std::cout << "call" << std::endl;
+    notifyObservers("callResponse", "call", payload);
+}
 
-    userInfo["type"] = (void*)(std::string("result").c_str());
-    userInfo["payload"] = payload;
-    std::cout << "Call is accepted" << std::endl;
-    notifyObservers("callResponse", userInfo);
+void ServerResponse::call(void *payload)
+{
+
+}
+
+void ServerResponse::acceptCall(void *payload)
+{
+    static bool isInit = false;
+
+    if (!isInit) {
+        subjects_.push_back(boost::shared_ptr<Subject>(new Subject("callAcceptResponse")));
+        notifHandler_->registerEvent(subjects_.back());
+        isInit = true;
+    }
+    std::cout << "call accept" << std::endl;
+    notifyObservers("callAcceptResponse", "callAccept", payload);
 }

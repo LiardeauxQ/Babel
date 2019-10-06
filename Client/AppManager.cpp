@@ -66,11 +66,22 @@ void AppManager::askToCall(const std::string &username)
     std::map<std::string, void*> userInfo;
     int port = serverHandler_->getPort() + 1;
 
+    std::cout << "to call:" << username << ":" <<std::endl;
     userInfo["username"] = (void*)(username.c_str());
     userInfo["addressIp"] = (void*)(serverHandler_->getIpAddress().c_str());
     userInfo["port"] = (void*)(&port);
-    std::cout << "test call" << std::endl;
     serverHandler_->send(CLIENT_CALL, userInfo);
+}
+
+void AppManager::askToAcceptCall(const std::string &username)
+{
+    std::map<std::string, void*> userInfo;
+    int port = serverHandler_->getPort() + 1;
+
+    userInfo["username"] = (void*)(username.c_str());
+    userInfo["addressIp"] = (void*)(serverHandler_->getIpAddress().c_str());
+    userInfo["port"] = (void*)(&port);
+    serverHandler_->send(CLIENT_ACCEPT_CALL, userInfo);
 }
 
 void AppManager::close()
@@ -111,4 +122,6 @@ void AppManager::AppManagerObserver::update(std::map<std::string, void*> userInf
         manager_.askToFetchFriends();
     if (!strcmp(typeValue, "call"))
         manager_.askToCall((char*)userInfo.find("username")->second);
+    if (!strcmp(typeValue, "acceptCall"))
+        manager_.askToAcceptCall((char*)userInfo.find("username")->second);
 }
