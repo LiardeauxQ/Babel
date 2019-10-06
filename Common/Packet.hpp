@@ -11,6 +11,6 @@ template <typename T>
 struct Packet {
     request_header_t header;
     T payload;
-}__attribute__((unpacked));
+};
 
 #endif //BABEL_SERVER_PACKET_HPP
