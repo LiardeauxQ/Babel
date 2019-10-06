@@ -203,6 +203,8 @@ void Session::call(client_call_t* payload, SharedData& data)
                     };
 
                     memcpy(req.payload.username, username_.c_str(), username_.length());
+                    memcpy(&req.payload.port, &payload->port, sizeof(short));
+                    memcpy(req.payload.ip, payload->ip, 16);
 
                     for (auto& session : data.sessions) {
                         if (session->username_.empty() || session->username_ == username_)
