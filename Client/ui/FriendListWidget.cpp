@@ -97,9 +97,11 @@ void ui::FriendListWidget::closeAddFriend()
 
 void ui::FriendListWidget::fetchFriendsEvent(char usernames[MAX_FRIENDS][USERNAME_LEN])
 {
+    friendList_->clear();
     for (int i = 0 ; i < MAX_FRIENDS ; i++) {
-        if (strlen(usernames[i]) > 0)
+        if (strlen(usernames[i]) > 0) {
             friendList_->addItem(usernames[i]);
+        }
     }
 }
 
