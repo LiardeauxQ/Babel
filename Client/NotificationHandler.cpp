@@ -10,7 +10,6 @@ void NotificationHandler::registerEvent(boost::shared_ptr<Subject> sub)
     for (const auto& status : observers_) {
         if (status.label == sub->getLabel() && !status.isAttach) {
             sub->attach(status.obs);
-            break;
         }
     }
 }
