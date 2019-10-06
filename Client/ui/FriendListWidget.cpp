@@ -6,8 +6,8 @@
 #include "BabelMainWindow.hpp"
 
 ui::FriendListWidget::FriendListWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent) :
-    notifHandler_(notifHandler),
     QWidget(parent),
+    notifHandler_(notifHandler),
     fetchFriendsEvent_(new Subject("fetchFriends")),
     observer_(new FriendListObserver(*this))
 {
@@ -15,14 +15,13 @@ ui::FriendListWidget::FriendListWidget(boost::shared_ptr<NotificationHandler> no
     usernameLabel_ = new QLabel("");
     addFriendButton_ = new QPushButton("+");
     disconnectButton_ = new QPushButton("disconnect");
+    callWidget_ = QSharedPointer<CallWidget>(new CallWidget(notifHandler_));
     userProfilWidget_ = QSharedPointer<QWidget>(new QWidget());
     widgetsHandler_ = new WidgetsHandler();
 
     connect(addFriendButton_, SIGNAL(clicked()), this, SLOT(addFriendTap()));
     connect(disconnectButton_, SIGNAL(clicked()), this, SLOT(disconnectTap()));
     connect(friendList_, SIGNAL(itemClicked(QListWidgetItem *)), this, SLOT(selectListItem(QListWidgetItem *)));
-
-    friendList_->addItem("copain 4");
 
     QPointer<QGridLayout> layout = new QGridLayout();
     QPointer<QGridLayout> mainLayout = new QGridLayout();
@@ -40,8 +39,15 @@ ui::FriendListWidget::FriendListWidget(boost::shared_ptr<NotificationHandler> no
     mainLayout->addWidget(widgetsHandler_);
     setLayout(mainLayout);
 
+    // Set close action of CallWidget
+    QPointer<QAction> closeAction = new QAction("close");
+
+    connect(closeAction, &QAction::triggered, this, &ui::FriendListWidget::stopCall);
+    callWidget_->addAction(closeAction);
+
     notifHandler_->registerEvent(fetchFriendsEvent_);
     notifHandler->attachToEvent(observer_, "fetchFriendsResponse");
+    notifHandler->attachToEvent(observer_, "callAcceptResponse");
     fetchFriends();
 }
 
@@ -49,7 +55,7 @@ void ui::FriendListWidget::fetchFriends()
 {
     std::map<std::string, void*> userInfo;
 
-    userInfo["type"] = (void*)(std::string("fetchFriends").c_str());
+    userInfo["type"] = strdup("fetchFriends");
     fetchFriendsEvent_->notify(userInfo);
 }
 
@@ -75,13 +81,8 @@ void ui::FriendListWidget::disconnectTap()
 
 void ui::FriendListWidget::selectListItem(QListWidgetItem *item)
 {
-    QPointer<CallWidget> wCall = new CallWidget(notifHandler_);
-    QPointer<QAction> closeAction = new QAction("close");
-
-    wCall->setFriendUsername(item->text().toStdString());
-    connect(closeAction, &QAction::triggered, this, &ui::FriendListWidget::stopCall);
-    wCall->addAction(closeAction);
-    widgetsHandler_->replaceLastWidget(wCall);
+    callWidget_->setFriendUsername(item->text().toStdString());
+    widgetsHandler_->replaceLastWidget(callWidget_.get());
 }
 
 void ui::FriendListWidget::stopCall()
@@ -102,6 +103,12 @@ void ui::FriendListWidget::fetchFriendsEvent(char usernames[MAX_FRIENDS][USERNAM
     }
 }
 
+void ui::FriendListWidget::acceptCallEvent(char username[USERNAME_LEN])
+{
+    callWidget_->displayDirectCall(username);
+    widgetsHandler_->replaceLastWidget(callWidget_.get());
+}
+
 ui::FriendListWidget::FriendListObserver::FriendListObserver(ui::FriendListWidget &widget) :
     widget_(widget)
 {
@@ -109,9 +116,16 @@ ui::FriendListWidget::FriendListObserver::FriendListObserver(ui::FriendListWidge
 
 void ui::FriendListWidget::FriendListObserver::update(std::map<std::string, void *> userInfo)
 {
-    auto response = userInfo.find("payload")->second;
-    server_friend_status_t *srv = (server_friend_status_t*)response;
+    char *type = (char*)userInfo.find("type")->second;
+    void *payload = userInfo.find("payload")->second;
 
-    if (srv != nullptr)
+    if (!strcmp(type, "fetchFriends")) {
+        server_friend_status_t *srv = (server_friend_status_t*)payload;
+
         widget_.fetchFriendsEvent(srv->usernames);
+    } else if (!strcmp(type, "callAccept")) {
+        server_accept_call_t *srv = (server_accept_call_t*)payload;
+
+        widget_.acceptCallEvent(srv->username);
+    }
 }

@@ -19,14 +19,18 @@ namespace ui {
         explicit CallWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget *parent = nullptr);
 
         void setFriendUsername(const std::string &username);
+        void displayDirectCall(const std::string &username);
+        void askToAcceptCall(const std::string &username);
     private:
         QSharedPointer<QPushButton> closeButton_;
         QSharedPointer<QPushButton> startCallButton_;
         QSharedPointer<QPushButton> stopCallButton_;
+        QSharedPointer<QPushButton> acceptCallButton_;
         QSharedPointer<QLabel> friendUsernameLabel_;
         boost::shared_ptr<NotificationHandler> notifHandler_;
 
         boost::shared_ptr<Subject> callEvent_;
+        boost::shared_ptr<Subject> acceptCallEvent_;
 
         bool isCalling_;
         std::string friendUsername_;
@@ -34,6 +38,7 @@ namespace ui {
         void closeTap();
         void startTap();
         void stopTap();
+        void acceptCallTap();
     };
 }
 
