@@ -9,14 +9,14 @@
 #include <QSharedPointer>
 
 #include "protocol/ServerHandler.hpp"
+#include "protocol/SoundServerHandler.hpp"
 #include "protocol/UserSession.hpp"
 #include "ui/BabelMainWindow.hpp"
 #include "NotificationHandler.hpp"
 
 class AppManager {
 public:
-    explicit AppManager(boost::shared_ptr<ServerHandler> serverHandler,
-            boost::shared_ptr<NotificationHandler> notifHandler);
+    explicit AppManager(const std::string &ipAddress, int port);
     ~AppManager() = default;
 
     void start();
@@ -33,21 +33,34 @@ private:
         AppManager &manager_;
     };
 
+    struct FriendInfo {
+        std::string username;
+        std::string ipAddress;
+        short port;
+    };
+
     void askToLog(const std::string &username, const std::string &password);
     void askToRegister(const std::string &username, const std::string &password);
     void askToFetchFriends();
     void askToCall(const std::string &username);
     void askToAcceptCall(const std::string &username);
+    void addFriendInfo(const std::string &username,
+            const std::string &ipAddress, short port);
+    void startSoundUdpServer(const std::string &username);
     void close();
     void call();
     void requestFriends();
 
     void initNotifications();
 
+    std::string ipAddress_;
+    int port_;
     boost::shared_ptr<NotificationHandler> notifHandler_;
     boost::shared_ptr<ServerHandler> serverHandler_;
+    boost::shared_ptr<SoundServerHandler> soundServerHandler_;
     ui::BabelMainWindow widget_;
     boost::shared_ptr<AppManagerObserver> observer_;
+    std::vector<FriendInfo> friendsInfo_;
 };
 
 #endif //BABEL_SERVER_APPMANAGER_HPP
