@@ -22,6 +22,19 @@ namespace ui {
         void registerTap();
         void closeTap();
     private:
+
+        class RegisterObserver: public Observer {
+        public:
+            RegisterObserver(RegisterWidget &widget);
+            ~RegisterObserver() = default;
+
+            void update(std::map<std::string, void*> userInfo) final;
+
+            RegisterWidget &widget_;
+        };
+
+        void registerEvent() const;
+
         QSharedPointer<QPushButton> button_;
         QSharedPointer<QPushButton> closeButton_;
         QSharedPointer<QLineEdit> usernameLineEdit_;
@@ -29,6 +42,7 @@ namespace ui {
         QSharedPointer<QLineEdit> confirmPassLineEdit_;
         boost::shared_ptr<NotificationHandler> notifHandler_;
         boost::shared_ptr<Subject> registerEvent_;
+        boost::shared_ptr<RegisterObserver> observer_;
     };
 }
 

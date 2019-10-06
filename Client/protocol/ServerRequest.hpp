@@ -25,6 +25,7 @@ protected:
     static Message registerRequest(std::map<std::string, void*> userInfo);
     static Message friendRequest(std::map<std::string, void*> userInfo);
     static Message call(std::map<std::string, void*> userInfo);
+    static Message acceptCall(std::map<std::string, void*> userInfo);
     static Message bye(std::map<std::string, void*> userInfo);
     static Message acceptFriend(std::map<std::string, void*> userInfo);
 

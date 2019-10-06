@@ -11,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "../NotificationHandler.hpp"
+#include "../protocol/UserSession.hpp"
 #include "protocol.h"
 
 namespace ui {

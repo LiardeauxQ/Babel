@@ -34,16 +34,15 @@ ui::LoginWidget::LoginWidget(boost::shared_ptr<NotificationHandler> notifHandler
     setWindowTitle(tr("Login to Babel"));
     notifHandler_->registerEvent(loginEvent_);
     notifHandler_->attachToEvent(observer_, "loginResponse");
-    notifHandler_->attachToEvent(observer_, "registerResponse");
 }
 
 void ui::LoginWidget::loginTap()
 {
     std::map<std::string, void*> userInfo;
 
-    userInfo["type"] = (void*)(std::string("login").c_str());
-    userInfo["username"] = (void*)(usernameLineEdit_->text().toStdString().c_str());
-    userInfo["password"] = (void*)(passwordLineEdit_->text().toStdString().c_str());
+    userInfo["type"] = strdup("login");
+    userInfo["username"] = strdup(usernameLineEdit_->text().toStdString().c_str());
+    userInfo["password"] = strdup(passwordLineEdit_->text().toStdString().c_str());
     loginEvent_->notify(userInfo);
 }
 
@@ -51,6 +50,7 @@ void ui::LoginWidget::loginEvent() const
 {
     for (auto action : actions()) {
         if (action->text() == "login") {
+            UserSession::get()->connectUser(usernameLineEdit_->text().toStdString());
             action->trigger();
             break;
         }

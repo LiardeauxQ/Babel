@@ -30,8 +30,11 @@ private:
     void hello(void *payload);
     void registerResponse(void *payload);
     void fetchFriends(void *payload);
+    void callResponse(void *payload);
     void call(void *payload);
+    void acceptCall(void *payload);
     void notifyObservers(const std::string &label, std::map<std::string, void*> userInfo);
+    void notifyObservers(const std::string &label, const std::string &type, void* payload);
     void initHandler();
     void dispatchPayloads(Message message);
 

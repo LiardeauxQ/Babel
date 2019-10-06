@@ -12,6 +12,7 @@ std::vector<std::tuple<int, Message (*)(std::map<std::string, void*>)>> ServerRe
         std::make_tuple(CLIENT_REGISTER, &ServerRequest::registerRequest),
         std::make_tuple(CLIENT_FRIEND_REQUEST, &ServerRequest::friendRequest),
         std::make_tuple(CLIENT_CALL, &ServerRequest::call),
+        std::make_tuple(CLIENT_ACCEPT_CALL, &ServerRequest::acceptCall),
         std::make_tuple(CLIENT_BYE, &ServerRequest::bye),
         std::make_tuple(CLIENT_ACCEPT_FRIEND, &ServerRequest::acceptFriend),
 };
@@ -148,6 +149,33 @@ Message ServerRequest::call(std::map<std::string, void*> userInfo)
     clt->number = 1;
 
     Message message(CLIENT_CALL, CLIENT_CALL_SIZE, clt);
+
+    return message;
+}
+
+Message ServerRequest::acceptCall(std::map<std::string, void*> userInfo)
+{
+    auto userIt = userInfo.find("username");
+    auto addressIpIt = userInfo.find("addressIp");
+    auto portIt = userInfo.find("port");
+
+    if (userIt == userInfo.end())
+        throw "Cannot find usernames key";
+    else if (addressIpIt == userInfo.end())
+        throw "Cannot find addressIp key";
+    else if (portIt == userInfo.end())
+        throw "Cannot find port key";
+
+    char *username = (char*)(userIt->second);
+    char *addressIp = (char*)(addressIpIt->second);
+    int port = *(int*)portIt->second;
+    client_accept_call_t *clt = (client_accept_call_t*)calloc(CLIENT_ACCEPT_CALL_SIZE, 1);
+
+    strcpy(clt->username, username);
+    strcpy(clt->ip, addressIp);
+    clt->port = port;
+
+    Message message(CLIENT_ACCEPT_CALL, CLIENT_ACCEPT_CALL_SIZE, clt);
 
     return message;
 }

@@ -39,6 +39,7 @@ namespace ui {
         QPointer<QLabel> usernameLabel_;
         QPointer<QPushButton> disconnectButton_;
         QSharedPointer<QWidget> userProfilWidget_;
+        QSharedPointer<CallWidget> callWidget_;
         QPointer<WidgetsHandler> widgetsHandler_;
         boost::shared_ptr<NotificationHandler> notifHandler_;
 
@@ -48,6 +49,7 @@ namespace ui {
         void fetchFriends();
 
         void fetchFriendsEvent(char usernames[MAX_FRIENDS][USERNAME_LEN]);
+        void acceptCallEvent(char username[USERNAME_LEN]);
 
     private slots:
         void addFriendTap();
