@@ -63,7 +63,6 @@ void ServerCommunication::receiveResponse(ServerResponse *response, boost::share
 
     if (message.getId() <= 0)
         return;
-    std::cout << message.getId() << " " << message.getPayloadSize() << std::endl;
     mutex->lock();
     queue->push(message);
     QCoreApplication::postEvent(response, new QEvent(QEvent::User));
@@ -82,6 +81,7 @@ Message ServerCommunication::read()
             message.setupPayload();
             socket_.receive(boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
         }
+        std::cout << "reading  id " << message.getId() << std::endl;
     } catch (std::exception e) {
         std::cout << "Connection has been closed " << std::endl;
     }

@@ -39,9 +39,9 @@ void ServerHandler::stop()
 void ServerHandler::send(int id, std::map<std::string, void *> userInfo)
 {
     requestsMutex_->lock();
-    if (id != -1)
+    if (id != -1) {
         requests_->push(ServerRequest::createRequest(id, userInfo));
-    else
+    } else
         requests_->push(Message(-1, 0, nullptr));
     requestsMutex_->unlock();
 }

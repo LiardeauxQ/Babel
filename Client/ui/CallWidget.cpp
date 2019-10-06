@@ -19,7 +19,7 @@ ui::CallWidget::CallWidget(boost::shared_ptr<NotificationHandler> notifHandler, 
     connect(closeButton_.get(), SIGNAL(clicked()), this, SLOT(closeTap()));
     connect(startCallButton_.get(), SIGNAL(clicked()), this, SLOT(startTap()));
     connect(stopCallButton_.get(), SIGNAL(clicked()), this, SLOT(stopTap()));
-    connect(stopCallButton_.get(), SIGNAL(clicked()), this, SLOT(acceptCallTap()));
+    connect(acceptCallButton_.get(), SIGNAL(clicked()), this, SLOT(acceptCallTap()));
 
     QPointer<QGridLayout> mainLayout = new QGridLayout();
 
@@ -32,6 +32,7 @@ ui::CallWidget::CallWidget(boost::shared_ptr<NotificationHandler> notifHandler, 
 
     setLayout(mainLayout);
     notifHandler->registerEvent(callEvent_);
+    notifHandler->registerEvent(acceptCallEvent_);
 }
 
 void ui::CallWidget::setFriendUsername(const std::string &username)

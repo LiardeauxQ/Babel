@@ -50,6 +50,7 @@ namespace ui {
 
         void fetchFriendsEvent(char usernames[MAX_FRIENDS][USERNAME_LEN]);
         void acceptCallEvent(char username[USERNAME_LEN]);
+        void callEvent(char username[USERNAME_LEN]);
 
     private slots:
         void addFriendTap();

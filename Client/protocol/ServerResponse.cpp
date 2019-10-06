@@ -19,6 +19,7 @@ bool ServerResponse::event(QEvent *event)
 {
     mutex_->lock();
     Message message = responses_->front();
+    std::cout << "receiving id " << message.getId() << std::endl;
     dispatchPayloads(message);
     responses_->pop();
     mutex_->unlock();
@@ -42,8 +43,12 @@ void ServerResponse::dispatchPayloads(Message message)
             break;
         case SERVER_CALL:
             call(message.getPayload());
+            break;
         case SERVER_ACCEPT_CALL:
             acceptCall(message.getPayload());
+            break;
+        case SERVER_ACCEPT_CALL_RESPONSE:
+            acceptCallResponse(message.getPayload());
             break;
         default:
             break;
@@ -124,16 +129,23 @@ void ServerResponse::callResponse(void *payload)
         notifHandler_->registerEvent(subjects_.back());
         isInit = true;
     }
-    std::cout << "call" << std::endl;
-    notifyObservers("callResponse", "call", payload);
+    notifyObservers("callResponse", "callResponse", payload);
 }
 
 void ServerResponse::call(void *payload)
 {
+    static bool isInit = false;
 
+    if (!isInit) {
+        subjects_.push_back(boost::shared_ptr<Subject>(new Subject("callServer")));
+        notifHandler_->registerEvent(subjects_.back());
+        isInit = true;
+    }
+    std::cout << "call server "<< std::endl;
+    notifyObservers("callServer", "callServer", payload);
 }
 
-void ServerResponse::acceptCall(void *payload)
+void ServerResponse::acceptCallResponse(void *payload)
 {
     static bool isInit = false;
 
@@ -142,6 +154,18 @@ void ServerResponse::acceptCall(void *payload)
         notifHandler_->registerEvent(subjects_.back());
         isInit = true;
     }
-    std::cout << "call accept" << std::endl;
-    notifyObservers("callAcceptResponse", "callAccept", payload);
+    notifyObservers("callAcceptResponse", "callAcceptResponse", payload);
+}
+
+void ServerResponse::acceptCall(void *payload)
+{
+    static bool isInit = false;
+
+    if (!isInit) {
+        subjects_.push_back(boost::shared_ptr<Subject>(new Subject("callAcceptServer")));
+        notifHandler_->registerEvent(subjects_.back());
+        isInit = true;
+    }
+    std::cout << "call accept server "<< std::endl;
+    notifyObservers("callAcceptServer", "callAcceptServer", payload);
 }

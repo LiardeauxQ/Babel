@@ -48,6 +48,8 @@ ui::FriendListWidget::FriendListWidget(boost::shared_ptr<NotificationHandler> no
     notifHandler_->registerEvent(fetchFriendsEvent_);
     notifHandler->attachToEvent(observer_, "fetchFriendsResponse");
     notifHandler->attachToEvent(observer_, "callAcceptResponse");
+    notifHandler->attachToEvent(observer_, "callServer");
+    notifHandler->attachToEvent(observer_, "callAcceptServer");
     fetchFriends();
 }
 
@@ -105,6 +107,12 @@ void ui::FriendListWidget::fetchFriendsEvent(char usernames[MAX_FRIENDS][USERNAM
 
 void ui::FriendListWidget::acceptCallEvent(char username[USERNAME_LEN])
 {
+    callWidget_->askToAcceptCall(username);
+    widgetsHandler_->replaceLastWidget(callWidget_.get());
+}
+
+void ui::FriendListWidget::callEvent(char username[USERNAME_LEN])
+{
     callWidget_->displayDirectCall(username);
     widgetsHandler_->replaceLastWidget(callWidget_.get());
 }
@@ -123,9 +131,15 @@ void ui::FriendListWidget::FriendListObserver::update(std::map<std::string, void
         server_friend_status_t *srv = (server_friend_status_t*)payload;
 
         widget_.fetchFriendsEvent(srv->usernames);
-    } else if (!strcmp(type, "callAccept")) {
+    } else if (!strcmp(type, "callServer")) {
+        server_call_t *srv = (server_call_t*)payload;
+
+        std::cout << "call server friend list" << std::endl;
+        widget_.acceptCallEvent(srv->username);
+    } else if (!strcmp(type, "callAcceptServer")) {
+        std::cout << "friend list call accept server" << std::endl;
         server_accept_call_t *srv = (server_accept_call_t*)payload;
 
-        widget_.acceptCallEvent(srv->username);
+        widget_.callEvent(srv->username);
     }
 }
