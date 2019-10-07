@@ -18,6 +18,25 @@ Session::Session(boost::asio::io_context& context, Database& conn, std::list<boo
 {
 }
 
+void Session::updateAllUsersNewConnection()
+{
+    Packet<server_friend_status_t> req {
+        { SERVER_FRIEND_STATUS, SERVER_FRIEND_STATUS_SIZE },
+        { { {} }, {} }
+    };
+
+    int cnt = 0;
+
+    for (auto& session : data_.sessions) {
+        memcpy(req.payload.usernames[cnt], session->username_.c_str(), session->username_.length());
+        req.payload.status[cnt] = OK;
+        cnt++;
+    }
+
+    for (auto& session : data_.sessions)
+        boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
+}
+
 void Session::run()
 {
     data_.sessions.push_back(shared_from_this());
@@ -130,6 +149,7 @@ void Session::hello(client_hello_t* payload, SharedData& data)
         if (std::strcmp(user.username.c_str(), payload->username) == 0 && std::strcmp(user.password.c_str(), payload->password) == 0) {
             res.payload.result = OK;
             username_ = std::string(payload->username);
+            updateAllUsersNewConnection();
         }
     }
 
@@ -151,6 +171,7 @@ void Session::goodbye(client_goodbye_t* payload, SharedData& data)
 
 void Session::clientRegister(client_register_t* payload, SharedData& data)
 {
+
     std::string sqlReq("INSERT INTO users (username, password) VALUES (\"");
 
     sqlReq += (std::string(payload->username) + "\", \"" + payload->password + "\")");
@@ -170,6 +191,11 @@ void Session::clientRegister(client_register_t* payload, SharedData& data)
     }
 
     std::cout << "Registered: " << (res.payload.result == OK ? "OK" : "KO") << std::endl;
+
+    if (res.payload.result == OK) {
+        username_ = std::string(payload->username);
+        updateAllUsersNewConnection();
+    }
 
     boost::asio::async_write(
         data.socket,
@@ -323,9 +349,9 @@ void Session::handleRequest(Message& request, SharedData& data)
     case CLIENT_ACCEPT_FRIEND:
         acceptFriend((client_accept_friend_t*)request.getPayload(), data);
         break;
-        case CLIENT_FRIEND_STATUS:
-            friendStatus((client_friend_status_t*)request.getPayload(), data);
-            break;
+    case CLIENT_FRIEND_STATUS:
+        friendStatus((client_friend_status_t*)request.getPayload(), data);
+        break;
     case CLIENT_FRIEND_REQUEST:
         friendRequest((client_friend_request_t*)request.getPayload(), data);
         break;
