@@ -53,8 +53,8 @@ void ServerCommunication::write(Message &message)
 {
     client_register_t *clt = (client_register_t*)(message.getPayload());
 
-    socket_.send(boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
-    socket_.send(boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
+    boost::asio::write(socket_, boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
+    boost::asio::write(socket_, boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
 }
 
 void ServerCommunication::receiveResponse(ServerResponse *response, boost::shared_ptr<boost::mutex> mutex, boost::shared_ptr<std::queue<Message>> queue)
@@ -77,11 +77,9 @@ Message ServerCommunication::read()
 
     try {
         boost::asio::read(socket_, boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
-        //socket_.receive(boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
         if (message.getId() >= 0) {
             message.setupPayload();
             boost::asio::read(socket_, boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
-            //socket_.receive(boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
         }
         std::cout << "reading  id " << message.getId() << std::endl;
     } catch (std::exception e) {
