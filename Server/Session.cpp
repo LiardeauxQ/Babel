@@ -40,7 +40,8 @@ void Session::updateAllUsersNewConnection(const std::string& exclude)
             std::cout << "Excluding " << exclude << "from update." << std::endl;
             continue;
         }
-        boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
+        std::cout << "Updating " << session->username_ << "users" << std::endl;
+        session->getSocket().send(boost::asio::buffer(&req, sizeof(req)));
     }
 }
 
