@@ -41,7 +41,7 @@ void Session::updateAllUsersNewConnection(const std::string& exclude)
             continue;
         }
         std::cout << "Updating " << session->username_ << "users" << std::endl;
-        session->getSocket().send(boost::asio::buffer(&req, sizeof(req)));
+        boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
     }
 }
 
