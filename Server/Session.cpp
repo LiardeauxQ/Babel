@@ -30,14 +30,16 @@ void Session::updateAllUsersNewConnection(const std::string& exclude)
     for (auto& session : data_.sessions) {
         if (session->username_.empty())
             continue;
-        memcpy(req.payload.usernames[cnt], session->username_.c_str(), session->username_.length());
+        strncpy(req.payload.usernames[cnt], session->username_.c_str(), USERNAME_LEN);
         req.payload.status[cnt] = OK;
         cnt++;
     }
 
     for (auto& session : data_.sessions) {
-        if (session->username_ == exclude)
+        if (session->username_ == exclude) {
+            std::cout << "Excluding " << exclude << "from update." << std::endl;
             continue;
+        }
         boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
     }
 }
@@ -155,6 +157,7 @@ void Session::hello(client_hello_t* payload, SharedData& data)
             res.payload.result = OK;
             username_ = std::string(payload->username);
             updateAllUsersNewConnection(username_);
+            break;
         }
     }
 
