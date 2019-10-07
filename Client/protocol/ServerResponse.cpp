@@ -155,6 +155,7 @@ void ServerResponse::acceptCallResponse(void *payload)
         notifHandler_->registerEvent(subjects_.back());
         isInit = true;
     }
+    std::cout << "call accept response" << std::endl;
     notifyObservers("callAcceptResponse", "callAcceptResponse", payload);
 }
 
