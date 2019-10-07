@@ -105,6 +105,7 @@ void ServerResponse::registerResponse(void *payload)
 
     userInfo["type"] = strdup("register");
     userInfo["result"] = (void*)(&srv->result);
+    std::cout << "Receive register resposne" << srv->result << std::endl;
     notifyObservers("registerResponse", userInfo);
 }
 

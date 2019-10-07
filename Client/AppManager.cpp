@@ -147,6 +147,8 @@ void AppManager::AppManagerObserver::update(std::map<std::string, void*> userInf
     }
     if (!strcmp(typeValue, "close"))
         manager_.close();
+    if (!UserSession::get()->isConnected())
+        return;
     if (!strcmp(typeValue, "fetchFriends"))
         manager_.askToFetchFriends();
     if (!strcmp(typeValue, "call"))

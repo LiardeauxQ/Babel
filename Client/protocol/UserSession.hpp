@@ -23,6 +23,8 @@ public:
         username_ = username;
     }
 
+    bool isConnected() const { return isConnected_; }
+
     void addFriend(const std::string &username)
     {
         if (!isConnected_)
