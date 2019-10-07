@@ -18,8 +18,7 @@ typedef boost::asio::ip::udp BoostUdp;
 
 class SoundServerHandler {
 public:
-    SoundServerHandler(const std::string &readIpAddress, int readPort,
-            const std::string &writeIpAddress, int writePort);
+    SoundServerHandler(BoostUdp::endpoint &remoteEndpoint);
 
     ~SoundServerHandler() = default;
 
@@ -29,14 +28,10 @@ public:
 private:
     void dispatchUdpPackets(bool *isRunning);
 
-    boost::asio::io_context context_;
+    boost::asio::io_service ioService_;
+    BoostUdp::endpoint remoteEndpoint_;
     boost::thread soundThread_;
-    BoostUdp::socket readSocket_;
-    BoostUdp::socket writeSocket_;
-    std::string readIpAddress_;
-    std::string writeIpAddress_;
-    int readPort_;
-    int writePort_;
+    BoostUdp::socket socket_;
     bool isRunning_;
     AudioController audioController_;
     std::unique_ptr<SoundManager> soundManager_;

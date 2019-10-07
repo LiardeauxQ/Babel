@@ -104,17 +104,19 @@ void AppManager::startSoundUdpServer(const std::string &username)
     }
     if (info.port == 0)
         return;
-    soundServerHandler_ = boost::shared_ptr<SoundServerHandler>(
-            new SoundServerHandler(info.ipAddress, info.port, ipAddress_, port_ + 1));
-    //soundServerHandler_->start();
+    std::cout << "start connection with " << info.ipAddress << ":" << info.port << std::endl;
+    boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string(info.ipAddress), info.port);
+
+    soundServerHandler_ = boost::shared_ptr<SoundServerHandler>(new SoundServerHandler(endpoint));
+    soundServerHandler_->start();
 }
 
 void AppManager::close()
 {
     serverHandler_->send(-1, std::map<std::string, void*>());
     serverHandler_->stop();
-    /*if (soundServerHandler_.get())
-        soundServerHandler_->stop();*/
+    if (soundServerHandler_.get())
+        soundServerHandler_->stop();
 }
 
 void AppManager::call()
