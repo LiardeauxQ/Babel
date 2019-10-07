@@ -18,7 +18,7 @@ Session::Session(boost::asio::io_context& context, Database& conn, std::list<boo
 {
 }
 
-void Session::updateAllUsersNewConnection()
+void Session::updateAllUsersNewConnection(const std::string& exclude)
 {
     Packet<server_friend_status_t> req {
         { SERVER_FRIEND_STATUS, SERVER_FRIEND_STATUS_SIZE },
@@ -28,13 +28,18 @@ void Session::updateAllUsersNewConnection()
     int cnt = 0;
 
     for (auto& session : data_.sessions) {
+        if (session->username_.empty())
+            continue;
         memcpy(req.payload.usernames[cnt], session->username_.c_str(), session->username_.length());
         req.payload.status[cnt] = OK;
         cnt++;
     }
 
-    for (auto& session : data_.sessions)
+    for (auto& session : data_.sessions) {
+        if (session->username_ == exclude)
+            continue;
         boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
+    }
 }
 
 void Session::run()
@@ -149,7 +154,7 @@ void Session::hello(client_hello_t* payload, SharedData& data)
         if (std::strcmp(user.username.c_str(), payload->username) == 0 && std::strcmp(user.password.c_str(), payload->password) == 0) {
             res.payload.result = OK;
             username_ = std::string(payload->username);
-            updateAllUsersNewConnection();
+            updateAllUsersNewConnection(username_);
         }
     }
 
@@ -194,7 +199,7 @@ void Session::clientRegister(client_register_t* payload, SharedData& data)
 
     if (res.payload.result == OK) {
         username_ = std::string(payload->username);
-        updateAllUsersNewConnection();
+        updateAllUsersNewConnection(username_);
     }
 
     boost::asio::async_write(
@@ -237,6 +242,7 @@ void Session::call(client_call_t* payload, SharedData& data)
                             continue;
 
                         if (session->username_ == user) {
+                            std::cout << "Sending call to " << user << std::endl;
                             boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
                             res.payload.result = OK;
                             break;
