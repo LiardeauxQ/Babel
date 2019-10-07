@@ -76,10 +76,12 @@ Message ServerCommunication::read()
     Message message;
 
     try {
-        socket_.receive(boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
+        boost::asio::read(socket_, boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
+        //socket_.receive(boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
         if (message.getId() >= 0) {
             message.setupPayload();
-            socket_.receive(boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
+            boost::asio::read(socket_, boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
+            //socket_.receive(boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
         }
         std::cout << "reading  id " << message.getId() << std::endl;
     } catch (std::exception e) {
