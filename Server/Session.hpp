@@ -33,6 +33,8 @@ public:
 
     void receiveBody(const boost::system::error_code& ec);
 
+    void updateAllUsersNewConnection(const std::string& exclude);
+
     // Handlers
 
     void handleRequest(Message& request, SharedData& data);
