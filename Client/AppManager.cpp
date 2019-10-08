@@ -71,7 +71,7 @@ void AppManager::askToCall(const std::string &username)
     int port = serverHandler_->getPort() + 1;
 
     userInfo["username"] = (void*)(username.c_str());
-    userInfo["addressIp"] = (void*)(serverHandler_->getIpAddress().c_str());
+    userInfo["addressIp"] = (void*)(ServerHandler::getLocalIpAddress().to_string().c_str());
     userInfo["port"] = (void*)(&port);
     serverHandler_->send(CLIENT_CALL, userInfo);
 }
@@ -82,7 +82,7 @@ void AppManager::askToAcceptCall(const std::string &username)
     int port = serverHandler_->getPort() + 1;
 
     userInfo["username"] = (void*)(username.c_str());
-    userInfo["addressIp"] = (void*)(serverHandler_->getIpAddress().c_str());
+    userInfo["addressIp"] = (void*)(ServerHandler::getLocalIpAddress().to_string().c_str());
     userInfo["port"] = (void*)(&port);
     serverHandler_->send(CLIENT_ACCEPT_CALL, userInfo);
 }
