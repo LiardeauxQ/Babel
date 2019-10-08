@@ -77,6 +77,7 @@ Message ServerCommunication::read()
 
     try {
         boost::asio::read(socket_, boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
+        std::cout << "Header " << message.getId() << " paylaod size " << message.getPayloadSize() << std::endl;
         if (message.getId() >= 0) {
             message.setupPayload();
             boost::asio::read(socket_, boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
