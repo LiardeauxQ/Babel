@@ -11,7 +11,6 @@
 #include <unistd.h> 
 #include <string.h> 
 #include "Common/protocol.h"
-#include "/home/alex/.conan/data/portaudio/v190600.20161030/bincrafters/stable/source/sources/include/portaudio.h"
 
 int send_ping(int s) {
     struct {
@@ -99,8 +98,8 @@ int send_register(int s)
         }
     };
 
-    memcpy(&request.payload.username, "Richard!", 8);
-    memcpy(&request.payload.password, "BoomBoom", 8);
+    memcpy(&request.payload.username, "AttJkJh", 7);
+    memcpy(&request.payload.password, "123", 3);
 
     write(s, &request, sizeof(request));
 
@@ -158,6 +157,44 @@ int send_call(int s)
     return 0;
 }
 
+int send_accept_call(int s, char *username, short port, char *ip)
+{
+    struct {
+        request_header_t hdr;
+        client_accept_call_t payload;
+    } request = {
+       {
+           .id = CLIENT_ACCEPT_CALL,
+           .request_len = CLIENT_ACCEPT_CALL_SIZE
+       },
+       {
+            .username = {{0}},
+            .port = port,
+            .ip = {{0}}
+       }
+    };
+
+    memcpy(&request.payload.username, username, USERNAME_LEN);
+    memcpy(&request.payload.ip, ip, 16);
+    write(s, &request, sizeof(request));
+    
+    request_header_t hdr = {0};
+
+    read(s, &hdr, sizeof(hdr));
+
+    if (hdr.id != SERVER_ACCEPT_CALL_RESPONSE) {
+        printf("Error hdr = %d\n", hdr.id);
+    }
+    printf("Receive header in %d\n", hdr.id);
+
+    server_accept_call_response_t srv = {0};
+
+    read(s, &srv, sizeof(srv));
+
+    printf("Call %s\n", srv.result == OK ? "Succeed" : "Failed");
+    return (0);
+}
+
 int setup_socket(short port) {
     int s = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -186,7 +223,7 @@ int main(int argc, char *argv[])
     char *password;
 
     if (argc < 3) {
-        name = "Alexandre";
+        name = "Antoine";
         password = "OuiOuiOui";
     } else {
         name = argv[1];
@@ -195,18 +232,18 @@ int main(int argc, char *argv[])
 
     int s = setup_socket(8080);
 
-    printf("Sending Ping!\n");
-    if (send_ping(s))
-        return 1;
+//    printf("Sending Ping!\n");
+//    if (send_ping(s))
+//        return 1;
     
-    printf("Sending Hello!\n");
-    if (send_hello(s, name, password))
-        return 1;
+    //printf("Sending Hello!\n");
+    //if (send_hello(s, name, password))
+    //    return 1;
 
     printf("Sending Register!\n");
     send_register(s);
 
-    printf("Sending Call!\n");
-    if (send_call(s))
+    printf("Sending Accept Call!\n");
+    if (send_accept_call(s, "Thomas", 8080, "10.109.252.138"))
         return 1;
 }
