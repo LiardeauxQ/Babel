@@ -8,12 +8,12 @@ AppManager::AppManager(int argc, char *argv[]) :
         notifHandler_(boost::shared_ptr<NotificationHandler>(new NotificationHandler())),
         widget_(ui::BabelMainWindow(notifHandler_, nullptr))
 {
-    if (argc < 3)
+    if (argc < 4)
         throw "Invalid arguments";
-    ipAddress_ = argv[1];
+    remoteIpAddress_ = argv[1];
     port_ = atoi(argv[2]);
-    remoteIpAddress_ = argv[3];
-    serverHandler_ = boost::shared_ptr<ServerHandler>(new ServerHandler(ipAddress_, port_, notifHandler_));
+    localIpAddress_ = argv[3];
+    serverHandler_ = boost::shared_ptr<ServerHandler>(new ServerHandler(remoteIpAddress_, port_, notifHandler_));
     observer_ = boost::shared_ptr<AppManagerObserver>(new AppManagerObserver(*this));
 }
 
@@ -74,7 +74,7 @@ void AppManager::askToCall(const std::string &username)
     int port = serverHandler_->getPort() + 1;
 
     userInfo["username"] = (void*)(username.c_str());
-    userInfo["addressIp"] = (void*)(remoteIpAddress_.c_str());
+    userInfo["addressIp"] = (void*)(localIpAddress_.c_str());
     userInfo["port"] = (void*)(&port);
     serverHandler_->send(CLIENT_CALL, userInfo);
 }
@@ -85,7 +85,7 @@ void AppManager::askToAcceptCall(const std::string &username)
     int port = serverHandler_->getPort() + 1;
 
     userInfo["username"] = (void*)(username.c_str());
-    userInfo["addressIp"] = (void*)(remoteIpAddress_.c_str());
+    userInfo["addressIp"] = (void*)(localIpAddress_.c_str());
     userInfo["port"] = (void*)(&port);
     serverHandler_->send(CLIENT_ACCEPT_CALL, userInfo);
 }
