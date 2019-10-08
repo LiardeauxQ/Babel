@@ -15,12 +15,13 @@
 #define IS_SERVER_REQUEST(x) ((x)&0b10000000)
 
 // This is the final data structure send through internet during the client/server communication.
-typedef struct {
+typedef struct __attribute__((packed)) {
     // Defined by CLIENT_REQ_ID if it's a client request. SERVER_REQ_ID otherwise.
     int id;
 
     // Defined by CLIENT_REQ_LEN if it's a client request. SERVER_REQ_LEN otherwise.
     int request_len;
+
 } request_header_t;
 
 const size_t HEADER_SIZE = sizeof(request_header_t);

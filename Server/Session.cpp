@@ -234,7 +234,7 @@ void Session::call(client_call_t* payload, SharedData& data)
                     Packet<server_call_t> req {
                         { SERVER_CALL,
                             SERVER_CALL_SIZE },
-                        { {}, 8080, "192.168.0.0" }
+                        { {}, 8080, {} }
                     };
 
                     memcpy(req.payload.username, username_.c_str(), username_.length());
@@ -247,6 +247,7 @@ void Session::call(client_call_t* payload, SharedData& data)
 
                         if (session->username_ == user) {
                             std::cout << "Sending call to " << user << std::endl;
+                            std::cout << sizeof(req) << std::endl;
                             boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
                             res.payload.result = OK;
                             break;
