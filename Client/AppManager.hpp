@@ -53,8 +53,8 @@ private:
 
     void initNotifications();
 
-    std::string ipAddress_;
     std::string remoteIpAddress_;
+    std::string localIpAddress_;
     int port_;
     boost::shared_ptr<NotificationHandler> notifHandler_;
     boost::shared_ptr<ServerHandler> serverHandler_;
