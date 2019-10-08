@@ -16,7 +16,7 @@
 
 class AppManager {
 public:
-    explicit AppManager(const std::string &ipAddress, int port);
+    explicit AppManager(int argc, char *argv[]);
     ~AppManager() = default;
 
     void start();
@@ -54,6 +54,7 @@ private:
     void initNotifications();
 
     std::string ipAddress_;
+    std::string remoteIpAddress_;
     int port_;
     boost::shared_ptr<NotificationHandler> notifHandler_;
     boost::shared_ptr<ServerHandler> serverHandler_;
