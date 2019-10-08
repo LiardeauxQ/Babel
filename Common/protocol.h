@@ -15,7 +15,7 @@
 #define IS_SERVER_REQUEST(x) ((x)&0b10000000)
 
 // This is the final data structure send through internet during the client/server communication.
-typedef struct {
+typedef struct __attribute__((packed)){
     // Defined by CLIENT_REQ_ID if it's a client request. SERVER_REQ_ID otherwise.
     int id;
 

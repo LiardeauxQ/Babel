@@ -241,6 +241,7 @@ void Session::call(client_call_t* payload, SharedData& data)
                     memcpy(&req.payload.port, &payload->port, sizeof(short));
                     memcpy(req.payload.ip, payload->ip, 16);
 
+                    std::cout << "sizeof " << sizeof(req) << " " << SERVER_CALL_SIZE << std::endl;
                     for (auto& session : data.sessions) {
                         if (session->username_.empty() || session->username_ == username_)
                             continue;
@@ -258,6 +259,7 @@ void Session::call(client_call_t* payload, SharedData& data)
     } catch (const DatabaseError& e) {
         std::cerr << "Failed to fetch username: " << e.what() << "." << std::endl;
     };
+    std::cout << "FUCK YOU MOTHER FUCKING SERVER" << std::endl;
 
     if (userFound && res.payload.result == KO)
         std::cerr << "User found but not connected." << std::endl;
@@ -307,8 +309,8 @@ void Session::friendStatus(client_friend_status_t*, SharedData& data)
 void Session::acceptCall(client_accept_call_t* payload, SharedData& data)
 {
     Packet<server_accept_call_response_t> res {
-        { SERVER_CALL_RESPONSE,
-            SERVER_CALL_RESPONSE_SIZE },
+        { SERVER_ACCEPT_CALL_RESPONSE,
+            SERVER_ACCEPT_CALL_RESPONSE_SIZE },
         { OK }
     };
 
@@ -325,6 +327,7 @@ void Session::acceptCall(client_accept_call_t* payload, SharedData& data)
                     { {}, payload->port, {} }
                 };
 
+                std::cout << "Send call accept to username: " << payload->username << std::endl;
                 memcpy(req.payload.username, payload->username, USERNAME_LEN);
                 memcpy(req.payload.ip, payload->ip, 16);
 

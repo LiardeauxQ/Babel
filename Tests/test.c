@@ -98,7 +98,7 @@ int send_register(int s)
         }
     };
 
-    memcpy(&request.payload.username, "AttJkJh", 7);
+    memcpy(&request.payload.username, "AttJkJb", 7);
     memcpy(&request.payload.password, "123", 3);
 
     write(s, &request, sizeof(request));
@@ -206,7 +206,7 @@ int setup_socket(short port) {
     struct sockaddr_in infos;
 
     infos.sin_family = AF_INET;
-    infos.sin_addr.s_addr = INADDR_ANY;
+    inet_aton("10.109.252.166", &infos.sin_addr);
     infos.sin_port = htons(port);
 
     if (connect(s, (const struct sockaddr *) &infos, sizeof(infos)) < 0) {
