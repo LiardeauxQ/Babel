@@ -29,6 +29,8 @@ public:
 
     const std::string &getIpAddress() const { return ipAddress_; }
     int getPort() const { return port_; }
+
+    static boost::asio::ip::address getLocalIpAddress();
 private:
     boost::shared_ptr<NotificationHandler> notifHandler_;
     ServerCommunication communicationHandler_;
