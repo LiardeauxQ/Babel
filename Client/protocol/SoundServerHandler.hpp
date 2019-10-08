@@ -25,9 +25,15 @@ public:
     void start();
     void stop();
 
+    void handleRead(boost::system::error_code ec);
+
+    void handleSend(boost::system::error_code ec);
+
 private:
     void dispatchUdpPackets(bool *isRunning);
 
+    std::vector<float> data_;
+    std::vector<float> toWrite_;
     boost::asio::io_service ioService_;
     BoostUdp::endpoint remoteEndpoint_;
     boost::thread soundThread_;

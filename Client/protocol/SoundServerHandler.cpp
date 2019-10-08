@@ -4,10 +4,12 @@
 
 #include "SoundServerHandler.hpp"
 
+static const auto localEndPoint = BoostUdp::endpoint(boost::asio::ip::address_v4::any(), 8081);
+
 SoundServerHandler::SoundServerHandler(BoostUdp::endpoint &remoteEndpoint) :
         ioService_(),
         remoteEndpoint_(remoteEndpoint),
-        socket_(BoostUdp::socket(ioService_))
+        socket_(BoostUdp::socket(ioService_, localEndPoint.protocol()))
 {
     audioController_ = AudioController();
     soundManager_ = audioController_.createManager();
@@ -16,7 +18,7 @@ SoundServerHandler::SoundServerHandler(BoostUdp::endpoint &remoteEndpoint) :
 void SoundServerHandler::start()
 {
     isRunning_ = true;
-    socket_.open(BoostUdp::v4());
+    socket_.bind(localEndPoint);
     soundThread_ = boost::thread(&SoundServerHandler::dispatchUdpPackets, this, &isRunning_);
 }
 
@@ -27,22 +29,43 @@ void SoundServerHandler::stop()
     soundThread_.join();
 }
 
+void SoundServerHandler::handleRead(boost::system::error_code ec)
+{
+    if (!ec) {
+        data_.clear();
+        soundManager_->read(data_);
+    } else {
+        std::cerr << "Error: " << ec.message() << std::endl;
+    }
+}
+
+void SoundServerHandler::handleSend(boost::system::error_code ec)
+{
+    if (!ec) {
+        soundManager_->write(toWrite_);
+        toWrite_.clear();
+    } else {
+        std::cerr << "Error: " << ec.message() << std::endl;
+    }
+}
+
 void SoundServerHandler::dispatchUdpPackets(bool *isRunning)
 {
     try {
-        std::vector<float> data;
+        std::vector<float> toWrite;
 
-        data.reserve(512);
+        boost::asio::ip::udp::endpoint remote;
+        data_.reserve(512);
+        toWrite.reserve(512);
         soundManager_->start();
+
+        socket_.async_send_to(boost::asio::buffer(data_, 512), remoteEndpoint_, boost::bind(&SoundServerHandler::handleSend, this, boost::asio::placeholders::error));
+
+        socket_.async_receive_from(boost::asio::buffer(toWrite_, 512), remote, boost::bind(&SoundServerHandler::handleRead, this, boost::asio::placeholders::error));
+
+        ioService_.run();
+        std::cout << "HERE" << std::endl;
         while (isRunning) {
-            soundManager_->read(data);
-            std::cout << data.size() << std::endl;
-            std::cout << "while send" << std::endl;
-            socket_.send_to(boost::asio::buffer(data), remoteEndpoint_);
-            std::cout << "while receive" << std::endl;
-            socket_.receive_from(boost::asio::buffer(data), remoteEndpoint_);
-            std::cout << "has received" << std::endl;
-            soundManager_->write(data);
             audioController_.sleep(100);
         }
         soundManager_->stop();
