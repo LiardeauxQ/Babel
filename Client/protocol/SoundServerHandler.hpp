@@ -10,6 +10,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <memory>
+#include <boost/array.hpp>
 
 #include "../AudioController.hpp"
 #include "../SoundManager.hpp"
@@ -34,6 +35,7 @@ private:
 
     std::vector<float> data_;
     std::vector<float> toWrite_;
+    boost::array<char, 1> toRead_;
     boost::asio::io_service ioService_;
     BoostUdp::endpoint remoteEndpoint_;
     boost::thread soundThread_;
