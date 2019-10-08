@@ -34,7 +34,7 @@ void SoundServerHandler::dispatchUdpPackets(bool *isRunning)
 
         data.reserve(512);
         soundManager_->start();
-        while (soundManager_->isActive() && isRunning) {
+        while (isRunning) {
             soundManager_->read(data);
             std::cout << data.size() << std::endl;
             std::cout << "while send" << std::endl;
@@ -43,6 +43,7 @@ void SoundServerHandler::dispatchUdpPackets(bool *isRunning)
             socket_.receive_from(boost::asio::buffer(data), remoteEndpoint_);
             std::cout << "has received" << std::endl;
             soundManager_->write(data);
+            audioController_.sleep(100);
         }
         soundManager_->stop();
     } catch (const AudioControllerError &e) {
