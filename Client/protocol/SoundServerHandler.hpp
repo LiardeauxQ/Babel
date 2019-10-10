@@ -19,7 +19,7 @@ typedef boost::asio::ip::udp BoostUdp;
 
 class SoundServerHandler {
 public:
-    SoundServerHandler(BoostUdp::endpoint &remoteEndpoint);
+    explicit SoundServerHandler(BoostUdp::endpoint &remoteEndpoint);
 
     ~SoundServerHandler() = default;
 
@@ -28,7 +28,7 @@ public:
 
     void handleRead(boost::system::error_code ec);
 
-    void handleSend(boost::system::error_code ec);
+    void handleSend(boost::system::error_code ec, size_t bytesTransfered);
 
 private:
     void dispatchUdpPackets(bool *isRunning);
