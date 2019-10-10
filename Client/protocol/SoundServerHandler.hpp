@@ -44,7 +44,7 @@ private:
     BoostUdp::socket sendSocket_;
 
     std::vector<float> toSend_;
-    float toReceive_[512];
+    float toReceive_[512]{};
 
     bool isRunning_{};
 
