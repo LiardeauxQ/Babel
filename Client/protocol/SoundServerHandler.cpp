@@ -36,6 +36,7 @@ void SoundServerHandler::stop()
 void SoundServerHandler::handleRead(boost::system::error_code ec, size_t received)
 {
     size_t rec = received / 4;
+
     std::cout << "Received: " << rec << " float." << std::endl;
 
     if (!ec) {
@@ -77,7 +78,7 @@ void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
     try {
         soundManager_->start();
 
-        audioController_.sleep(100);
+        audioController_.sleep(40);
 
         soundManager_->read(toSend_);
 
