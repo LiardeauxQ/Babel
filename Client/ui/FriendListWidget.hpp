@@ -44,6 +44,7 @@ namespace ui {
         boost::shared_ptr<NotificationHandler> notifHandler_;
 
         boost::shared_ptr<Subject> fetchFriendsEvent_;
+        boost::shared_ptr<Subject> disconnectEvent_;
         boost::shared_ptr<FriendListObserver> observer_;
 
         void fetchFriends();

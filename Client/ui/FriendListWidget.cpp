@@ -9,7 +9,8 @@
 ui::FriendListWidget::FriendListWidget(boost::shared_ptr<NotificationHandler> notifHandler, QWidget* parent)
     : QWidget(parent)
     , notifHandler_(notifHandler)
-    , fetchFriendsEvent_(new Subject("fetchFriends"))
+        , fetchFriendsEvent_(new Subject("fetchFriends"))
+    , disconnectEvent_(new Subject("goodbye"))
     , observer_(new FriendListObserver(*this))
 {
     friendList_ = new QListWidget();
@@ -46,6 +47,7 @@ ui::FriendListWidget::FriendListWidget(boost::shared_ptr<NotificationHandler> no
     connect(closeAction, &QAction::triggered, this, &ui::FriendListWidget::stopCall);
     callWidget_->addAction(closeAction);
 
+    notifHandler_->registerEvent(disconnectEvent_);
     notifHandler_->registerEvent(fetchFriendsEvent_);
     notifHandler->attachToEvent(observer_, "fetchFriendsResponse");
     notifHandler->attachToEvent(observer_, "callAcceptResponse");
@@ -60,6 +62,7 @@ void ui::FriendListWidget::fetchFriends()
 
     userInfo["type"] = strdup("fetchFriends");
     fetchFriendsEvent_->notify(userInfo);
+    free(userInfo["type"]);
 }
 
 void ui::FriendListWidget::addFriendTap()
@@ -74,12 +77,17 @@ void ui::FriendListWidget::addFriendTap()
 
 void ui::FriendListWidget::disconnectTap()
 {
+    std::map<std::string, void*> userInfo;
+
+    userInfo["type"] = strdup("goodbye");
     for (auto action : actions()) {
         if (action->text() == "disconnect") {
+            disconnectEvent_->notify(userInfo);
             action->trigger();
             break;
         }
     }
+    free(userInfo["type"]);
 }
 
 void ui::FriendListWidget::selectListItem(QListWidgetItem* item)
