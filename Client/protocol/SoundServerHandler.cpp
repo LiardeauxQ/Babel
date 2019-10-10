@@ -59,7 +59,7 @@ void SoundServerHandler::handleSend(boost::system::error_code ec, size_t /* byte
         std::cerr << "Error: " << ec.message() << std::endl;
     }
 
-    audioController_.sleep(10);
+    audioController_.sleep(50);
 
     std::cout << "Sending: " << toSend_.size() << " bytes." << std::endl;
 
@@ -74,9 +74,11 @@ void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
 {
     try {
         soundManager_->start();
-        soundManager_->read(toSend_);
 
         audioController_.sleep(100);
+
+        soundManager_->read(toSend_);
+
 
         socket_.async_send_to(
             boost::asio::buffer(&toSend_.front(), toSend_.size()),
