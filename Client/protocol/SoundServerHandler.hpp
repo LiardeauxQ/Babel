@@ -28,10 +28,10 @@ public:
 
     void handleRead(boost::system::error_code ec);
 
-    void handleSend(boost::system::error_code ec, size_t bytesTransfered);
+    void handleSend(boost::system::error_code ec, size_t transfered);
 
 private:
-    void dispatchUdpPackets(bool *isRunning);
+    void dispatchUdpPackets(const bool *isRunning);
 
 
     boost::asio::io_service ioService_;
@@ -43,10 +43,10 @@ private:
     BoostUdp::socket socket_;
     BoostUdp::socket sendSocket_;
 
-    std::vector<float> toRead_;
-    std::vector<float> toWrite_;
+    std::vector<float> toSend_;
+    float toReceive_[512];
 
-    bool isRunning_;
+    bool isRunning_{};
 
     AudioController audioController_;
 
