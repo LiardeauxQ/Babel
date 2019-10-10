@@ -8,7 +8,8 @@ ui::CallWidget::CallWidget(boost::shared_ptr<NotificationHandler> notifHandler, 
     QWidget(parent),
     notifHandler_(notifHandler),
     callEvent_(new Subject("call")),
-    acceptCallEvent_(new Subject("acceptCall"))
+    acceptCallEvent_(new Subject("acceptCall")),
+    endCallEvent_(new Subject("endCall"))
 {
     closeButton_ = QSharedPointer<QPushButton>(new QPushButton("Close"));
     startCallButton_ = QSharedPointer<QPushButton>(new QPushButton("Start"));
@@ -33,6 +34,7 @@ ui::CallWidget::CallWidget(boost::shared_ptr<NotificationHandler> notifHandler, 
     setLayout(mainLayout);
     notifHandler->registerEvent(callEvent_);
     notifHandler->registerEvent(acceptCallEvent_);
+    notifHandler->registerEvent(endCallEvent_);
 }
 
 void ui::CallWidget::setFriendUsername(const std::string &username)
@@ -78,13 +80,19 @@ void ui::CallWidget::startTap()
     userInfo["type"] = strdup("call");
     userInfo["username"] = strdup(friendUsername_.c_str());
     callEvent_->notify(userInfo);
+    free(userInfo["type"]);
+    free(userInfo["username"]);
 }
 
 void ui::CallWidget::stopTap()
 {
+    std::map<std::string, void*> userInfo;
     isCalling_ = false;
     startCallButton_->setHidden(false);
-    std::cout << "stop" << std::endl;
+
+    userInfo["type"] = strdup("endCall");
+    endCallEvent_->notify(userInfo);
+    free(userInfo["type"]);
 }
 
 void ui::CallWidget::acceptCallTap()
@@ -94,4 +102,6 @@ void ui::CallWidget::acceptCallTap()
     userInfo["type"] = strdup("acceptCall");
     userInfo["username"] = strdup(friendUsername_.c_str());
     acceptCallEvent_->notify(userInfo);
+    free(userInfo["type"]);
+    free(userInfo["username"]);
 }

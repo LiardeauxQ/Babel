@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <QSharedPointer>
+#include <tuple>
 
 #include "protocol/ServerHandler.hpp"
 #include "protocol/SoundServerHandler.hpp"
@@ -16,6 +17,8 @@
 
 class AppManager {
 public:
+    typedef void (AppManager::*commandPtr)(std::map<std::string, void*>&);
+
     explicit AppManager(int argc, char *argv[]);
     ~AppManager() = default;
 
@@ -25,12 +28,12 @@ private:
 
     class AppManagerObserver: public Observer {
     public:
-        explicit AppManagerObserver(AppManager &manager);
+        explicit AppManagerObserver(AppManager *manager);
         ~AppManagerObserver() = default;
 
         void update(std::map<std::string, void*>) final;
 
-        AppManager &manager_;
+        AppManager *manager_;
     };
 
     struct FriendInfo {
@@ -39,19 +42,25 @@ private:
         short port;
     };
 
-    void askToLog(const std::string &username, const std::string &password);
-    void askToRegister(const std::string &username, const std::string &password);
-    void askToFetchFriends();
-    void askToCall(const std::string &username);
-    void askToAcceptCall(const std::string &username);
-    void addFriendInfo(const std::string &username,
-            const std::string &ipAddress, short port);
-    void startSoundUdpServer(const std::string &username);
-    void close();
-    void call();
-    void requestFriends();
+    void askToLog(std::map<std::string, void*> &userInfo);
+    void askToRegister(std::map<std::string, void*> &userInfo);
+    void askToFetchFriends(std::map<std::string, void*> &userInfo);
+    void askToCall(std::map<std::string, void*> &userInfo);
+    void askToAcceptCall(std::map<std::string, void*> &userInfo);
+    void askToEndCall(std::map<std::string, void*> &userInfo);
+    void askToDisconnect(std::map<std::string, void*> &userInfo);
+    void addFriendInfo(std::string username, std::string ip, short port);
+    void startSoundUdpServer(std::string username);
+    void close(std::map<std::string, void*> &userInfo);
+    void call(std::map<std::string, void*> &userInfo);
+    void requestFriends(std::map<std::string, void*> &userInfo);
+    void receiveCallFromServer(std::map<std::string, void*> &userInfo);
+    void receiveCallAcceptServer(std::map<std::string, void*> &userInfo);
+    void receiveCallAcceptResponse(std::map<std::string, void*> &userInfo);
 
     void initNotifications();
+
+    static std::vector<std::tuple<std::string, void (AppManager::*)(std::map<std::string, void*>&)>> commands;
 
     std::string remoteIpAddress_;
     std::string localIpAddress_;

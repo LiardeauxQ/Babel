@@ -4,6 +4,20 @@
 
 #include "AppManager.hpp"
 
+std::vector<std::tuple<std::string, AppManager::commandPtr>> AppManager::commands = {
+        std::make_tuple("login", &AppManager::askToLog),
+        std::make_tuple("register", &AppManager::askToRegister),
+        std::make_tuple("goodbye", &AppManager::askToDisconnect),
+        std::make_tuple("close", &AppManager::close),
+        std::make_tuple("fetchFriends", &AppManager::askToFetchFriends),
+        std::make_tuple("call", &AppManager::askToCall),
+        std::make_tuple("endCall", &AppManager::askToEndCall),
+        std::make_tuple("acceptCall", &AppManager::askToAcceptCall),
+        std::make_tuple("callServer", &AppManager::receiveCallFromServer),
+        std::make_tuple("callAcceptServer", &AppManager::receiveCallAcceptServer),
+        std::make_tuple("callAcceptResponse", &AppManager::receiveCallAcceptResponse)
+};
+
 AppManager::AppManager(int argc, char *argv[]) :
         notifHandler_(boost::shared_ptr<NotificationHandler>(new NotificationHandler())),
         widget_(ui::BabelMainWindow(notifHandler_, nullptr))
@@ -14,7 +28,7 @@ AppManager::AppManager(int argc, char *argv[]) :
     port_ = atoi(argv[2]);
     localIpAddress_ = argv[3];
     serverHandler_ = boost::shared_ptr<ServerHandler>(new ServerHandler(remoteIpAddress_, port_, notifHandler_));
-    observer_ = boost::shared_ptr<AppManagerObserver>(new AppManagerObserver(*this));
+    observer_ = boost::shared_ptr<AppManagerObserver>(new AppManagerObserver(this));
 }
 
 void AppManager::start()
@@ -33,70 +47,85 @@ void AppManager::initNotifications()
     notifHandler_->attachToEvent(observer_, "call");
     notifHandler_->attachToEvent(observer_, "acceptCall");
     notifHandler_->attachToEvent(observer_, "callServer");
+    notifHandler_->attachToEvent(observer_, "endCall");
+    notifHandler_->attachToEvent(observer_, "goodbye");
     notifHandler_->attachToEvent(observer_, "callAcceptServer");
     notifHandler_->attachToEvent(observer_, "callAcceptResponse");
 }
 
-void AppManager::askToLog(const std::string &username, const std::string &password)
+void AppManager::askToLog(std::map<std::string, void*> &userInfo)
 {
-    std::map<std::string, void*> userInfo;
+    std::string username((char*)userInfo.find("username")->second);
+    std::string password((char*)userInfo.find("password")->second);
+    std::map<std::string, void*> newUserInfo;
 
     std::cout << "Login:" << std::endl;
     std::cout << username << std::endl;
-    userInfo["username"] = (void *)(username.c_str());
-    userInfo["password"] = (void *)(password.c_str());
+    newUserInfo["username"] = (void *)(username.c_str());
+    newUserInfo["password"] = (void *)(password.c_str());
 
-    serverHandler_->send(CLIENT_HELLO, userInfo);
+    serverHandler_->send(CLIENT_HELLO, newUserInfo);
 }
 
-void AppManager::askToRegister(const std::string &username, const std::string &password)
+void AppManager::askToRegister(std::map<std::string, void*> &userInfo)
 {
-    std::map<std::string, void*> userInfo;
+    std::string username((char*)userInfo.find("username")->second);
+    std::string password((char*)userInfo.find("password")->second);
+    std::map<std::string, void*> newUserInfo;
 
     std::cout << "Register:" << std::endl;
     std::cout << username << std::endl;
-    userInfo["username"] = (void *)(username.c_str());
-    userInfo["password"] = (void *)(password.c_str());
+    newUserInfo["username"] = (void *)(username.c_str());
+    newUserInfo["password"] = (void *)(password.c_str());
 
-    serverHandler_->send(CLIENT_REGISTER, userInfo);
+    serverHandler_->send(CLIENT_REGISTER, newUserInfo);
 }
 
-void AppManager::askToFetchFriends()
+void AppManager::askToFetchFriends(std::map<std::string, void*> &userInfo)
 {
-    std::map<std::string, void*> userInfo;
-
-    serverHandler_->send(CLIENT_FRIEND_STATUS, userInfo);
+    serverHandler_->send(CLIENT_FRIEND_STATUS, std::map<std::string, void*>());
 }
 
-void AppManager::askToCall(const std::string &username)
+void AppManager::askToCall(std::map<std::string, void*> &userInfo)
 {
-    std::map<std::string, void*> userInfo;
+    std::string username((char*)userInfo.find("username")->second);
+    std::map<std::string, void*> newUserInfo;
     int port = serverHandler_->getPort() + 1;
 
-    userInfo["username"] = (void*)(username.c_str());
-    userInfo["addressIp"] = (void*)(localIpAddress_.c_str());
-    userInfo["port"] = (void*)(&port);
-    serverHandler_->send(CLIENT_CALL, userInfo);
+    newUserInfo["username"] = (void*)(username.c_str());
+    newUserInfo["addressIp"] = (void*)(localIpAddress_.c_str());
+    newUserInfo["port"] = (void*)(&port);
+    serverHandler_->send(CLIENT_CALL, newUserInfo);
 }
 
-void AppManager::askToAcceptCall(const std::string &username)
+void AppManager::askToAcceptCall(std::map<std::string, void*> &userInfo)
 {
-    std::map<std::string, void*> userInfo;
+    std::string username((char*)userInfo.find("username")->second);
+    std::map<std::string, void*> newUserInfo;
     int port = serverHandler_->getPort() + 1;
 
-    userInfo["username"] = (void*)(username.c_str());
-    userInfo["addressIp"] = (void*)(localIpAddress_.c_str());
-    userInfo["port"] = (void*)(&port);
-    serverHandler_->send(CLIENT_ACCEPT_CALL, userInfo);
+    newUserInfo["username"] = (void*)(username.c_str());
+    newUserInfo["addressIp"] = (void*)(localIpAddress_.c_str());
+    newUserInfo["port"] = (void*)(&port);
+    serverHandler_->send(CLIENT_ACCEPT_CALL, newUserInfo);
 }
 
-void AppManager::addFriendInfo(const std::string &username,
-        const std::string &ipAddress, short port)
+void AppManager::askToEndCall(std::map<std::string, void*> &userInfo)
 {
-    friendsInfo_.push_back(FriendInfo{username, ipAddress, port});
+    serverHandler_->send(CLIENT_BYE, std::map<std::string, void*>());
 }
 
-void AppManager::startSoundUdpServer(const std::string &username)
+void AppManager::askToDisconnect(std::map<std::string, void*> &userInfo)
+{
+    serverHandler_->send(CLIENT_GOODBYE, std::map<std::string, void*>());
+}
+
+void AppManager::addFriendInfo(std::string username, std::string ip, short port)
+{
+    friendsInfo_.push_back(FriendInfo{username, ip, port});
+}
+
+void AppManager::startSoundUdpServer(std::string username)
 {
     FriendInfo info;
 
@@ -115,64 +144,58 @@ void AppManager::startSoundUdpServer(const std::string &username)
     soundServerHandler_->start();
 }
 
-void AppManager::close()
+void AppManager::close(std::map<std::string, void*> &userInfo)
 {
+    askToDisconnect(userInfo);
     serverHandler_->send(-1, std::map<std::string, void*>());
     serverHandler_->stop();
     if (soundServerHandler_.get())
         soundServerHandler_->stop();
 }
 
-void AppManager::call()
+void AppManager::call(std::map<std::string, void*> &userInfo)
 {
 }
 
-void AppManager::requestFriends()
+void AppManager::requestFriends(std::map<std::string, void*> &userInfo)
 {
 }
 
-AppManager::AppManagerObserver::AppManagerObserver(AppManager &manager) :
+void AppManager::receiveCallFromServer(std::map<std::string, void*> &userInfo)
+{
+    server_call_t *srv = (server_call_t*)userInfo.find("payload")->second;
+    std::cout << "app manager and call server" << std::endl;
+    addFriendInfo(srv->username, srv->ip, srv->port);
+}
+
+void AppManager::receiveCallAcceptServer(std::map<std::string, void*> &userInfo)
+{
+    server_accept_call_t *srv = (server_accept_call_t*)userInfo.find("payload")->second;
+    std::cout << "app manager list call accept server" << std::endl;
+
+    addFriendInfo(srv->username, srv->ip, srv->port);
+    startSoundUdpServer(srv->username);
+}
+
+void AppManager::receiveCallAcceptResponse(std::map<std::string, void*> &userInfo)
+{
+    startSoundUdpServer(friendsInfo_.back().username);
+}
+
+AppManager::AppManagerObserver::AppManagerObserver(AppManager *manager) :
     Observer(nullptr),
     manager_(manager)
 {
 }
 
 void AppManager::AppManagerObserver::update(std::map<std::string, void*> userInfo) {
-    auto typeValue = (char *)(userInfo.find("type")->second);
+    std::string typeValue((char *)(userInfo.find("type")->second));
 
-    if (!strcmp(typeValue, "login") || !strcmp(typeValue, "register")) {
-        auto usernameValue = (char *)(userInfo.find("username")->second);
-        auto passwordValue = (char *)(userInfo.find("password")->second);
-
-        if (!strcmp(typeValue, "login"))
-            manager_.askToLog(usernameValue, passwordValue);
-        if (!strcmp(typeValue, "register"))
-            manager_.askToRegister(usernameValue, passwordValue);
-    }
-    if (!strcmp(typeValue, "close"))
-        manager_.close();
-    if (!UserSession::get()->isConnected())
-        return;
-    if (!strcmp(typeValue, "fetchFriends"))
-        manager_.askToFetchFriends();
-    if (!strcmp(typeValue, "call"))
-        manager_.askToCall((char*)userInfo.find("username")->second);
-    if (!strcmp(typeValue, "acceptCall"))
-        manager_.askToAcceptCall((char*)userInfo.find("username")->second);
-    if (!strcmp(typeValue, "callServer")) {
-        server_call_t *srv = (server_call_t*)userInfo.find("payload")->second;
-
-        std::cout << "app manager and call server" << std::endl;
-        manager_.addFriendInfo(srv->username, srv->ip, srv->port);
-    }
-    if (!strcmp(typeValue, "callAcceptServer")) {
-        server_accept_call_t *srv = (server_accept_call_t*)userInfo.find("payload")->second;
-        std::cout << "app manager list call accept server" << std::endl;
-
-        manager_.addFriendInfo(srv->username, srv->ip, srv->port);
-        manager_.startSoundUdpServer(srv->username);
-    }
-    if (!strcmp(typeValue, "callAcceptResponse")) {
-        manager_.startSoundUdpServer(manager_.friendsInfo_.back().username);
+    for (auto command : commands) {
+        std::string type(std::get<0>(command).c_str());
+        if ((type != "login" && type != "register") && !UserSession::get()->isConnected())
+            continue;
+        if (type == typeValue)
+            boost::bind(std::get<1>(command), manager_, _1)(userInfo);
     }
 }

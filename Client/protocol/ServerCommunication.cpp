@@ -53,8 +53,12 @@ void ServerCommunication::write(Message &message)
 {
     client_register_t *clt = (client_register_t*)(message.getPayload());
 
-    boost::asio::write(socket_, boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
-    boost::asio::write(socket_, boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
+    try {
+        boost::asio::write(socket_, boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
+        boost::asio::write(socket_, boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
+    } catch (boost::exception &e) {
+        std::cout << "Connection has been closed !" << std::endl;
+    }
 }
 
 void ServerCommunication::receiveResponse(ServerResponse *response, boost::shared_ptr<boost::mutex> mutex, boost::shared_ptr<std::queue<Message>> queue)
@@ -87,9 +91,8 @@ Message ServerCommunication::read()
             boost::asio::read(socket_, boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
 
         }
-        std::cout << "reading  id " << message.getId() << std::endl;
     } catch (std::exception e) {
-        std::cout << "Connection has been closed " << std::endl;
+        std::cout << "Connection has been close !" << std::endl;
     }
     return message;
 }

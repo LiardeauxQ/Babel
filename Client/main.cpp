@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
         app.start();
 
         return babelApp.exec();
-    } catch (std::exception e) {
+    } catch (std::exception &e) {
         std::cerr << "Error while starting app." << std::endl;
     }
     return 1;

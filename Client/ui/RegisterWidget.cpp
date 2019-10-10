@@ -48,6 +48,9 @@ void ui::RegisterWidget::registerTap()
     userInfo["username"] = strdup(usernameLineEdit_->text().toStdString().c_str());
     userInfo["password"] = strdup(passwordLineEdit_->text().toStdString().c_str());
     registerEvent_->notify(userInfo);
+    free(userInfo["type"]);
+    free(userInfo["username"]);
+    free(userInfo["password"]);
 }
 
 void ui::RegisterWidget::registerEvent() const
