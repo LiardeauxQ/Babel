@@ -31,6 +31,7 @@ namespace ui {
 
         boost::shared_ptr<Subject> callEvent_;
         boost::shared_ptr<Subject> acceptCallEvent_;
+        boost::shared_ptr<Subject> endCallEvent_;
 
         bool isCalling_;
         std::string friendUsername_;

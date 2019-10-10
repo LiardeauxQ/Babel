@@ -185,7 +185,7 @@ Message ServerRequest::bye(std::map<std::string, void*> userInfo)
     client_bye_t *clt = (client_bye_t*)calloc(CLIENT_BYE_SIZE, 1);
 
     Message message(CLIENT_BYE, CLIENT_BYE_SIZE, clt);
-
+    std::cout << "bye" << std::endl;
     return message;
 }
 
