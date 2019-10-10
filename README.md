@@ -14,3 +14,10 @@ or
 ```
 mkdir build && conan install .. && cmake .. && cmake -build
 ```
+
+### Authors
+
+Alexandre Fourcat
+Thomas Nicollet
+Killian Perrier
+Quentin Liardeaux
