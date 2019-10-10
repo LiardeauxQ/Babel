@@ -60,7 +60,7 @@ void SoundServerHandler::handleSend(boost::system::error_code ec, size_t /* byte
         std::cerr << "Error: " << ec.message() << std::endl;
     }
 
-    audioController_.sleep(50);
+    audioController_.sleep(10);
 
     std::cout << "Sending: " << toSend_.size() << " bytes." << std::endl;
 
