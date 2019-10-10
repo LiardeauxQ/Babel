@@ -26,7 +26,7 @@ public:
     void start();
     void stop();
 
-    void handleRead(boost::system::error_code ec);
+    void handleRead(boost::system::error_code ec, size_t received);
 
     void handleSend(boost::system::error_code ec, size_t transfered);
 
