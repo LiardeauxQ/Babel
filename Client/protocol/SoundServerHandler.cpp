@@ -35,9 +35,9 @@ void SoundServerHandler::stop()
 
 void SoundServerHandler::handleRead(boost::system::error_code ec, size_t received)
 {
-    size_t rec = received / 4;
+    size_t rec = received / sizeof(float);
 
-    std::cout << "Received: " << rec << " float." << std::endl;
+    // std::cout << "Received: " << rec << " float." << std::endl;
 
     if (!ec) {
         soundManager_->write(std::vector<float>(toReceive_, toReceive_ + rec));
@@ -62,9 +62,9 @@ void SoundServerHandler::handleSend(boost::system::error_code ec, size_t /* byte
         std::cerr << "Error: " << ec.message() << std::endl;
     }
 
-    // audioController_.sleep(100);
+    audioController_.sleep(30);
 
-    std::cout << "Sending: " << toSend_.size() << " bytes." << std::endl;
+    // std::cout << "Sending: " << toSend_.size() / 4 << " float." << std::endl;
 
     socket_.async_send_to(
         boost::asio::buffer(&toSend_.front(), toSend_.size()),
