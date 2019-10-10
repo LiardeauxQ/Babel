@@ -78,7 +78,7 @@ void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
     try {
         soundManager_->start();
 
-        audioController_.sleep(40);
+        audioController_.sleep(100);
 
         soundManager_->read(toSend_);
 
