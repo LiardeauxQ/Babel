@@ -12,12 +12,12 @@ int main(int argc, char *argv[])
         return 1;
     try {
         QApplication babelApp(argc, argv);
-        AppManager app(argv[1], atoi(argv[2]));
+        AppManager app(argc, argv);
 
         app.start();
 
         return babelApp.exec();
-    } catch (std::exception e) {
+    } catch (std::exception &e) {
         std::cerr << "Error while starting app." << std::endl;
     }
     return 1;
