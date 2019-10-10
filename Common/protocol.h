@@ -9,7 +9,7 @@
 
 #include <time.h>
 
-#define VERSION 0x07
+#define VERSION 0x08
 
 // 1 if the request id come from the server.
 #define IS_SERVER_REQUEST(x) ((x)&0b10000000)
@@ -83,6 +83,8 @@ enum SERVER_REQ_ID {
 
     SERVER_REGISTER_RESPONSE = 0b10000101,
 
+    SERVER_FRIEND_REQUEST_RESPONSE = 0b1010011,
+
     SERVER_FRIEND_REQUEST = 0b10000111,
 
     SERVER_CALL = 0b10001000,
@@ -91,7 +93,11 @@ enum SERVER_REQ_ID {
 
     SERVER_BYE = 0b10001011,
 
+    SERVER_BYE_RESPONSE = 0b10011011,
+
     SERVER_ACCEPT_FRIEND = 0b10001111,
+
+    SERVER_ACCEPT_FRIEND_RESPONSE = 0b10011111,
 
     SERVER_ACCEPT_CALL = 0b10010001,
 
@@ -217,6 +223,12 @@ typedef struct {
 const size_t SERVER_FRIEND_REQUEST_SIZE = sizeof(server_friend_request_t);
 
 typedef struct {
+    int result;
+} server_friend_request_response_t;
+
+const size_t SERVER_FRIEND_REQUEST_RESPONSE_SIZE = sizeof(server_friend_request_response_t);
+
+typedef struct {
     // The asker username.
     char username[USERNAME_LEN];
 
@@ -242,8 +254,7 @@ typedef struct {
 const size_t SERVER_BYE_SIZE = sizeof(server_bye_t);
 
 typedef struct {
-    // Leaver username.
-    char username[USERNAME_LEN];
+    int result;
 } server_bye_response_t;
 
 const size_t SERVER_BYE_RESPONSE_SIZE = sizeof(server_bye_response_t);
@@ -254,6 +265,12 @@ typedef struct {
 } server_accept_friend_t;
 
 const size_t SERVER_ACCEPT_FRIEND_SIZE = sizeof(server_accept_friend_t);
+
+typedef struct {
+    int result;
+} server_accept_friend_response_t;
+
+const size_t SERVER_ACCEPT_FRIEND_RESPONSE_SIZE = sizeof(server_accept_friend_response_t);
 
 typedef struct {
     char username[USERNAME_LEN];

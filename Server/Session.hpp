@@ -70,6 +70,8 @@ private:
     Message request_;
 
     SharedData data_;
+
+    Session *inCallWith_;
 };
 
 #endif //BABEL_SERVER_SESSION_HPP
