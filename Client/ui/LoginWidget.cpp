@@ -44,6 +44,9 @@ void ui::LoginWidget::loginTap()
     userInfo["username"] = strdup(usernameLineEdit_->text().toStdString().c_str());
     userInfo["password"] = strdup(passwordLineEdit_->text().toStdString().c_str());
     loginEvent_->notify(userInfo);
+    free(userInfo["type"]);
+    free(userInfo["username"]);
+    free(userInfo["password"]);
 }
 
 void ui::LoginWidget::loginEvent() const
