@@ -50,6 +50,7 @@ void AppManager::initNotifications()
     notifHandler_->attachToEvent(observer_, "endCall");
     notifHandler_->attachToEvent(observer_, "goodbye");
     notifHandler_->attachToEvent(observer_, "callAcceptServer");
+    notifHandler_->attachToEvent(observer_, "callAcceptResponse");
 }
 
 void AppManager::askToLog(std::map<std::string, void*> &userInfo)
@@ -134,9 +135,9 @@ void AppManager::startSoundUdpServer(std::string username)
             break;
         }
     }
+    std::cout << "start connection with " << info.ipAddress << ":" << info.port << std::endl;
     if (info.port == 0)
         return;
-    std::cout << "start connection with " << info.ipAddress << ":" << info.port << std::endl;
     boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string(info.ipAddress), info.port);
 
     soundServerHandler_ = boost::shared_ptr<SoundServerHandler>(new SoundServerHandler(endpoint));

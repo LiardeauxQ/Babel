@@ -15,6 +15,7 @@ Session::Session(boost::asio::io_context& context, Database& conn, std::list<boo
     , socket_(context)
     , request_()
     , data_ { conn, socket_, sessions }
+    , inCallWith_(nullptr)
 {
 }
 
@@ -172,6 +173,35 @@ void Session::hello(client_hello_t* payload, SharedData& data)
 
 void Session::friendRequest(client_friend_request_t* payload, SharedData& data)
 {
+    Packet<server_friend_request_response_t> res {
+        { SERVER_ACCEPT_FRIEND_RESPONSE, SERVER_FRIEND_REQUEST_RESPONSE_SIZE },
+        { OK }
+    };
+
+    if (!username_.empty()) {
+        for (auto& session: data.sessions) {
+            if (strcmp(session->username_.c_str(), payload->username) == 0) {
+                Packet<server_friend_request_t> req {
+                    { SERVER_FRIEND_REQUEST, SERVER_FRIEND_REQUEST_SIZE },
+                    { {} }
+                };
+
+                strncpy(req.payload.username, username_.c_str(), USERNAME_LEN);
+
+                std::cout << "Sending friend request to " << payload->username << "." << std::endl;
+                boost::asio::write(session->socket_, boost::asio::buffer(&req, sizeof(req)));
+                break;
+            }
+        }
+    } else {
+        res.payload.result = KO;
+        std::cerr << "User: " << payload->username << " not found !" << std::endl;
+    }
+
+    boost::asio::async_write(
+        socket_,
+        boost::asio::buffer(&res, sizeof(res)),
+        boost::bind(&Session::waitHeader, shared_from_this(), boost::asio::placeholders::error));
 }
 
 void Session::goodbye(client_goodbye_t* payload, SharedData& data)
@@ -234,19 +264,21 @@ void Session::call(client_call_t* payload, SharedData& data)
                     Packet<server_call_t> req {
                         { SERVER_CALL,
                             SERVER_CALL_SIZE },
-                        { {}, 8080, "192.168.0.0" }
+                        { {}, 8080, {} }
                     };
 
                     memcpy(req.payload.username, username_.c_str(), username_.length());
                     memcpy(&req.payload.port, &payload->port, sizeof(short));
                     memcpy(req.payload.ip, payload->ip, 16);
 
+                    std::cout << "sizeof " << sizeof(req) << " " << SERVER_CALL_SIZE << std::endl;
                     for (auto& session : data.sessions) {
                         if (session->username_.empty() || session->username_ == username_)
                             continue;
 
                         if (session->username_ == user) {
                             std::cout << "Sending call to " << user << std::endl;
+                            std::cout << sizeof(req) << std::endl;
                             boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
                             res.payload.result = OK;
                             break;
@@ -258,6 +290,7 @@ void Session::call(client_call_t* payload, SharedData& data)
     } catch (const DatabaseError& e) {
         std::cerr << "Failed to fetch username: " << e.what() << "." << std::endl;
     };
+    std::cout << "FUCK YOU MOTHER FUCKING SERVER" << std::endl;
 
     if (userFound && res.payload.result == KO)
         std::cerr << "User found but not connected." << std::endl;
@@ -272,10 +305,65 @@ void Session::call(client_call_t* payload, SharedData& data)
 
 void Session::bye(client_bye_t*, SharedData& data)
 {
+    if (inCallWith_ == nullptr) {
+        std::cerr << "User not in call try to bye." << std::endl;
+        return;
+    }
+
+    Packet<server_bye_t> req {
+        { SERVER_BYE, SERVER_BYE_SIZE },
+        { {} }
+    };
+
+    boost::asio::write(inCallWith_->socket_, boost::asio::buffer(&req, sizeof(req)));
+
+    inCallWith_->inCallWith_ = nullptr;
+    inCallWith_ = nullptr;
+
+    Packet<server_bye_response_t> res {
+        { SERVER_BYE_RESPONSE, SERVER_BYE_RESPONSE_SIZE },
+        { OK }
+    };
+
+    boost::asio::async_write(
+        socket_,
+        boost::asio::buffer(&res, sizeof(res)),
+        boost::bind(&Session::waitHeader, shared_from_this(), boost::asio::placeholders::error));
 }
 
 void Session::acceptFriend(client_accept_friend_t* payload, SharedData& data)
 {
+    /*
+    Packet<server_accept_friend_response_t> res {
+        { SERVER_ACCEPT_FRIEND_RESPONSE, SERVER_ACCEPT_FRIEND_RESPONSE_SIZE },
+        { OK }
+    };
+
+    std::vector<User> usersComplete;
+
+
+    std::string sqlReq("INSERT INTO `friendship` (user, friend) VALUES (");
+
+
+    try {
+        data.database.exec("SELECT * FROM `users` WHERE username = " + username_ + " OR username = " + , appendUserComplete, &usersComplete);
+
+        if (usersComplete.size() == 0) {
+            std::cerr << "User not found." << std::endl;
+            res.payload.result = KO;
+        } else {
+            data.database.exec("INSERT INTO `friendship` (user, friend) VALUES (" + std::to_string(usersComplete[0].id) + "," +
+        }
+    } catch (DatabaseError& e) {
+        std::cerr << "Error while using database: " << e.what() << std::endl;
+        res.payload.result = KO;
+    }
+
+    boost::asio::async_write(
+        socket_,
+        boost::asio::buffer(&res, sizeof(res)),
+        boost::bind(&Session::waitHeader, shared_from_this(), boost::asio::placeholders::error));
+    */
 }
 
 void Session::friendStatus(client_friend_status_t*, SharedData& data)
@@ -307,8 +395,8 @@ void Session::friendStatus(client_friend_status_t*, SharedData& data)
 void Session::acceptCall(client_accept_call_t* payload, SharedData& data)
 {
     Packet<server_accept_call_response_t> res {
-        { SERVER_CALL_RESPONSE,
-            SERVER_CALL_RESPONSE_SIZE },
+        { SERVER_ACCEPT_CALL_RESPONSE,
+            SERVER_ACCEPT_CALL_RESPONSE_SIZE },
         { OK }
     };
 
@@ -325,11 +413,14 @@ void Session::acceptCall(client_accept_call_t* payload, SharedData& data)
                     { {}, payload->port, {} }
                 };
 
+                std::cout << "Send call accept to username: " << payload->username << std::endl;
                 memcpy(req.payload.username, payload->username, USERNAME_LEN);
                 memcpy(req.payload.ip, payload->ip, 16);
 
                 boost::asio::write(session->getSocket(), boost::asio::buffer(&req, sizeof(req)));
                 userFound = true;
+                session->inCallWith_ = this;
+                inCallWith_ = session.get();
                 break;
             }
         }

@@ -171,6 +171,7 @@ Message ServerRequest::acceptCall(std::map<std::string, void*> userInfo)
     int port = *(int*)portIt->second;
     client_accept_call_t *clt = (client_accept_call_t*)calloc(CLIENT_ACCEPT_CALL_SIZE, 1);
 
+    std::cout << "Username " << username << std::endl;
     strcpy(clt->username, username);
     strcpy(clt->ip, addressIp);
     clt->port = port;

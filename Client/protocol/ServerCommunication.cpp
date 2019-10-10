@@ -81,9 +81,15 @@ Message ServerCommunication::read()
 
     try {
         boost::asio::read(socket_, boost::asio::buffer(message.getHeaderRaw(), HEADER_SIZE));
+        std::cout << "Header " << message.getId() << " paylaod size " << message.getPayloadSize() << std::endl;
         if (message.getId() >= 0) {
+            for (int i = 0 ; i < HEADER_SIZE ; i++) {
+                printf("%d ", ((unsigned char*)(message.getHeaderRaw()))[i]);
+            }
+            printf("\n");
             message.setupPayload();
             boost::asio::read(socket_, boost::asio::buffer(message.getPayload(), message.getPayloadSize()));
+
         }
     } catch (std::exception e) {
         std::cout << "Connection has been close !" << std::endl;
