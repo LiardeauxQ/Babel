@@ -35,10 +35,11 @@ void SoundServerHandler::stop()
 
 void SoundServerHandler::handleRead(boost::system::error_code ec, size_t received)
 {
-    std::cout << "Received: " << received << " bytes." << std::endl;
+    size_t rec = received / 4;
+    std::cout << "Received: " << rec << " float." << std::endl;
 
     if (!ec) {
-        soundManager_->write(std::vector<float>(toReceive_, toReceive_ + received));
+        soundManager_->write(std::vector<float>(toReceive_, toReceive_ + rec));
         memset(toReceive_, 0, BUFFER_RECEIVE_SIZE);
     } else {
         std::cerr << "Error: " << ec.message() << std::endl;
@@ -60,7 +61,7 @@ void SoundServerHandler::handleSend(boost::system::error_code ec, size_t /* byte
         std::cerr << "Error: " << ec.message() << std::endl;
     }
 
-    audioController_.sleep(10);
+    audioController_.sleep(20);
 
     std::cout << "Sending: " << toSend_.size() << " bytes." << std::endl;
 
