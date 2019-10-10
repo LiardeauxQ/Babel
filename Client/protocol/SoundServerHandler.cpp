@@ -5,7 +5,6 @@
 #include "SoundServerHandler.hpp"
 
 static const auto localEndPoint = BoostUdp::endpoint(boost::asio::ip::address_v4::any(), 8081);
-static const size_t BUFFER_RECEIVE_SIZE = sizeof(float) * 512;
 
 SoundServerHandler::SoundServerHandler(BoostUdp::endpoint& remoteEndpoint)
     : ioService_()
