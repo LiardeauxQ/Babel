@@ -33,14 +33,23 @@ public:
 private:
     void dispatchUdpPackets(bool *isRunning);
 
+
+    boost::asio::io_service ioService_;
+
+    BoostUdp::endpoint remoteEndpoint_;
+
+    boost::thread soundThread_;
+
+    BoostUdp::socket socket_;
+    BoostUdp::socket sendSocket_;
+
     std::vector<float> toRead_;
     std::vector<float> toWrite_;
-    boost::asio::io_service ioService_;
-    BoostUdp::endpoint remoteEndpoint_;
-    boost::thread soundThread_;
-    BoostUdp::socket socket_;
+
     bool isRunning_;
+
     AudioController audioController_;
+
     std::unique_ptr<SoundManager> soundManager_;
 };
 
