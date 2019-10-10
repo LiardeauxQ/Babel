@@ -44,6 +44,7 @@ void SoundServerHandler::handleRead(boost::system::error_code ec)
     } else {
         std::cerr << "Error: " << ec.message() << std::endl;
     }
+    audioController_.sleep(100);
     socket_.async_receive_from(boost::asio::buffer(&toWrite_.front(), 512), remoteEndpoint_, boost::bind(&SoundServerHandler::handleSend, this, boost::asio::placeholders::error));
 }
 
@@ -58,6 +59,7 @@ void SoundServerHandler::handleSend(boost::system::error_code ec)
     }
 
     std::cout << "Sending: " << toRead_.size() << "bytes." << std::endl;
+    audioController_.sleep(100);
     socket_.async_send_to(boost::asio::buffer(&toRead_.front(), 512),
         remoteEndpoint_,
         boost::bind(&SoundServerHandler::handleSend, this, boost::asio::placeholders::error));
@@ -72,8 +74,8 @@ void SoundServerHandler::dispatchUdpPackets(bool* isRunning)
 
             soundManager_->read(toRead_);
 
+            socket_.async_receive_from(boost::asio::buffer(&toWrite_.front(), 512), remoteEndpoint_, boost::bind(&SoundServerHandler::handleRead, this, boost::asio::placeholders::error));
             socket_.async_send_to(boost::asio::buffer(&toRead_.front(), 512), remoteEndpoint_, boost::bind(&SoundServerHandler::handleSend, this, boost::asio::placeholders::error));
-            socket_.async_receive_from(boost::asio::buffer(&toWrite_.front(), 512), remote, boost::bind(&SoundServerHandler::handleRead, this, boost::asio::placeholders::error));
 
             ioService_.run();
 
