@@ -6,6 +6,8 @@
 #include <QApplication>
 #include "AppManager.hpp"
 
+#include "InputOptionsHandler.hpp"
+
 int main(int argc, char *argv[])
 {
     try {
@@ -16,7 +18,7 @@ int main(int argc, char *argv[])
 
         return babelApp.exec();
     } catch (std::exception &e) {
-        std::cerr << "Error while starting app." << std::endl;
+        std::cerr << "Error while starting app, error: " << e.what() <<  std::endl;
     }
     return 1;
 }
