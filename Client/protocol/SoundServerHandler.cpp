@@ -39,7 +39,7 @@ void SoundServerHandler::handleRead(boost::system::error_code ec, size_t receive
     size_t rec = received / sizeof(float);
 
     if (!ec) {
-        soundManager_->write(toReceive_, rec);
+        soundManager_->write(std::vector<float>(toReceive_, toReceive_ + rec));
     } else {
         std::cerr << "Error: " << ec.message() << std::endl;
     }
