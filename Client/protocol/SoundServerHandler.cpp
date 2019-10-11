@@ -70,7 +70,7 @@ void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
     try {
         soundManager_->start();
 
-        audioController_.sleep(100);
+        audioController_.sleep(10);
 
         socket_.async_send_to(
             boost::asio::buffer(toSend_, BUFFER_SIZE_BYTES),
