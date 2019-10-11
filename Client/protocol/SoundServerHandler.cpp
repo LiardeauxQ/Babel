@@ -12,6 +12,7 @@ SoundServerHandler::SoundServerHandler(BoostUdp::endpoint& remoteEndpoint)
     , socket_(ioService_, localEndPoint.protocol())
     , sendSocket_(ioService_)
     , toSend_()
+    , toReceive_()
 {
     memset(toReceive_, 0, BUFFER_SIZE_BYTES);
     memset(toSend_, 0, BUFFER_SIZE_BYTES);
