@@ -53,7 +53,7 @@ void SoundServerHandler::handleRead(boost::system::error_code ec, size_t receive
 void SoundServerHandler::handleSend(boost::system::error_code ec, size_t /* bytes_transfered */)
 {
     if (!ec) {
-        auto toto = std::vector<float>(toSend_, toSend_ + 256);
+        auto toto = std::vector<float>(toSend_, toSend_ + BUFFER_SIZE_FLOAT);
         soundManager_->read(toto);
     } else {
         std::cerr << "Error: " << ec.message() << std::endl;
