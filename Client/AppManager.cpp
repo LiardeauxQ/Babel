@@ -25,10 +25,10 @@ AppManager::AppManager(int argc, char *argv[]) :
     InputOptionsHandler handler(argc, argv);
 
     isUdpOnly_ = handler.isUdpOnly();
-    if (!isUdpOnly_) {
         remoteIpAddress_ = handler.getRemoteIp();
         port_ = handler.getPort();
         localIpAddress_ = handler.getLocalIp();
+    if (!isUdpOnly_) {
         serverHandler_ = boost::shared_ptr<ServerHandler>(new ServerHandler(remoteIpAddress_, port_, notifHandler_));
         observer_ = boost::shared_ptr<AppManagerObserver>(new AppManagerObserver(this));
     }

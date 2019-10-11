@@ -5,15 +5,15 @@
 #include "InputOptionsHandler.hpp"
 
 std::vector<InputOptionsHandler::OptionInfo> InputOptionsHandler::options_ = {
-        OptionInfo{UDP_ONLY, "-u", "--udpOnly"},
-        OptionInfo{REMOTE_IP, "-r", "--remoteIp"},
-        OptionInfo{LOCAL_IP, "-l", "--localIp"},
-        OptionInfo{PORT, "-p", "--port"},
-        OptionInfo{HELP, "-h", "--help"},
+    OptionInfo { UDP_ONLY, "-u", "--udpOnly" },
+    OptionInfo { REMOTE_IP, "-r", "--remoteIp" },
+    OptionInfo { LOCAL_IP, "-l", "--localIp" },
+    OptionInfo { PORT, "-p", "--port" },
+    OptionInfo { HELP, "-h", "--help" },
 };
 
-InputOptionsHandler::InputOptionsHandler(int argc, char **argv) :
-    argc_(argc)
+InputOptionsHandler::InputOptionsHandler(int argc, char** argv)
+    : argc_(argc)
     , argv_(argv)
 {
 }
@@ -25,16 +25,16 @@ InputOptionsHandler::OptionInfo InputOptionsHandler::getOption(OptionId id)
             return option;
         }
     }
-    return OptionInfo{};
+    return OptionInfo {};
 }
 
-std::string InputOptionsHandler::getOptionValue(OptionInfo &info)
+std::string InputOptionsHandler::getOptionValue(OptionInfo& info)
 {
     std::string value;
 
-    for (int i = 0 ; i < argc_ ; i++) {
-        if (!strcmp(info.shortName.c_str(), argv_[i])
-        || !strcmp(info.longName.c_str(), argv_[i])) {
+    for (int i = 0; i < argc_; i++) {
+        if (!std::strcmp(info.shortName.c_str(), argv_[i])
+            || !std::strcmp(info.longName.c_str(), argv_[i])) {
             value = (i + 1 == argc_) ? argv_[i] : argv_[i + 1];
             break;
         }

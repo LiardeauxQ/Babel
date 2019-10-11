@@ -8,6 +8,7 @@
 #include <vector>
 #include <tuple>
 #include <string>
+#include <cstring>
 #include <stdexcept>
 
 class InputOptionsHandler {
