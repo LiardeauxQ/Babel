@@ -18,8 +18,8 @@ SoundManager::SoundManager(PaStreamParameters* input, PaStreamParameters* output
         input,
         output,
         sampleRate,
-        paFramesPerBufferUnspecified,
-        paNoFlag,
+        256,
+        paClipOff,
         callback,
         &buffers_);
 
@@ -65,18 +65,13 @@ int SoundManager::callback(const void* inputBuffer, void* outputBuffer,
     PaStreamCallbackFlags statusFlags,
     void* userData)
 {
-    std::cout << "currentTime: " << timeInfo->currentTime << std::endl;
-    std::cout << "inputBufferAdc: " << timeInfo->inputBufferAdcTime << std::endl;
-    std::cout << "outputBufferAdc: " << timeInfo->outputBufferDacTime << std::endl;
-    std::cout << "status: " << statusFlags << std::endl;
-    std::cout << std::endl;
-
     auto in = (float*)inputBuffer;
     auto out = (float*)outputBuffer;
     auto shared = (SharedData*)userData;
 
     for (size_t i = 0; i < framesPerBuffer; i++) {
         shared->toRead->push_front(*in++);
+
         if (shared->toWrite->empty()) {
             *out++ = 0;
             *out++ = 0;
