@@ -53,8 +53,7 @@ void SoundServerHandler::handleRead(boost::system::error_code ec, size_t receive
 void SoundServerHandler::handleSend(boost::system::error_code ec, size_t /* bytes_transfered */)
 {
     if (!ec) {
-        auto toto = std::vector<float>(toSend_, toSend_ + BUFFER_SIZE_FLOAT);
-        soundManager_->read(toto);
+        soundManager_->read(toSend_, BUFFER_SIZE_FLOAT);
     } else {
         std::cerr << "Error: " << ec.message() << std::endl;
     }
@@ -72,6 +71,8 @@ void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
         soundManager_->start();
 
         audioController_.sleep(10);
+
+        std::cout << "Reading: " << soundManager_->read(toSend_, 256) << std::endl;
 
         socket_.async_send_to(
             boost::asio::buffer(toSend_, BUFFER_SIZE_BYTES),
