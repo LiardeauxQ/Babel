@@ -5,11 +5,12 @@
 #include "SoundManager.hpp"
 #include <iostream>
 
-SoundManager::SoundManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate)
+SoundManager::SoundManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate, middlewareFunc middleware)
     : stream_(nullptr)
     , buffers_ {
         std::make_unique<boost::circular_buffer<float>>(MAX_SIZE),
         std::make_unique<boost::circular_buffer<float>>(MAX_SIZE),
+        middleware
     }
 {
     int error = Pa_OpenStream(
@@ -29,15 +30,33 @@ SoundManager::SoundManager(PaStreamParameters* input, PaStreamParameters* output
 // Copy all information to read buffer and discard local data.
 void SoundManager::read(std::vector<float>& buffer)
 {
-    for (auto e: *buffers_.toRead)
+    for (auto e : *buffers_.toRead)
         buffer.push_back(e);
     buffers_.toRead->clear();
     buffers_.toRead->resize(0);
 }
 
+// Copy all information to read buffer and discard local data.
+size_t SoundManager::read(float* buffer, size_t n)
+{
+    size_t size = buffers_.toRead->size();
+    size_t i;
+
+    for (i = 0; i < n && i < size; ++i)
+        buffer[i] = (*buffers_.toRead)[i];
+    buffers_.toRead->rotate(buffers_.toRead->begin() + i);
+    buffers_.toRead->resize(buffers_.toRead->size() - i);
+    return i;
+}
+
 void SoundManager::write(const std::vector<float>& data)
 {
     buffers_.toWrite->insert(buffers_.toWrite->begin(), data.begin(), data.end());
+}
+
+void SoundManager::write(float* buffer, size_t n)
+{
+    buffers_.toWrite->insert(buffers_.toWrite->begin(), buffer, buffer + n);
 }
 
 int SoundManager::callback(const void* inputBuffer, void* outputBuffer,
@@ -46,6 +65,12 @@ int SoundManager::callback(const void* inputBuffer, void* outputBuffer,
     PaStreamCallbackFlags statusFlags,
     void* userData)
 {
+    std::cout << "currentTime: " << timeInfo->currentTime << std::endl;
+    std::cout << "inputBufferAdc: " << timeInfo->inputBufferAdcTime << std::endl;
+    std::cout << "outputBufferAdc: " << timeInfo->outputBufferDacTime << std::endl;
+    std::cout << "status: " << statusFlags << std::endl;
+    std::cout << std::endl;
+
     auto in = (float*)inputBuffer;
     auto out = (float*)outputBuffer;
     auto shared = (SharedData*)userData;
@@ -56,8 +81,13 @@ int SoundManager::callback(const void* inputBuffer, void* outputBuffer,
             *out++ = 0;
             *out++ = 0;
         } else {
-            *out++ = shared->toWrite->back();
-            *out++ = shared->toWrite->back();
+            auto toOutput = shared->toWrite->back();
+
+            if (shared->middleware)
+                shared->middleware(toOutput);
+
+            *out++ = toOutput;
+            *out++ = toOutput;
             shared->toWrite->pop_back();
         }
     }
