@@ -60,8 +60,8 @@ private:
 
     void initNotifications();
 
-    void startSoundConnection(std::string username);
-    void runUdpServer(std::string ipAddress, short port);
+    void startSoundConnection(const std::string &username);
+    void runUdpServer(const std::string &ipAddress, short port);
 
     static std::vector<std::tuple<std::string, void (AppManager::*)(std::map<std::string, void*>&)>> commands;
 

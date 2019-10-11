@@ -25,10 +25,10 @@ AppManager::AppManager(int argc, char *argv[]) :
     InputOptionsHandler handler(argc, argv);
 
     isUdpOnly_ = handler.isUdpOnly();
+    remoteIpAddress_ = handler.getRemoteIp();
+    port_ = handler.getPort();
+    localIpAddress_ = handler.getLocalIp();
     if (!isUdpOnly_) {
-        remoteIpAddress_ = handler.getRemoteIp();
-        port_ = handler.getPort();
-        localIpAddress_ = handler.getLocalIp();
         serverHandler_ = boost::shared_ptr<ServerHandler>(new ServerHandler(remoteIpAddress_, port_, notifHandler_));
         observer_ = boost::shared_ptr<AppManagerObserver>(new AppManagerObserver(this));
     }
@@ -132,7 +132,7 @@ void AppManager::addFriendInfo(std::string username, std::string ip, short port)
     friendsInfo_.push_back(FriendInfo{username, ip, port});
 }
 
-void AppManager::startSoundConnection(std::string username)
+void AppManager::startSoundConnection(const std::string &username)
 {
     FriendInfo info;
 
@@ -142,16 +142,16 @@ void AppManager::startSoundConnection(std::string username)
             break;
         }
     }
-    std::cout << "start connection with " << info.ipAddress << ":" << info.port << std::endl;
     if (info.port == 0)
         return;
     runUdpServer(info.ipAddress, info.port);
 }
 
-void AppManager::runUdpServer(std::string ipAddress, short port)
+void AppManager::runUdpServer(const std::string &ipAddress, short port)
 {
     boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string(ipAddress), port);
 
+    std::cout << "start connection with " << ipAddress << ":" << port << std::endl;
     soundServerHandler_ = boost::shared_ptr<SoundServerHandler>(new SoundServerHandler(endpoint));
     soundServerHandler_->start();
 }
