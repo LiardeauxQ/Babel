@@ -11,8 +11,8 @@ SoundServerHandler::SoundServerHandler(BoostUdp::endpoint& remoteEndpoint)
     , remoteEndpoint_(remoteEndpoint)
     , socket_(ioService_, localEndPoint.protocol())
     , sendSocket_(ioService_)
-    , toSend_()
     , toReceive_()
+    , toSend_()
 {
     memset(toReceive_, 0, BUFFER_SIZE_BYTES);
     memset(toSend_, 0, BUFFER_SIZE_BYTES);
@@ -37,6 +37,8 @@ void SoundServerHandler::stop()
 void SoundServerHandler::handleRead(boost::system::error_code ec, size_t received)
 {
     size_t rec = received / sizeof(float);
+
+    std::cout << "Receiving: " << rec << " floats." << std::endl;
 
     if (!ec) {
         soundManager_->write(toReceive_, BUFFER_SIZE_FLOAT);
