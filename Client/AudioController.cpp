@@ -87,5 +87,5 @@ std::unique_ptr<SoundManager> AudioController::createManager() const
     out.device = getDefaultOutputId();
     out.hostApiSpecificStreamInfo = nullptr;
 
-    return std::unique_ptr<SoundManager>(new SoundManager(&in, &out, dOut->defaultSampleRate));
+    return std::unique_ptr<SoundManager>(new SoundManager(&in, &out, 44100));
 }
