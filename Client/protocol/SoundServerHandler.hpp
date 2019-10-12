@@ -46,8 +46,8 @@ private:
     BoostUdp::socket socket_;
     BoostUdp::socket sendSocket_;
 
-    float toReceive_[256];
-    float toSend_[256];
+    float toReceive_[1024];
+    float toSend_[1024];
 
     bool isRunning_ = false;
 

@@ -18,13 +18,41 @@ SoundManager::SoundManager(PaStreamParameters* input, PaStreamParameters* output
         input,
         output,
         sampleRate,
-        256,
-        paClipOff,
+        paFramesPerBufferUnspecified,
+        paNoFlag,
         callback,
         &buffers_);
 
     if (error != paNoError)
         throw AudioControllerError(error);
+}
+
+size_t SoundManager::readBlock(float *buffer, size_t n)
+{
+    size_t size = Pa_GetStreamReadAvailable(stream_);
+
+    size = (size > n) ? n : size;
+
+    int error = Pa_ReadStream(stream_, buffer, size);
+
+    if (error != paNoError)
+        throw AudioControllerError(error);
+
+    return size;
+}
+
+size_t SoundManager::writeBlock(float *buffer, size_t n)
+{
+    size_t size = Pa_GetStreamWriteAvailable(stream_);
+
+    size = (size > n) ? n : size;
+
+    int error = Pa_WriteStream(stream_, buffer, size);
+
+    if (error != paNoError)
+        throw AudioControllerError(error);
+
+    return size;
 }
 
 // Copy all information to read buffer and discard local data.

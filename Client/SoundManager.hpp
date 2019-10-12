@@ -26,11 +26,15 @@ public:
     // Raw read
     size_t read(float *buffer, size_t n);
 
+    size_t readBlock(float *buffer, size_t n);
+
     // Append to internal buffer the new data.
     void write(const std::vector<float>& data);
 
     // Append to internal buffer the new data.
     void write(float *buffer, size_t n);
+
+    size_t writeBlock(float *buffer, size_t n);
 
     // Enable streaming interaction.
     inline void start() { Pa_StartStream(stream_); }

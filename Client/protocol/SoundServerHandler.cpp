@@ -14,8 +14,8 @@ SoundServerHandler::SoundServerHandler(BoostUdp::endpoint& remoteEndpoint)
     , toReceive_()
     , toSend_()
 {
-    memset(toReceive_, 0, BUFFER_SIZE_BYTES);
-    memset(toSend_, 0, BUFFER_SIZE_BYTES);
+    memset(toReceive_, 0, BUFFER_SIZE_FLOAT * sizeof(float));
+    memset(toSend_, 0, BUFFER_SIZE_FLOAT * sizeof(float));
     audioController_ = AudioController();
     soundManager_ = audioController_.createManager();
 }
@@ -69,11 +69,17 @@ void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
 {
     try {
         soundManager_->start();
+        audioController_.sleep(50);
 
-        audioController_.sleep(10);
 
-        std::cout << "Reading: " << soundManager_->read(toSend_, 256) << std::endl;
-
+        while (true) {
+            size_t i = soundManager_->read(toSend_, 1024);
+            std::cout << i << std::endl;
+            socket_.send_to(boost::asio::buffer(toSend_, i), remoteEndpoint_);
+            socket_.receive_from(boost::asio::buffer(toReceive_, 1024), remoteEndpoint_);
+            soundManager_->write(toSend_, i);
+            audioController_.sleep(10);
+        }
         socket_.async_send_to(
             boost::asio::buffer(toSend_, BUFFER_SIZE_BYTES),
             remoteEndpoint_,
