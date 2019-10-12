@@ -14,6 +14,7 @@
 #include "protocol/UserSession.hpp"
 #include "ui/BabelMainWindow.hpp"
 #include "NotificationHandler.hpp"
+#include "InputOptionsHandler.hpp"
 
 class AppManager {
 public:
@@ -50,7 +51,6 @@ private:
     void askToEndCall(std::map<std::string, void*> &userInfo);
     void askToDisconnect(std::map<std::string, void*> &userInfo);
     void addFriendInfo(std::string username, std::string ip, short port);
-    void startSoundUdpServer(std::string username);
     void close(std::map<std::string, void*> &userInfo);
     void call(std::map<std::string, void*> &userInfo);
     void requestFriends(std::map<std::string, void*> &userInfo);
@@ -60,11 +60,15 @@ private:
 
     void initNotifications();
 
+    void startSoundConnection(const std::string &username);
+    void runUdpServer(const std::string &ipAddress, short port);
+
     static std::vector<std::tuple<std::string, void (AppManager::*)(std::map<std::string, void*>&)>> commands;
 
     std::string remoteIpAddress_;
     std::string localIpAddress_;
     int port_;
+    bool isUdpOnly_;
     boost::shared_ptr<NotificationHandler> notifHandler_;
     boost::shared_ptr<ServerHandler> serverHandler_;
     boost::shared_ptr<SoundServerHandler> soundServerHandler_;

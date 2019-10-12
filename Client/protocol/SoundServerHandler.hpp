@@ -15,8 +15,8 @@
 #include "../AudioController.hpp"
 #include "../SoundManager.hpp"
 
-static const size_t BUFFER_SIZE = 1024;
-static const size_t BUFFER_RECEIVE_SIZE = sizeof(float) * BUFFER_SIZE;
+static const size_t BUFFER_SIZE_FLOAT = 256;
+static const size_t BUFFER_SIZE_BYTES = BUFFER_SIZE_FLOAT * sizeof(float);
 
 typedef boost::asio::ip::udp BoostUdp;
 
@@ -46,8 +46,8 @@ private:
     BoostUdp::socket socket_;
     BoostUdp::socket sendSocket_;
 
-    std::vector<float> toSend_;
-    float toReceive_[BUFFER_SIZE];
+    float toReceive_[1024];
+    float toSend_[1024];
 
     bool isRunning_ = false;
 
