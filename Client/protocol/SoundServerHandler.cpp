@@ -70,14 +70,14 @@ void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
     try {
         soundManager_->start();
         audioController_.sleep(50);
-
+        int data;
 
         while (true) {
             size_t i = soundManager_->read(toSend_, 1024);
             std::cout << i << std::endl;
             socket_.send_to(boost::asio::buffer(toSend_, i), remoteEndpoint_);
-            socket_.receive_from(boost::asio::buffer(toReceive_, 1024), remoteEndpoint_);
-            soundManager_->write(toSend_, i);
+            size_t read_size = socket_.receive_from(boost::asio::buffer(toReceive_, 1024), remoteEndpoint_);
+            soundManager_->write(toReceive_, read_size);
             audioController_.sleep(10);
         }
         socket_.async_send_to(
