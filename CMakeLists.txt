@@ -13,13 +13,21 @@ set(CMAKE_AUTOUIC ON)
 
 # Set compiler arguments
 if (NOT WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++17 -Wno-unused")
+	if(NOT CMAKE_BUILD_TYPE)
+		set(CMAKE_BUILD_TYPE Release)
+	endif()
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++17 -Wno-unused")
+	set(CMAKE_CXX_FLAGS_DEBUG "-g")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O2 -pipe -march=native")
 endif ()
 
 # Set Qt specific information
 if (APPLE)
+	add_definitions(-DAPPLE)
     set(Qt5_DIR "/usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5")
 elseif (WIN32)
+	add_definitions(-DWINDOWS)
 	set(CMAKE_PREFIX_PATH "C:\\Qt\\5.13.1\\msvc2017_64\\" ${CMAKE_PREFIX_PATH})
 	set(GUI_TYPE WIN32)
 	add_definitions(-D_WIN32_WINNT=0x0A00)
@@ -35,7 +43,6 @@ else()
 endif()
 
 if (UNIX)
-    set(LINUX)
 	include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
 endif ()
 
@@ -163,8 +170,11 @@ if(WIN32)
 	)
 endif(WIN32)
 
+
+
 # Link linux `asound` and `jack` library
 if (UNIX AND NOT APPLE)
+	add_definitions(-DLINUX)
     target_link_libraries(babel-client
         jack
         asound)
