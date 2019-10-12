@@ -74,10 +74,12 @@ void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
 
         while (true) {
             size_t i = soundManager_->read(toSend_, 1024);
+            std::cout << "Sending: " << i << " floats." << std::endl;
             socket_.send_to(boost::asio::buffer(toSend_, i * sizeof(float)), remoteEndpoint_);
-            size_t read_size = socket_.receive_from(boost::asio::buffer(toReceive_, 1024), remoteEndpoint_);
+            size_t read_size = socket_.receive_from(boost::asio::buffer(toReceive_, 1024 * sizeof(float)), remoteEndpoint_);
+            std::cout << "Writing: " << read_size / sizeof(float) << " floats." << std::endl;
             soundManager_->write(toReceive_, read_size / sizeof(float));
-            audioController_.sleep(10);
+            audioController_.sleep(5);
         }
         socket_.async_send_to(
             boost::asio::buffer(toSend_, BUFFER_SIZE_BYTES),
