@@ -5,6 +5,10 @@
 #include "SoundManager.hpp"
 #include <iostream>
 
+#ifdef LINUX
+    #include <pa_linux_alsa.h>
+#endif /* LINUX */
+
 SoundManager::SoundManager(PaStreamParameters* input, PaStreamParameters* output, double sampleRate, middlewareFunc middleware)
     : stream_(nullptr)
     , buffers_ {
@@ -22,6 +26,11 @@ SoundManager::SoundManager(PaStreamParameters* input, PaStreamParameters* output
         paNoFlag,
         callback,
         &buffers_);
+
+#ifdef LINUX
+    std::cout << "ALSA" << std::endl;
+    PaAlsa_EnableRealtimeScheduling(&stream_, true);
+#endif /* LINUX */
 
     if (error != paNoError)
         throw AudioControllerError(error);
@@ -107,7 +116,7 @@ int SoundManager::callback(const void* inputBuffer, void* outputBuffer,
             auto toOutput = shared->toWrite->back();
 
             if (shared->middleware)
-                shared->middleware(toOutput);
+                toOutput = shared->middleware(toOutput);
 
             *out++ = toOutput;
             *out++ = toOutput;

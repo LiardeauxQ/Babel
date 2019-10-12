@@ -35,6 +35,7 @@ else()
 endif()
 
 if (UNIX)
+    set(LINUX)
 	include_directories("${CMAKE_HOME_DIRECTORY}/.conan/data")
 endif ()
 

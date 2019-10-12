@@ -12,7 +12,7 @@
 #include <portaudio.h>
 #include <vector>
 
-const size_t MAX_SIZE = 32000;
+const size_t MAX_SIZE = 0x2000;
 
 class SoundManager {
 public:
