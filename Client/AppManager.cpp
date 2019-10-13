@@ -120,6 +120,7 @@ void AppManager::askToAcceptCall(std::map<std::string, void*> &userInfo)
 void AppManager::askToEndCall(std::map<std::string, void*> &userInfo)
 {
     serverHandler_->send(CLIENT_BYE, std::map<std::string, void*>());
+    soundServerHandler_->setRunningStatus(false);
 }
 
 void AppManager::askToDisconnect(std::map<std::string, void*> &userInfo)

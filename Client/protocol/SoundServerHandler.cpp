@@ -64,6 +64,10 @@ void SoundServerHandler::handleSend(boost::system::error_code ec, size_t /* byte
         boost::bind(&SoundServerHandler::handleSend, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 }
 
+void SoundServerHandler::setRunningStatus(bool status)
+{
+    isRunning_ = status;
+}
 
 void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
 {
@@ -72,29 +76,15 @@ void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
         audioController_.sleep(50);
         int data;
 
-        while (true) {
+        while (*isRunning) {
             size_t i = soundManager_->read(toSend_, 1024);
             std::cout << "Sending: " << i << " floats." << std::endl;
             socket_.send_to(boost::asio::buffer(toSend_, i * sizeof(float)), remoteEndpoint_);
-            size_t read_size = socket_.receive_from(boost::asio::buffer(toReceive_, 1024 * sizeof(float)), remoteEndpoint_);
+            size_t read_size = socket_.receive_from(boost::asio::buffer(toReceive_, 1024 * sizeof(float)),
+                                                    remoteEndpoint_);
             std::cout << "Writing: " << read_size / sizeof(float) << " floats." << std::endl;
             soundManager_->write(toReceive_, read_size / sizeof(float));
         }
-        socket_.async_send_to(
-            boost::asio::buffer(toSend_, BUFFER_SIZE_BYTES),
-            remoteEndpoint_,
-            boost::bind(&SoundServerHandler::handleSend, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
-
-        socket_.async_receive_from(
-            boost::asio::buffer(toReceive_, BUFFER_SIZE_BYTES),
-            remoteEndpoint_,
-            boost::bind(&SoundServerHandler::handleRead, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
-
-        ioService_.run();
-
-        while (*isRunning && soundManager_->isActive())
-            audioController_.sleep(100);
-
         soundManager_->stop();
     } catch (const AudioControllerError& e) {
         std::cerr << e.what() << std::endl;
