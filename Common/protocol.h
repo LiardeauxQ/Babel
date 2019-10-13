@@ -14,8 +14,25 @@
 // 1 if the request id come from the server.
 #define IS_SERVER_REQUEST(x) ((x)&0b10000000)
 
+#include <stdint.h>
+#include <stddef.h>
+
+#if defined (__clang__) || (WINDOWS)
+#   pragma pack(1)
+#endif /* __clang__ */
+
+#if defined (__GNUC__) && (__GNUC__ >= 7)
+#   define PACKED __attribute__((packed))
+#else
+#   define PACKED
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // This is the final data structure send through internet during the client/server communication.
-typedef struct __attribute__((packed)) {
+typedef struct PACKED {
     // Defined by CLIENT_REQ_ID if it's a client request. SERVER_REQ_ID otherwise.
     int id;
 
@@ -285,5 +302,16 @@ typedef struct {
 } server_accept_call_response_t;
 
 const size_t SERVER_ACCEPT_CALL_RESPONSE_SIZE = sizeof(server_accept_call_response_t);
+
+#ifdef __cplusplus
+}
+#endif
+
+#if defined (__clang__) || (WINDOWS)
+#   pragma options align=reset
+#endif /* __clang__ */
+
+
+
 
 #endif //BABEL_SERVER_PROTOCOL_H

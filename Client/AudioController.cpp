@@ -83,7 +83,7 @@ std::unique_ptr<SoundManager> AudioController::createManager() const
     PaStreamParameters out;
     out.channelCount = 2;
     out.sampleFormat = paFloat32;
-    out.suggestedLatency = dOut->defaultLowOutputLatency;
+    out.suggestedLatency = dOut->defaultHighOutputLatency;
     out.device = getDefaultOutputId();
     out.hostApiSpecificStreamInfo = nullptr;
 

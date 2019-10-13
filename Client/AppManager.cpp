@@ -27,8 +27,8 @@ AppManager::AppManager(int argc, char *argv[]) :
     isUdpOnly_ = handler.isUdpOnly();
     remoteIpAddress_ = handler.getRemoteIp();
     port_ = handler.getPort();
-    localIpAddress_ = handler.getLocalIp();
     if (!isUdpOnly_) {
+        localIpAddress_ = handler.getLocalIp();
         serverHandler_ = boost::shared_ptr<ServerHandler>(new ServerHandler(remoteIpAddress_, port_, notifHandler_));
         observer_ = boost::shared_ptr<AppManagerObserver>(new AppManagerObserver(this));
     }

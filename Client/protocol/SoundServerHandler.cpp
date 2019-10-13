@@ -79,7 +79,6 @@ void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
             size_t read_size = socket_.receive_from(boost::asio::buffer(toReceive_, 1024 * sizeof(float)), remoteEndpoint_);
             std::cout << "Writing: " << read_size / sizeof(float) << " floats." << std::endl;
             soundManager_->write(toReceive_, read_size / sizeof(float));
-            audioController_.sleep(5);
         }
         socket_.async_send_to(
             boost::asio::buffer(toSend_, BUFFER_SIZE_BYTES),
