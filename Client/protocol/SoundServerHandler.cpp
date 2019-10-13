@@ -76,7 +76,7 @@ void SoundServerHandler::dispatchUdpPackets(const bool* isRunning)
         audioController_.sleep(50);
         int data;
 
-        while (*isRunning) {
+        while (*isRunning && soundManager_->isActive()) {
             size_t i = soundManager_->read(toSend_, 1024);
             std::cout << "Sending: " << i << " floats." << std::endl;
             socket_.send_to(boost::asio::buffer(toSend_, i * sizeof(float)), remoteEndpoint_);
