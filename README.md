@@ -9,11 +9,11 @@ mkdir build
 cd build
 conan install ..
 cmake ..
-cmake -build
+cmake -build .
 ```
 or
 ```
-mkdir build && cd build && conan install .. && cmake .. && cmake -build
+mkdir build && cd build && conan install .. && cmake .. && cmake -build .
 ```
 
 After that, you can copy default-server.cfg file in build directory, rename it to server.cfg and edit default variables.
